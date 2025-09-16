@@ -6,30 +6,33 @@
 
 #include <frc2/command/button/Trigger.h>
 
-#include "commands/Autos.h"
-#include "commands/ExampleCommand.h"
+#include "commands/FieldDriveCommand.hpp"
+#include "commands/PrintOutputCommand.hpp"
 
-RobotContainer::RobotContainer() {
+RobotContainer::RobotContainer() : m_driveSubsystem() {
   // Initialize all of your commands and subsystems here
+  wpi::outs() << "RobotContainer initialized\n";
 
   // Configure the button bindings
   ConfigureBindings();
 }
 
 void RobotContainer::ConfigureBindings() {
-  // Configure your trigger bindings here
-
-  // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-  frc2::Trigger([this] {
-    return m_subsystem.ExampleCondition();
-  }).OnTrue(ExampleCommand(&m_subsystem).ToPtr());
-
-  // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
-  // pressed, cancelling on release.
-  m_driverController.B().WhileTrue(m_subsystem.ExampleMethodCommand());
+  m_operatorController.Button(1).OnTrue(GetPrintOutputCommand("A button pressed"));
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  // An example command will be run in autonomous
-  return autos::ExampleAuto(&m_subsystem);
+void RobotContainer::ConfigureDefaultCommands() {
+  m_driveSubsystem.SetDefaultCommand(GetDefaultDriveCommand());
+}
+
+frc2::CommandPtr RobotContainer::GetDefaultDriveCommand() {
+  return FieldDriveCommand(
+             &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
+             [this] { return m_driverController.GetLeftX(); },
+             [this] { return m_driverController.GetRightX(); })
+      .ToPtr();
+}
+
+frc2::CommandPtr RobotContainer::GetPrintOutputCommand(const std::string &message) {
+  return PrintOutputCommand(message).ToPtr();
 }

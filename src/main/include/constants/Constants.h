@@ -15,21 +15,25 @@
  */
 
 #include <string>
+
+#include "frc/geometry/Translation2d.h"
+#include "frc/kinematics/SwerveDriveKinematics.h"
 namespace OperatorConstants {
 
 inline constexpr int kDriverControllerPort = 0;
+inline constexpr int kOperatorControllerPort = 1;
 
-} // namespace OperatorConstants
+}  // namespace OperatorConstants
 
 namespace NeoKrakenModuleConstants {
 
 inline constexpr double kNominalVoltage = 12.8;
 
-} // namespace NeoKrakenModuleConstants
+}  // namespace NeoKrakenModuleConstants
 
 namespace DriveSubsystemConstants {
 inline constexpr int kPigeonID = 10;
-inline constexpr std::string kCanivoreName = "CANIVORE";
+inline const std::string kCanivoreName = "CANIVORE";
 
 inline constexpr double kFrontLeftDriveID = 1;
 inline constexpr double kFrontLeftSteerID = 2;
@@ -51,4 +55,17 @@ inline constexpr double kFrontLeftOffset = 1.919009965644937 + M_PI;
 inline constexpr double kFrontRightOffset = 2.049398332615217;
 inline constexpr double kBackLeftOffset = -0.578310757032887 + M_PI;
 inline constexpr double kBackRightOffset = -2.581689666011534 + M_PI;
-} // namespace DriveSubsystemConstants
+
+inline constexpr double kRobotLength = .5525;
+inline constexpr double kRobotWidth = .5525;
+
+inline constexpr frc::Translation2d kModulePositions[] = {
+    {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},   // Front Left
+    {units::meter_t{kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}},  // Front Right
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},  // Back Left
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}}  // Back Right
+};
+
+inline frc::SwerveDriveKinematics<4> kKinematics{kModulePositions[0], kModulePositions[1],
+                                                 kModulePositions[2], kModulePositions[3]};
+}  // namespace DriveSubsystemConstants

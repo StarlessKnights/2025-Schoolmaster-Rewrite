@@ -5,10 +5,11 @@
 #pragma once
 
 #include <frc2/command/CommandPtr.h>
+#include <frc2/command/button/CommandJoystick.h>
 #include <frc2/command/button/CommandXboxController.h>
 
 #include "constants/Constants.h"
-#include "subsystems/ExampleSubsystem.h"
+#include "subsystems/DriveSubsystem.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -18,18 +19,18 @@
  * commands, and trigger mappings) should be declared here.
  */
 class RobotContainer {
-public:
+ public:
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::CommandPtr GetDefaultDriveCommand();
+  frc2::CommandPtr GetPrintOutputCommand(const std::string &message);
 
-private:
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  frc2::CommandXboxController m_driverController{
-      OperatorConstants::kDriverControllerPort};
+ private:
+  frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};
+  frc2::CommandJoystick m_operatorController{OperatorConstants::kOperatorControllerPort};
 
-  // The robot's subsystems are defined here...
-  ExampleSubsystem m_subsystem;
+  DriveSubsystem m_driveSubsystem;
 
   void ConfigureBindings();
+  void ConfigureDefaultCommands();
 };
