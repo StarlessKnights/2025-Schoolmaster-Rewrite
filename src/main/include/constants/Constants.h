@@ -18,4 +18,10 @@ namespace OperatorConstants {
 
 inline constexpr int kDriverControllerPort = 0;
 
-}  // namespace OperatorConstants
+} // namespace OperatorConstants
+
+namespace NeoKrakenModuleConstants {
+
+inline constexpr double kNominalVoltage = 12.8;
+
+} // namespace NeoKrakenModuleConstants
