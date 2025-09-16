@@ -1,16 +1,13 @@
 #include "subsystems/DriveSubsystem.hpp"
 
 #include "constants/Constants.h"
-#include "frc/DataLogManager.h"
 #include "frc/kinematics/SwerveModuleState.h"
 
 DriveSubsystem::DriveSubsystem()
     : fleft(1, 2, 3, 0.0, DriveSubsystemConstants::kCanivoreName),
       fright(4, 5, 6, 0.0, DriveSubsystemConstants::kCanivoreName),
       bleft(7, 8, 9, 0.0, DriveSubsystemConstants::kCanivoreName),
-      bright(11, 12, 13, 0.0, DriveSubsystemConstants::kCanivoreName) {
-  frc::DataLogManager::Log("DriveSubsystem initialized");
-}
+      bright(11, 12, 13, 0.0, DriveSubsystemConstants::kCanivoreName) {}
 
 void DriveSubsystem::drive(frc::ChassisSpeeds speeds) {
   auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);

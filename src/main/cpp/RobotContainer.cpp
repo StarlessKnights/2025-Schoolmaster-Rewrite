@@ -7,18 +7,17 @@
 #include <frc2/command/button/Trigger.h>
 
 #include "commands/FieldDriveCommand.hpp"
-#include "commands/PrintOutputCommand.hpp"
+#include "frc/smartdashboard/SmartDashboard.h"
+#include "frc2/command/Commands.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem() {
-  // Initialize all of your commands and subsystems here
-  wpi::outs() << "RobotContainer initialized\n";
-
-  // Configure the button bindings
   ConfigureBindings();
+  ConfigureDefaultCommands();
 }
 
 void RobotContainer::ConfigureBindings() {
-  m_operatorController.Button(1).OnTrue(GetPrintOutputCommand("A button pressed"));
+  m_driverController.Button(1).OnTrue(
+      frc2::cmd::RunOnce([] { frc::SmartDashboard::PutString("Hello", "World"); }, {}));
 }
 
 void RobotContainer::ConfigureDefaultCommands() {
@@ -31,8 +30,4 @@ frc2::CommandPtr RobotContainer::GetDefaultDriveCommand() {
              [this] { return m_driverController.GetLeftX(); },
              [this] { return m_driverController.GetRightX(); })
       .ToPtr();
-}
-
-frc2::CommandPtr RobotContainer::GetPrintOutputCommand(const std::string &message) {
-  return PrintOutputCommand(message).ToPtr();
 }

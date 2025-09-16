@@ -5,7 +5,6 @@
 #pragma once
 
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/CommandJoystick.h>
 #include <frc2/command/button/CommandXboxController.h>
 
 #include "constants/Constants.h"
@@ -23,11 +22,10 @@ class RobotContainer {
   RobotContainer();
 
   frc2::CommandPtr GetDefaultDriveCommand();
-  frc2::CommandPtr GetPrintOutputCommand(const std::string &message);
 
  private:
   frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};
-  frc2::CommandJoystick m_operatorController{OperatorConstants::kOperatorControllerPort};
+  frc2::CommandXboxController m_operatorController{OperatorConstants::kOperatorControllerPort};
 
   DriveSubsystem m_driveSubsystem;
 

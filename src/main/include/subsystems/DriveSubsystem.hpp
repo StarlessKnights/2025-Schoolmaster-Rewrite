@@ -10,10 +10,11 @@
 
 class DriveSubsystem : public frc2::SubsystemBase {
   NeoKrakenModule fleft, fright, bleft, bright;
-  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID, DriveSubsystemConstants::kCanivoreName};
+  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID,
+                                           DriveSubsystemConstants::kCanivoreName};
   frc::Rotation2d driverGyroOffset{};
 
-public:
+ public:
   DriveSubsystem();
 
   void drive(frc::ChassisSpeeds speeds);
