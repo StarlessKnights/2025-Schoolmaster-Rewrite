@@ -1,9 +1,12 @@
 #pragma once
 
+#include <array>
+
 #include "constants/Constants.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "frc2/command/SubsystemBase.h"
 #include "utils/NeoKrakenModule.hpp"
@@ -21,4 +24,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void setModuleStates(const std::array<frc::SwerveModuleState, 4> &states);
   frc::Rotation2d getDriverGyroAngle();
   frc::Rotation2d getAngle() { return pigeon.GetRotation2d(); }
+  std::array<frc::SwerveModuleState, 4> getModuleStates();
+  std::array<frc::SwerveModulePosition, 4> getModulePositions();
 };

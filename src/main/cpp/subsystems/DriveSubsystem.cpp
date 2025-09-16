@@ -1,6 +1,9 @@
 #include "subsystems/DriveSubsystem.hpp"
 
+#include <array>
+
 #include "constants/Constants.h"
+#include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 
 DriveSubsystem::DriveSubsystem()
@@ -19,6 +22,16 @@ void DriveSubsystem::setModuleStates(const std::array<frc::SwerveModuleState, 4>
   fright.setModuleState(states[1]);
   bleft.setModuleState(states[2]);
   bright.setModuleState(states[3]);
+}
+
+std::array<frc::SwerveModuleState, 4> DriveSubsystem::getModuleStates() {
+  return {fleft.getModuleState(), fright.getModuleState(), bleft.getModuleState(),
+          bright.getModuleState()};
+}
+
+std::array<frc::SwerveModulePosition, 4> DriveSubsystem::getModulePositions() {
+  return {fleft.getModulePosition(), fright.getModulePosition(), bleft.getModulePosition(),
+          bright.getModulePosition()};
 }
 
 frc::Rotation2d DriveSubsystem::getDriverGyroAngle() { return getAngle() - driverGyroOffset; }

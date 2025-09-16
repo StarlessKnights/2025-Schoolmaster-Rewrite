@@ -19,8 +19,15 @@
 #include "units/base.h"
 #include "units/length.h"
 
-NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string &can)
-    : driveMotor(driveID, can), steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless), encoderObject(encoderID, can), offset(offset), ff(0_V, 0_V / 1_mps), driveController(0.0, 0.0, 0.0), steerController(0.0, 0.0, 0.0) {
+NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset,
+                                 const std::string &can)
+    : driveMotor(driveID, can),
+      steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
+      encoderObject(encoderID, can),
+      offset(offset),
+      ff(0_V, 0_V / 1_mps),
+      driveController(0.0, 0.0, 0.0),
+      steerController(0.0, 0.0, 0.0) {
   setupEncoder(encoderObject);
   configDriveMotor(driveMotor);
   configSteerMotor(steerMotor);
@@ -36,9 +43,7 @@ void NeoKrakenModule::setupEncoder(ctre::phoenix6::hardware::CANcoder &encoder) 
 }
 
 void NeoKrakenModule::configPIDInternal() {
-  this->ff = frc::SimpleMotorFeedforward<units::meters>{
-      0.015_V,
-      0.212_V / 1_mps};
+  this->ff = frc::SimpleMotorFeedforward<units::meters>{0.015_V, 0.212_V / 1_mps};
 
   this->driveController = frc::PIDController(0.01, 0.0, 0.0);
   this->steerController = frc::PIDController(0.3, 0.0, 0.0);
@@ -61,7 +66,8 @@ void NeoKrakenModule::configSteerMotor(rev::spark::SparkMax &target) {
   config.VoltageCompensation(NeoKrakenModuleConstants::kNominalVoltage);
   config.SetIdleMode(rev::spark::SparkBaseConfig::kBrake);
   config.SmartCurrentLimit(80);
-  target.Configure(config, rev::spark::SparkBase::ResetMode::kNoResetSafeParameters, rev::spark::SparkBase::PersistMode::kPersistParameters);
+  target.Configure(config, rev::spark::SparkBase::ResetMode::kNoResetSafeParameters,
+                   rev::spark::SparkBase::PersistMode::kPersistParameters);
 }
 
 void NeoKrakenModule::currentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration &config) {
@@ -93,7 +99,20 @@ double NeoKrakenModule::getEncoderPosition() {
   return (angle.GetValueAsDouble() * kCanCoderMultiplier) - offset;
 }
 
-units::turns_per_second_t NeoKrakenModule::getVelocity() {
+double NeoKrakenModule::getPosition() {
+  ctre::phoenix6::StatusSignal<units::turn_t> position = driveMotor.GetPosition();
+  return position.GetValue().value() * kPositionMultiplier;
+}
+
+frc::SwerveModuleState NeoKrakenModule::getModuleState() {
+  return {getVelocity(), frc::Rotation2d{units::radian_t{getEncoderPosition()}}};
+}
+
+frc::SwerveModulePosition NeoKrakenModule::getModulePosition() {
+  return {units::meter_t{getPosition()}, units::radian_t{M_PI + getEncoderPosition()}};
+}
+
+units::meters_per_second_t NeoKrakenModule::getVelocity() {
   ctre::phoenix6::StatusSignal<units::turns_per_second_t> velocity = driveMotor.GetVelocity();
-  return velocity.GetValue() * kVelocityMultiplier;
+  return units::meters_per_second_t{velocity.GetValue().value() * kVelocityMultiplier};
 }
