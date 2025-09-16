@@ -6,6 +6,7 @@
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <rev/SparkMax.h>
+#include <string>
 
 class NeoKrakenModule {
 private:
@@ -23,6 +24,9 @@ private:
   constexpr static double kCanCoderMultiplier = 2 * M_PI;                         // degrees per tick
 
 public:
+  NeoKrakenModule(int driveID, int steerID, int encoderID, double offset);
+  NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, std::string can);
+
   void configPIDInternal();
   void configSteerMotor(rev::spark::SparkMax &target);
 };
