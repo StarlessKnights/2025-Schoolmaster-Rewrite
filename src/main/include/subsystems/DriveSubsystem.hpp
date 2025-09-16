@@ -8,14 +8,18 @@
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
+#include "frc/smartdashboard/Field2d.h"
 #include "frc2/command/SubsystemBase.h"
 #include "utils/NeoKrakenModule.hpp"
+#include "utils/TurboPoseEstimator.hpp"
 
 class DriveSubsystem : public frc2::SubsystemBase {
   NeoKrakenModule fleft, fright, bleft, bright;
   ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID,
                                            DriveSubsystemConstants::kCanivoreName};
   frc::Rotation2d driverGyroOffset{};
+  frc::Field2d field;
+  TurboPoseEstimator estimator;
 
  public:
   DriveSubsystem();
@@ -26,4 +30,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::Rotation2d getAngle() { return pigeon.GetRotation2d(); }
   std::array<frc::SwerveModuleState, 4> getModuleStates();
   std::array<frc::SwerveModulePosition, 4> getModulePositions();
+
+  void Periodic() override;
+
+  void setSimulatedGyroAngle(double angle);
 };
