@@ -2,8 +2,10 @@
 
 #include <array>
 
+#include "choreo/trajectory/SwerveSample.h"
 #include "constants/Constants.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
+#include "frc/controller/PIDController.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -28,16 +30,22 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::Pose2d m_simPose{};
   units::second_t m_lastTime{0.0_s};
 
+  frc::PIDController xController{1.0, 0.0, 0.0};
+  frc::PIDController yController{1.0, 0.0, 0.0};
+  frc::PIDController thetaController{1.0, 0.0, 0.0};
+
  public:
   DriveSubsystem();
 
-  void drive(frc::ChassisSpeeds speeds);
-  void setModuleStates(const std::array<frc::SwerveModuleState, 4> &states);
-  frc::Rotation2d getDriverGyroAngle();
-  frc::Rotation2d getAngle() { return pigeon.GetRotation2d(); }
-  std::array<frc::SwerveModuleState, 4> getModuleStates();
-  std::array<frc::SwerveModulePosition, 4> getModulePositions();
+  void Drive(frc::ChassisSpeeds speeds);
+  void SetModuleStates(const std::array<frc::SwerveModuleState, 4> &states);
+  frc::Rotation2d GetDriverGyroAngle();
+  frc::Rotation2d GetAngle() { return pigeon.GetRotation2d(); }
+  std::array<frc::SwerveModuleState, 4> GetModuleStates();
+  std::array<frc::SwerveModulePosition, 4> GetModulePositions();
 
   void Periodic() override;
   void SimulationPeriodic() override;
+
+  void FollowTrajectory(const choreo::SwerveSample &sample);
 };

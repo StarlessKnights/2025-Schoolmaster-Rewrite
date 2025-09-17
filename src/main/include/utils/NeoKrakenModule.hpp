@@ -31,15 +31,15 @@ class NeoKrakenModule {
  public:
   NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string &can);
 
-  void configPIDInternal();
-  void configDriveMotor(ctre::phoenix6::hardware::TalonFX &target);
-  void configSteerMotor(rev::spark::SparkMax &target);
-  void setupEncoder(ctre::phoenix6::hardware::CANcoder &target);
-  void currentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration &config);
-  void setModuleState(frc::SwerveModuleState state);
-  double getEncoderPosition();
-  double getPosition();
-  frc::SwerveModuleState getModuleState();
-  frc::SwerveModulePosition getModulePosition();
-  units::meters_per_second_t getVelocity();
+  void ConfigPIDInternal();
+  void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX &target);
+  void ConfigSteerMotor(rev::spark::SparkMax &target);
+  void SetupEncoder(ctre::phoenix6::hardware::CANcoder &target);
+  void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration &config);
+  void SetModuleState(frc::SwerveModuleState state);
+  double GetEncoderPosition();
+  double GetPosition();
+  frc::SwerveModuleState GetModuleState();
+  frc::SwerveModulePosition GetModulePosition();
+  units::meters_per_second_t GetVelocity();
 };

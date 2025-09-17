@@ -12,9 +12,9 @@ void FieldDriveCommand::Execute() {
   frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
       ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
       xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
-      rotX() * DriveSubsystemConstants::kMaxAngularSpeed, drive->getDriverGyroAngle());
+      rotX() * DriveSubsystemConstants::kMaxAngularSpeed, drive->GetDriverGyroAngle());
 
-  drive->drive(fieldRelativeSpeeds);
+  drive->Drive(fieldRelativeSpeeds);
   frc::SmartDashboard::PutNumber("Field Relative Speed X", fieldRelativeSpeeds.vx.value());
   frc::SmartDashboard::PutNumber("Field Relative Speed Y", fieldRelativeSpeeds.vy.value());
   frc::SmartDashboard::PutNumber("Field Relative Rot", fieldRelativeSpeeds.omega.value());
