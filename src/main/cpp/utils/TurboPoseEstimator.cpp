@@ -1,6 +1,12 @@
 #include "utils/TurboPoseEstimator.hpp"
 
-frc::Pose2d TurboPoseEstimator::getPose2D() { return poseEstimator.GetEstimatedPosition(); }
+#include "frc/geometry/Pose2d.h"
+
+frc::Pose2d TurboPoseEstimator::getPose2D() {
+  frc::Pose2d pose = poseEstimator.GetEstimatedPosition();
+
+  return pose;
+}
 
 void TurboPoseEstimator::resetEstimatorPosition(
     frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
