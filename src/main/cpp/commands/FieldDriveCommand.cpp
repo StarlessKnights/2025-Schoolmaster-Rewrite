@@ -2,6 +2,7 @@
 
 #include <commands/FieldDriveCommand.hpp>
 
+#include "constants/Constants.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "units/angular_velocity.h"
 
@@ -9,8 +10,9 @@ void FieldDriveCommand::Initialize() {};
 
 void FieldDriveCommand::Execute() {
   frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-      ySpeed() * 4.5_mps, xSpeed() * 4.5_mps, rotX() * units::radians_per_second_t{570},
-      drive->getDriverGyroAngle());
+      ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+      xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+      rotX() * DriveSubsystemConstants::kMaxAngularSpeed, drive->getDriverGyroAngle());
 
   drive->drive(fieldRelativeSpeeds);
   frc::SmartDashboard::PutNumber("Field Relative Speed X", fieldRelativeSpeeds.vx.value());

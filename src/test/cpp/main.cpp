@@ -1,10 +1,8 @@
-#include <hal/HAL.h>
+#include <gtest/gtest.h>
 
-#include "gtest/gtest.h"
+TEST(DummyTest, AlwaysPasses) { EXPECT_EQ(1, 1); }
 
-int main(int argc, char** argv) {
-  HAL_Initialize(500, 0);
+int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  int ret = RUN_ALL_TESTS();
-  return ret;
+  return RUN_ALL_TESTS();
 }
