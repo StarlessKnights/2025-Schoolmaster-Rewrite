@@ -32,6 +32,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   DriveSubsystem();
 
   void Drive(frc::ChassisSpeeds speeds);
+  void AutoDrive(frc::ChassisSpeeds speeds);
   void SetModuleStates(const std::array<frc::SwerveModuleState, 4> &states);
   void ResetGyro();
   frc::Rotation2d GetDriverGyroAngle();

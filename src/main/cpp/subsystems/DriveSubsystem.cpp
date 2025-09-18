@@ -22,10 +22,19 @@
 #include "utils/TurboPoseEstimator.hpp"
 
 DriveSubsystem::DriveSubsystem()
-    : fleft(1, 2, 3, 0.0, DriveSubsystemConstants::kCanivoreName),
-      fright(4, 5, 6, 0.0, DriveSubsystemConstants::kCanivoreName),
-      bleft(7, 8, 9, 0.0, DriveSubsystemConstants::kCanivoreName),
-      bright(11, 12, 13, 0.0, DriveSubsystemConstants::kCanivoreName),
+    : fleft(DriveSubsystemConstants::kFrontLeftDriveID, DriveSubsystemConstants::kFrontLeftSteerID,
+            DriveSubsystemConstants::kFrontLeftEncoderID, DriveSubsystemConstants::kFrontLeftOffset,
+            DriveSubsystemConstants::kCanivoreName),
+      fright(DriveSubsystemConstants::kFrontRightDriveID,
+             DriveSubsystemConstants::kFrontRightSteerID,
+             DriveSubsystemConstants::kFrontRightEncoderID,
+             DriveSubsystemConstants::kFrontRightOffset, DriveSubsystemConstants::kCanivoreName),
+      bleft(DriveSubsystemConstants::kBackLeftDriveID, DriveSubsystemConstants::kBackLeftSteerID,
+            DriveSubsystemConstants::kBackLeftEncoderID, DriveSubsystemConstants::kBackLeftOffset,
+            DriveSubsystemConstants::kCanivoreName),
+      bright(DriveSubsystemConstants::kBackRightDriveID, DriveSubsystemConstants::kBackRightSteerID,
+             DriveSubsystemConstants::kBackRightEncoderID,
+             DriveSubsystemConstants::kBackRightOffset, DriveSubsystemConstants::kCanivoreName),
       field(),
       estimator(GetAngle(), GetModulePositions(), frc::Pose2d()) {
   frc::SmartDashboard::PutData("Field", &field);
@@ -39,9 +48,9 @@ DriveSubsystem::DriveSubsystem()
         estimator.ResetEstimatorPosition(GetAngle(), GetModulePositions(), pose);
       },
       [this]() { return GetRobotRelativeSpeeds(); },
-      [this](auto speeds, auto feedforwards) { Drive(speeds); },
-      std::make_shared<pathplanner::PPHolonomicDriveController>(pathplanner::PIDConstants(1.0, 0),
-                                                                pathplanner::PIDConstants(1.0, 0)),
+      [this](auto speeds, auto feedforwards) { AutoDrive(speeds); },
+      std::make_shared<pathplanner::PPHolonomicDriveController>(pathplanner::PIDConstants(0.1, 0),
+                                                                pathplanner::PIDConstants(0.1, 0)),
       config,
       []() {
         auto alliance = frc::DriverStation::GetAlliance();
@@ -59,10 +68,23 @@ void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
   SetModuleStates(states);
 }
 
+void DriveSubsystem::AutoDrive(frc::ChassisSpeeds speeds) {
+  // speeds.omega *= -1;
+  speeds.vx *= -1;
+  speeds.vy *= -1;
+
+  m_cmdSpeeds = speeds;
+
+  std::array<frc::SwerveModuleState, 4> states =
+      DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
+  SetModuleStates(states);
+}
+
 void DriveSubsystem::ResetGyro() { driverGyroOffset = GetAngle(); }
 
 frc::ChassisSpeeds DriveSubsystem::GetRobotRelativeSpeeds() {
-  return frc::ChassisSpeeds::FromFieldRelativeSpeeds(m_cmdSpeeds, GetAngle());
+  auto moduleStates = GetModuleStates();
+  return DriveSubsystemConstants::kKinematics.ToChassisSpeeds(moduleStates);
 }
 
 void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states) {
