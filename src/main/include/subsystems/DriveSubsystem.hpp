@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include "choreo/trajectory/SwerveSample.h"
 #include "constants/Constants.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
 #include "frc/controller/PIDController.h"
@@ -46,6 +45,4 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   void Periodic() override;
   void SimulationPeriodic() override;
-
-  void FollowTrajectory(const choreo::SwerveSample &sample);
 };
