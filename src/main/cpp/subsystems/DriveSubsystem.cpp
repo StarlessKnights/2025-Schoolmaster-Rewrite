@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include "choreo/trajectory/SwerveSample.h"
 #include "constants/Constants.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
@@ -12,7 +11,6 @@
 #include "frc/smartdashboard/Field2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "units/length.h"
-#include "units/velocity.h"
 #include "utils/TurboPoseEstimator.hpp"
 
 DriveSubsystem::DriveSubsystem()
@@ -78,18 +76,4 @@ void DriveSubsystem::SimulationPeriodic() {
 
   auto& simGyro = pigeon.GetSimState();
   simGyro.SetRawYaw(m_simPose.Rotation().Degrees());
-}
-
-void DriveSubsystem::FollowTrajectory(const choreo::SwerveSample& sample) {
-  frc::Pose2d pose = estimator.getPose2D();
-
-  units::meters_per_second_t xFeedback{xController.Calculate(pose.X().value(), sample.x.value())};
-  units::meters_per_second_t yFeedback{yController.Calculate(pose.Y().value(), sample.y.value())};
-  units::radians_per_second_t thetaFeedback{
-      thetaController.Calculate(pose.Rotation().Radians().value(), sample.heading.value())};
-
-  frc::ChassisSpeeds speeds{sample.vx + xFeedback, sample.vy + yFeedback,
-                            sample.omega + thetaFeedback};
-
-  Drive(speeds);
 }
