@@ -40,8 +40,8 @@ DriveSubsystem::DriveSubsystem()
       },
       [this]() { return GetRobotRelativeSpeeds(); },
       [this](auto speeds, auto feedforwards) { Drive(speeds); },
-      std::make_shared<pathplanner::PPHolonomicDriveController>(pathplanner::PIDConstants(5.0, 0),
-                                                                pathplanner::PIDConstants(5.0, 0)),
+      std::make_shared<pathplanner::PPHolonomicDriveController>(pathplanner::PIDConstants(1.0, 0),
+                                                                pathplanner::PIDConstants(1.0, 0)),
       config,
       []() {
         auto alliance = frc::DriverStation::GetAlliance();
@@ -58,6 +58,8 @@ void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
   auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
   SetModuleStates(states);
 }
+
+void DriveSubsystem::ResetGyro() { driverGyroOffset = GetAngle(); }
 
 frc::ChassisSpeeds DriveSubsystem::GetRobotRelativeSpeeds() {
   return frc::ChassisSpeeds::FromFieldRelativeSpeeds(m_cmdSpeeds, GetAngle());

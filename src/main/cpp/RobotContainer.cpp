@@ -7,7 +7,6 @@
 #include <frc2/command/button/Trigger.h>
 
 #include "commands/FieldDriveCommand.hpp"
-#include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/Commands.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_autoChooser() {
@@ -16,8 +15,8 @@ RobotContainer::RobotContainer() : m_driveSubsystem(), m_autoChooser() {
 }
 
 void RobotContainer::ConfigureBindings() {
-  m_driverController.Button(1).OnTrue(
-      frc2::cmd::RunOnce([] { frc::SmartDashboard::PutString("Hello", "World"); }, {}));
+  m_driverController.Y().OnTrue(
+      frc2::cmd::RunOnce([this] { m_driveSubsystem.ResetGyro(); }, {&m_driveSubsystem}));
 }
 
 void RobotContainer::ConfigureDefaultCommands() {
