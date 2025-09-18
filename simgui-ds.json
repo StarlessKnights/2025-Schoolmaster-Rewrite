@@ -97,7 +97,7 @@
   ],
   "robotJoysticks": [
     {
-      "guid": "030000005e040000000b000017050000"
+      "guid": "Keyboard0"
     }
   ],
   "useEnableDisableHotkeys": true

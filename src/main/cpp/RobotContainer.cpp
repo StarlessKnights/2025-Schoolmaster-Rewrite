@@ -10,7 +10,7 @@
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/Commands.h"
 
-RobotContainer::RobotContainer() : m_driveSubsystem() {
+RobotContainer::RobotContainer() : m_driveSubsystem(), m_autoChooser() {
   ConfigureBindings();
   ConfigureDefaultCommands();
 }
@@ -22,6 +22,10 @@ void RobotContainer::ConfigureBindings() {
 
 void RobotContainer::ConfigureDefaultCommands() {
   m_driveSubsystem.SetDefaultCommand(GetDefaultDriveCommand());
+}
+
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+  return m_autoChooser.GetAutonomousCommand();
 }
 
 frc2::CommandPtr RobotContainer::GetDefaultDriveCommand() {

@@ -8,7 +8,9 @@
 #include <frc2/command/button/CommandXboxController.h>
 
 #include "constants/Constants.h"
+#include "frc2/command/Command.h"
 #include "subsystems/DriveSubsystem.hpp"
+#include "utils/AutonomousChooser.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -22,12 +24,17 @@ class RobotContainer {
   RobotContainer();
 
   frc2::CommandPtr GetDefaultDriveCommand();
+  frc2::Command* GetAutonomousCommand();
 
  private:
   frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};
   frc2::CommandXboxController m_operatorController{OperatorConstants::kOperatorControllerPort};
 
   DriveSubsystem m_driveSubsystem;
+
+  AutonomousChooser m_autoChooser;
+
+  std::optional<frc2::CommandPtr> m_autonomousCommand;
 
   void ConfigureBindings();
   void ConfigureDefaultCommands();

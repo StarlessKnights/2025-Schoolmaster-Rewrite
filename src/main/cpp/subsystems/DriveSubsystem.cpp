@@ -1,8 +1,14 @@
 #include "subsystems/DriveSubsystem.hpp"
 
+#include <pathplanner/lib/auto/AutoBuilder.h>
+#include <pathplanner/lib/config/RobotConfig.h>
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+
 #include <array>
+#include <memory>
 
 #include "constants/Constants.h"
+#include "frc/DriverStation.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -10,6 +16,8 @@
 #include "frc/kinematics/SwerveModuleState.h"
 #include "frc/smartdashboard/Field2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "pathplanner/lib/config/PIDConstants.h"
+#include "pathplanner/lib/config/RobotConfig.h"
 #include "units/length.h"
 #include "utils/TurboPoseEstimator.hpp"
 
@@ -22,12 +30,37 @@ DriveSubsystem::DriveSubsystem()
       estimator(GetAngle(), GetModulePositions(), frc::Pose2d()) {
   frc::SmartDashboard::PutData("Field", &field);
   m_lastTime = frc::Timer::GetFPGATimestamp();
+
+  pathplanner::RobotConfig config = pathplanner::RobotConfig::fromGUISettings();
+
+  pathplanner::AutoBuilder::configure(
+      [this]() { return estimator.getPose2D(); },
+      [this](frc::Pose2d pose) {
+        estimator.ResetEstimatorPosition(GetAngle(), GetModulePositions(), pose);
+      },
+      [this]() { return GetRobotRelativeSpeeds(); },
+      [this](auto speeds, auto feedforwards) { Drive(speeds); },
+      std::make_shared<pathplanner::PPHolonomicDriveController>(pathplanner::PIDConstants(5.0, 0),
+                                                                pathplanner::PIDConstants(5.0, 0)),
+      config,
+      []() {
+        auto alliance = frc::DriverStation::GetAlliance();
+        if (alliance) {
+          return alliance.value() == frc::DriverStation::Alliance::kRed;
+        }
+        return false;
+      },
+      this);
 }
 
 void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
   m_cmdSpeeds = speeds;
   auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
   SetModuleStates(states);
+}
+
+frc::ChassisSpeeds DriveSubsystem::GetRobotRelativeSpeeds() {
+  return frc::ChassisSpeeds::FromFieldRelativeSpeeds(m_cmdSpeeds, GetAngle());
 }
 
 void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states) {

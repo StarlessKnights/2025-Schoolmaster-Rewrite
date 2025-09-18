@@ -42,6 +42,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::Rotation2d GetAngle() { return pigeon.GetRotation2d(); }
   std::array<frc::SwerveModuleState, 4> GetModuleStates();
   std::array<frc::SwerveModulePosition, 4> GetModulePositions();
+  frc::ChassisSpeeds GetRobotRelativeSpeeds();
 
   void Periodic() override;
   void SimulationPeriodic() override;

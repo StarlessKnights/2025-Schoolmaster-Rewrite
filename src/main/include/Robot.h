@@ -7,6 +7,8 @@
 #include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
 
+#include <optional>
+
 #include "RobotContainer.h"
 
 class Robot : public frc::TimedRobot {
@@ -24,5 +26,7 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override;
 
  private:
+  std::optional<frc2::Command*> m_autonomousCommand;
+
   RobotContainer m_container;
 };
