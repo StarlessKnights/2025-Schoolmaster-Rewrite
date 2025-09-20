@@ -10,19 +10,18 @@
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
-#include "frc/smartdashboard/Field2d.h"
 #include "frc2/command/SubsystemBase.h"
+#include "networktables/StructArrayTopic.h"
+#include "networktables/StructTopic.h"
 #include "units/time.h"
 #include "utils/NeoKrakenModule.hpp"
 #include "utils/TurboPoseEstimator.hpp"
 
 class DriveSubsystem : public frc2::SubsystemBase {
- private:
+private:
   NeoKrakenModule fleft, fright, bleft, bright;
-  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID,
-                                           DriveSubsystemConstants::kCanivoreName};
+  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID, DriveSubsystemConstants::kCanivoreName};
   frc::Rotation2d driverGyroOffset{};
-  frc::Field2d field;
   TurboPoseEstimator estimator;
 
   frc::ChassisSpeeds m_cmdSpeeds{0.0_mps, 0.0_mps, 0.0_rad_per_s};
@@ -33,7 +32,11 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::PIDController yController{1.0, 0.0, 0.0};
   frc::PIDController thetaController{1.0, 0.0, 0.0};
 
- public:
+  nt::StructPublisher<frc::Pose2d> m_posePublisher;
+  nt::StructPublisher<frc::ChassisSpeeds> m_speedsPublisher;
+  nt::StructArrayPublisher<frc::SwerveModuleState> m_swerveStatesPublisher;
+
+public:
   DriveSubsystem();
 
   void Drive(frc::ChassisSpeeds speeds);

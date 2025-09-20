@@ -60,7 +60,7 @@ inline constexpr double kRobotLength = .5525;
 inline constexpr double kRobotWidth = .5525;
 
 inline constexpr units::meters_per_second_t kMaxLinearSpeed = 4.5_mps;
-inline constexpr units::radians_per_second_t kMaxAngularSpeed = 3_rad_per_s;
+inline constexpr units::radians_per_second_t kMaxAngularSpeed = 570_deg_per_s;
 
 inline constexpr frc::Translation2d kModulePositions[] = {
     {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},   // Front Left

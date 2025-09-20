@@ -19,14 +19,9 @@
 #include "units/base.h"
 #include "units/length.h"
 
-NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset,
-                                 const std::string &can)
-    : driveMotor(driveID, can),
-      steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
-      encoderObject(encoderID, can),
-      offset(offset),
-      ff(0_V, 0_V / 1_mps),
-      driveController(0.0, 0.0, 0.0),
+NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string &can)
+    : driveMotor(driveID, can), steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
+      encoderObject(encoderID, can), offset(offset), ff(0_V, 0_V / 1_mps), driveController(0.0, 0.0, 0.0),
       steerController(0.0, 0.0, 0.0) {
   SetupEncoder(encoderObject);
   ConfigDriveMotor(driveMotor);

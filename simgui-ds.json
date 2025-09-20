@@ -19,8 +19,7 @@
         {},
         {
           "decKey": 71,
-          "incKey": 84,
-          "maxAbsValue": 0.10000000894069672
+          "incKey": 84
         }
       ],
       "axisCount": 5,
@@ -97,7 +96,7 @@
   ],
   "robotJoysticks": [
     {
-      "guid": "030000005e040000000b000017050000"
+      "guid": "Keyboard0"
     }
   ],
   "useEnableDisableHotkeys": true
