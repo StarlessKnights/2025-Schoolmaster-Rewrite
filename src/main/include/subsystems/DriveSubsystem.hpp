@@ -4,7 +4,6 @@
 
 #include "constants/Constants.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
-#include "frc/controller/PIDController.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -27,10 +26,6 @@ private:
   frc::ChassisSpeeds m_cmdSpeeds{0.0_mps, 0.0_mps, 0.0_rad_per_s};
   frc::Pose2d m_simPose{};
   units::second_t m_lastTime{0.0_s};
-
-  frc::PIDController xController{1.0, 0.0, 0.0};
-  frc::PIDController yController{1.0, 0.0, 0.0};
-  frc::PIDController thetaController{1.0, 0.0, 0.0};
 
   nt::StructPublisher<frc::Pose2d> m_posePublisher;
   nt::StructPublisher<frc::ChassisSpeeds> m_speedsPublisher;
