@@ -18,6 +18,10 @@
 
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+
+namespace RobotConstants {
+inline constexpr int kNominalVoltage = 12;
+}
 namespace OperatorConstants {
 
 inline constexpr int kDriverControllerPort = 0;
