@@ -1,6 +1,8 @@
 #include "subsystems/ElevatorSubsystem.hpp"
 
 #include "constants/Constants.h"
+#include "frc/RobotBase.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "rev/ClosedLoopSlot.h"
 #include "rev/SparkBase.h"
 #include "rev/SparkClosedLoopController.h"
@@ -9,9 +11,17 @@
 #include "rev/config/SparkMaxConfig.h"
 #include <cstdlib>
 
-ElevatorSubsystem::ElevatorSubsystem() { ConfigureMotors(); }
+ElevatorSubsystem::ElevatorSubsystem() {
+  frc::SmartDashboard::PutData("Elevator Mech", &elevatorMech);
+
+  ConfigureMotors();
+}
 
 void ElevatorSubsystem::ConfigureMotors() {
+  if (frc::RobotBase::IsSimulation()) {
+    return;
+  }
+
   rev::spark::SparkMaxConfig smc{};
   smc.Follow(primaryMotor, false);
   smc.VoltageCompensation(RobotConstants::kNominalVoltage);
@@ -45,13 +55,40 @@ void ElevatorSubsystem::ConfigureMotors() {
 
 void ElevatorSubsystem::SetPosition(double position) {
   currentSetpoint = position;
-  onboardClosedLoop.SetReference(-position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
-                                 rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
-                                 rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
+
+  if (!frc::RobotBase::IsSimulation()) {
+    onboardClosedLoop.SetReference(-position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
+                                   rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
+                                   rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
+  }
 }
 
-double ElevatorSubsystem::GetPosition() { return -primaryEncoder.GetPosition(); }
+double ElevatorSubsystem::GetPosition() {
+  if (frc::RobotBase::IsSimulation()) {
+    return simulatedPosition;
+  }
+
+  return -primaryEncoder.GetPosition();
+}
 
 bool ElevatorSubsystem::IsElevatorPIDAtSetpoint() {
-  return abs(GetPosition() - currentSetpoint) < ElevatorSubsystemConstants::kAtSetpointTolerance;
+  return abs(GetPosition() - (currentSetpoint * 0.3)) < ElevatorSubsystemConstants::kAtSetpointTolerance;
+}
+
+void ElevatorSubsystem::Periodic() {
+  frc::SmartDashboard::PutNumber("Elevator Position", GetPosition());
+  frc::SmartDashboard::PutNumber("Elevator Setpoint", currentSetpoint);
+  frc::SmartDashboard::PutBoolean("Elevator At Setpoint", IsElevatorPIDAtSetpoint());
+}
+
+void ElevatorSubsystem::SimulationPeriodic() {
+  double kSimSpeed = 0.06;
+  if (abs(simulatedPosition - (currentSetpoint * 0.3)) > 0.01) {
+    simulatedPosition += kSimSpeed * ((currentSetpoint * 0.3) - simulatedPosition);
+  } else {
+    simulatedPosition = currentSetpoint * 0.3;
+  }
+
+  m_elevator->SetLength(simulatedPosition);
+  frc::SmartDashboard::PutNumber("Simulated Elevator Position", simulatedPosition);
 }

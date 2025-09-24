@@ -9,6 +9,7 @@
 
 #include "constants/Constants.h"
 #include "subsystems/DriveSubsystem.hpp"
+#include "subsystems/ElevatorSubsystem.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -18,17 +19,19 @@
  * commands, and trigger mappings) should be declared here.
  */
 class RobotContainer {
- public:
+public:
   RobotContainer();
 
   frc2::CommandPtr GetDefaultDriveCommand();
 
- private:
+private:
   frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};
   frc2::CommandXboxController m_operatorController{OperatorConstants::kOperatorControllerPort};
 
   DriveSubsystem m_driveSubsystem;
+  ElevatorSubsystem m_elevatorSubsystem;
 
   void ConfigureBindings();
+  void ConfigureElevatorBindings();
   void ConfigureDefaultCommands();
 };
