@@ -44,7 +44,7 @@ std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::getCameraEstimatedP
   return poseEstimator.Update(result);
 }
 
-class PoseTimestampPair TurboPhotonCamera::fetchPose() {
+std::optional<PoseTimestampPair> TurboPhotonCamera::fetchPose() {
   std::optional<photon::EstimatedRobotPose> ret;
 
   try {
@@ -57,5 +57,5 @@ class PoseTimestampPair TurboPhotonCamera::fetchPose() {
     return PoseTimestampPair{ret->estimatedPose.ToPose2d(), ret->timestamp};
   }
 
-  return PoseTimestampPair{frc::Pose2d(), -1_s};
+  return std::nullopt;
 }

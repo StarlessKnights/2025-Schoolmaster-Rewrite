@@ -18,12 +18,12 @@
  * commands, and trigger mappings) should be declared here.
  */
 class RobotContainer {
- public:
+public:
   RobotContainer();
 
   frc2::CommandPtr GetDefaultDriveCommand();
 
- private:
+private:
   frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};
   frc2::CommandXboxController m_operatorController{OperatorConstants::kOperatorControllerPort};
 

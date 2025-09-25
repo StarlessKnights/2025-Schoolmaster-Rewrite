@@ -67,7 +67,7 @@ std::array<frc::SwerveModulePosition, 4> DriveSubsystem::GetModulePositions() {
 frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() { return GetAngle() - driverGyroOffset; }
 
 void DriveSubsystem::Periodic() {
-  estimator.UpdateWithOdometry(GetAngle(), GetModulePositions());
+  estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
   m_posePublisher.Set(estimator.getPose2D());
 }
 

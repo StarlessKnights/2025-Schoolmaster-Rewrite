@@ -19,5 +19,5 @@ public:
   frc::AprilTagFieldLayout getLayout();
   photon::PhotonPipelineResult getLatestResult();
   std::optional<photon::EstimatedRobotPose> getCameraEstimatedPose3d();
-  class PoseTimestampPair fetchPose();
+  std::optional<PoseTimestampPair> fetchPose();
 };

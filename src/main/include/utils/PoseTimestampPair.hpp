@@ -10,4 +10,6 @@ private:
 
 public:
   PoseTimestampPair(frc::Pose2d pose, units::second_t latency) : pose(pose), latency(latency) {};
+  frc::Pose2d getPose() { return pose; };
+  units::second_t getLatency() { return latency; };
 };

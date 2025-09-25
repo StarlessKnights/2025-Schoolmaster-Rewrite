@@ -24,6 +24,7 @@ public:
   frc::Pose2d getPose2D();
   void ResetEstimatorPosition(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
                               frc::Pose2d pose);
-  void UpdateWithOdometry(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions);
-  void TryVisionUpdateWithCamera(const TurboPhotonCamera &camera);
+  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions);
+  void TryVisionUpdateWithCamera(TurboPhotonCamera &camera);
+  void UpdateWithAllAvailableVisionMeasurements();
 };
