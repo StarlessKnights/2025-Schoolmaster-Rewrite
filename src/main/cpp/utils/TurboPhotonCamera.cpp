@@ -41,6 +41,11 @@ std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::getCameraEstimatedP
   frc::SmartDashboard::PutNumber("Best target ID", result.GetBestTarget().GetFiducialId());
   frc::SmartDashboard::PutNumber("Timestamp", double(result.GetTimestamp().value()));
 
+  if (result.GetTimestamp() == units::second_t{-1}) {
+    frc::DataLogManager::Log("Photon result not valid");
+    return std::nullopt;
+  }
+
   return poseEstimator.Update(result);
 }
 
@@ -69,6 +74,11 @@ std::optional<PoseTimestampPair> TurboPhotonCamera::fetchPose() {
     if (currentTime.value() - poseTime.value() > 0.5) {
       frc::DataLogManager::Log("Photon pose too late, Time Diff: " +
                                std::to_string(currentTime.value() - poseTime.value()));
+      return std::nullopt;
+    }
+
+    if (poseTime.value() == -1) {
+      frc::DataLogManager::Log("Photon pose has invalid timestamp");
       return std::nullopt;
     }
 
