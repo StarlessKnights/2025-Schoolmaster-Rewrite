@@ -1,6 +1,9 @@
 #include "utils/TurboPoseEstimator.hpp"
 
+#include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
+
+#include "networktables/NetworkTableInstance.h"
 #include "utils/PoseTimestampPair.hpp"
 #include <optional>
 
@@ -23,6 +26,13 @@ void TurboPoseEstimator::UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
 }
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera &camera) {
+  if (frc::RobotBase::IsSimulation()) {
+    auto pose =
+        nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Subscribe(frc::Pose2d{}).Get();
+
+    camera.updateSim(pose);
+  }
+
   std::optional<PoseTimestampPair> visionPose = camera.fetchPose();
 
   if (visionPose.has_value()) {

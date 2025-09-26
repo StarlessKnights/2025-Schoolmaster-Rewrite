@@ -1,24 +1,58 @@
 #include "utils/TurboPhotonCamera.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
+#include "frc/RobotBase.h"
 #include "frc/Timer.h"
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "networktables/NetworkTableInstance.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
+#include "photon/simulation/PhotonCameraSim.h"
+#include "photon/simulation/SimCameraProperties.h"
+#include "photon/simulation/VisionSystemSim.h"
 #include "photon/targeting/PhotonPipelineResult.h"
+#include "units/frequency.h"
 #include "units/time.h"
 #include "utils/PoseTimestampPair.hpp"
 #include <exception>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
-TurboPhotonCamera::TurboPhotonCamera(const std::string_view cameraName, frc::Transform3d cameraInBotSpace)
+TurboPhotonCamera::TurboPhotonCamera(const std::string &cameraName, frc::Transform3d cameraInBotSpace)
     : layout(getLayout()), camera(cameraName),
-      poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {}
+      poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
+  if (frc::RobotBase::IsSimulation()) {
+    auto cameraProp = photon::SimCameraProperties();
+    cameraProp.SetCalibration(1280, 720, 75_deg);
+    cameraProp.SetCalibError(0.25, 0.08);
+    cameraProp.SetFPS(units::hertz_t{30});
+    cameraProp.SetAvgLatency(35_ms);
+    cameraProp.SetLatencyStdDev(5_ms);
+
+    systemSim.emplace("main");
+    cameraSim.emplace(photon::PhotonCameraSim(&camera, cameraProp));
+    cameraSim->EnableDrawWireframe(true);
+
+    systemSim->AddAprilTags(getLayout());
+    systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
+  }
+
+  visionTargetPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets").Publish();
+}
+
+void TurboPhotonCamera::updateSim(frc::Pose2d robotPose) {
+  if (frc::RobotBase::IsSimulation()) {
+    frc::SmartDashboard::PutData("Sim Field", &systemSim->GetDebugField());
+    systemSim->Update(robotPose);
+  }
+}
 
 frc::AprilTagFieldLayout TurboPhotonCamera::getLayout() {
   try {
@@ -32,7 +66,23 @@ frc::AprilTagFieldLayout TurboPhotonCamera::getLayout() {
   return layout;
 }
 
-photon::PhotonPipelineResult TurboPhotonCamera::getLatestResult() { return camera.GetLatestResult(); }
+photon::PhotonPipelineResult TurboPhotonCamera::getLatestResult() {
+  auto result = camera.GetLatestResult();
+  std::vector<frc::Pose2d> targetPoses;
+
+  for (const auto &target : result.GetTargets()) {
+    if (target.GetFiducialId() >= 0) {
+      auto tagPose = layout.GetTagPose(target.GetFiducialId());
+      if (tagPose.has_value()) {
+        targetPoses.push_back(tagPose->ToPose2d());
+      }
+    }
+  }
+
+  visionTargetPublisher.Set(targetPoses);
+
+  return result;
+}
 
 std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::getCameraEstimatedPose3d() {
   auto result = getLatestResult();
