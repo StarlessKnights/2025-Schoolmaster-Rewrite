@@ -17,6 +17,7 @@ RobotContainer::RobotContainer() : m_driveSubsystem() {
 
 void RobotContainer::ConfigureBindings() {
   m_driverController.Button(1).OnTrue(frc2::cmd::RunOnce([] { frc::DataLogManager::Log("Button 1 pressed"); }, {}));
+  m_driverController.Y().OnTrue(frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }));
 }
 
 void RobotContainer::ConfigureDefaultCommands() { m_driveSubsystem.SetDefaultCommand(GetDefaultDriveCommand()); }

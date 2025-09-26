@@ -36,6 +36,7 @@ public:
 
   void Drive(frc::ChassisSpeeds speeds);
   void SetModuleStates(const std::array<frc::SwerveModuleState, 4> &states);
+  void DriverGryoZero();
   frc::Rotation2d GetDriverGyroAngle();
   frc::Rotation2d GetAngle() { return pigeon.GetRotation2d(); }
   std::array<frc::SwerveModuleState, 4> GetModuleStates();

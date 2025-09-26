@@ -2,6 +2,7 @@
 
 #include "frc/DataLogManager.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "utils/PoseTimestampPair.hpp"
 #include <optional>
 
@@ -28,8 +29,9 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera &camera) {
 
   if (visionPose.has_value()) {
     poseEstimator.AddVisionMeasurement(visionPose->getPose(), visionPose->getLatency());
+
   } else {
-    frc::DataLogManager::Log("No vision pose available");
+    // frc::DataLogManager::Log("No vision pose available");
   }
 }
 
