@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include "constants/Constants.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -10,6 +9,7 @@
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "frc2/command/SubsystemBase.h"
+#include "global/Globals.h"
 #include "networktables/StructArrayTopic.h"
 #include "networktables/StructTopic.h"
 #include "units/time.h"
