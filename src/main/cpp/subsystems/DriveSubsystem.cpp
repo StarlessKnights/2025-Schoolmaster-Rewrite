@@ -2,12 +2,12 @@
 
 #include <array>
 
-#include "constants/Constants.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
+#include "global/Globals.h"
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/StructArrayTopic.h"
 #include "units/length.h"
@@ -42,7 +42,7 @@ DriveSubsystem::DriveSubsystem()
 
 void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
   m_cmdSpeeds = speeds;
-  auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
+  auto states = DriveSubsystemConstants::swerveKinematics.ToSwerveModuleStates(speeds);
   SetModuleStates(states);
 
   m_swerveStatesPublisher.Set(states);

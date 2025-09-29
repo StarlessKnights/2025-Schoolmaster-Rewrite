@@ -23,13 +23,13 @@ namespace OperatorConstants {
 inline constexpr int kDriverControllerPort = 0;
 inline constexpr int kOperatorControllerPort = 1;
 
-}  // namespace OperatorConstants
+} // namespace OperatorConstants
 
 namespace NeoKrakenModuleConstants {
 
 inline constexpr double kNominalVoltage = 12.8;
 
-}  // namespace NeoKrakenModuleConstants
+} // namespace NeoKrakenModuleConstants
 
 namespace DriveSubsystemConstants {
 inline constexpr int kPigeonID = 10;
@@ -63,12 +63,12 @@ inline constexpr units::meters_per_second_t kMaxLinearSpeed = 4.5_mps;
 inline constexpr units::radians_per_second_t kMaxAngularSpeed = 570_deg_per_s;
 
 inline constexpr frc::Translation2d kModulePositions[] = {
-    {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},   // Front Left
-    {units::meter_t{kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}},  // Front Right
-    {units::meter_t{-kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},  // Back Left
-    {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}}  // Back Right
+    {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},  // Front Left
+    {units::meter_t{kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}}, // Front Right
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{kRobotWidth / 2}}, // Back Left
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}} // Back Right
 };
 
-inline frc::SwerveDriveKinematics<4> kKinematics{kModulePositions[0], kModulePositions[1],
-                                                 kModulePositions[2], kModulePositions[3]};
-}  // namespace DriveSubsystemConstants
+inline frc::SwerveDriveKinematics<4> swerveKinematics{kModulePositions[0], kModulePositions[1], kModulePositions[2],
+                                                      kModulePositions[3]};
+} // namespace DriveSubsystemConstants
