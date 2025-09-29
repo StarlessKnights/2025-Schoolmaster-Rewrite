@@ -69,6 +69,7 @@ inline constexpr frc::Translation2d kModulePositions[] = {
     {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}} // Back Right
 };
 
+// skipcq CXX-W2009
 inline frc::SwerveDriveKinematics<4> swerveKinematics{kModulePositions[0], kModulePositions[1], kModulePositions[2],
                                                       kModulePositions[3]};
 } // namespace DriveSubsystemConstants
