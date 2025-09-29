@@ -97,7 +97,7 @@ std::optional<PoseTimestampPair> TurboPhotonCamera::fetchPose() {
   }
 
   if (ret.has_value() && getNumTargets() >= 1) {
-    return PoseTimestampPair { ret->estimatedPose.ToPose2d(), ret->timestamp }
+    return PoseTimestampPair{ret->estimatedPose.ToPose2d(), ret->timestamp};
   }
 
   return std::nullopt;
