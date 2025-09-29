@@ -14,7 +14,7 @@
 #include "units/velocity.h"
 
 class NeoKrakenModule {
- private:
+private:
   ctre::phoenix6::hardware::TalonFX driveMotor;
   rev::spark::SparkMax steerMotor;
   ctre::phoenix6::hardware::CANcoder encoderObject;
@@ -28,7 +28,7 @@ class NeoKrakenModule {
   constexpr static double kPositionMultiplier = (1 / 6.75) * (.1016 * M_PI);
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
- public:
+public:
   NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string &can);
 
   void ConfigPIDInternal();
