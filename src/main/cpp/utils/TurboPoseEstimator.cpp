@@ -36,6 +36,7 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera &camera) {
   std::optional<PoseTimestampPair> visionPose = camera.fetchPose();
 
   if (visionPose.has_value()) {
+    posePublisher.Set(visionPose->getPose());
     poseEstimator.AddVisionMeasurement(visionPose->getPose(), visionPose->getLatency());
   }
 }
