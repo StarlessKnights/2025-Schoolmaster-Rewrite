@@ -2,7 +2,6 @@
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
-#include "frc/Timer.h"
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
@@ -98,7 +97,7 @@ std::optional<PoseTimestampPair> TurboPhotonCamera::fetchPose() {
   }
 
   if (ret.has_value() && getNumTargets() >= 1) {
-    return PoseTimestampPair{ret->estimatedPose.ToPose2d(), ret->timestamp};
+    return PoseTimestampPair { ret->estimatedPose.ToPose2d(), ret->timestamp }
   }
 
   return std::nullopt;

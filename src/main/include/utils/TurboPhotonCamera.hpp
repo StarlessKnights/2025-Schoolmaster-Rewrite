@@ -27,6 +27,7 @@ private:
 public:
   TurboPhotonCamera(const std::string &cameraName, frc::Transform3d cameraInBotSpace);
   void updateSim(frc::Pose2d robotPose);
+  frc::AprilTagFieldLayout getLayout();
   photon::PhotonPipelineResult getLatestResult();
   std::optional<photon::EstimatedRobotPose> getCameraEstimatedPose3d();
   std::optional<PoseTimestampPair> fetchPose();
