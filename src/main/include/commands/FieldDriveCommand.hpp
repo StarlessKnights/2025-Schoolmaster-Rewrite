@@ -11,7 +11,8 @@ private:
   DriveSubsystem *drive;
 
 public:
-  explicit FieldDriveCommand(DriveSubsystem *drive, std::function<double()> ySpeed, std::function<double()> xSpeed, std::function<double()> rotX)
+  explicit FieldDriveCommand(DriveSubsystem *drive, std::function<double()> ySpeed, std::function<double()> xSpeed,
+                             std::function<double()> rotX)
       : xSpeed(xSpeed), ySpeed(ySpeed), rotX(rotX), drive(drive) {
     AddRequirements(drive);
   }

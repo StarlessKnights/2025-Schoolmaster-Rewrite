@@ -7,20 +7,16 @@
 #include "frc/kinematics/SwerveModulePosition.h"
 
 class TurboPoseEstimator {
- private:
+private:
   frc::SwerveDrivePoseEstimator<4> poseEstimator;
 
- public:
-  TurboPoseEstimator(frc::Rotation2d gyroAngle,
-                     std::array<frc::SwerveModulePosition, 4> modulePositions,
+public:
+  TurboPoseEstimator(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
                      frc::Pose2d initialPose)
-      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions,
-                      initialPose) {}
+      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions, initialPose) {}
 
   frc::Pose2d getPose2D();
-  void ResetEstimatorPosition(frc::Rotation2d gyroAngle,
-                              std::array<frc::SwerveModulePosition, 4> modulePositions,
+  void ResetEstimatorPosition(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
                               frc::Pose2d pose);
-  void UpdateWithOdometry(frc::Rotation2d gyroAngle,
-                          std::array<frc::SwerveModulePosition, 4> modulePositions);
+  void UpdateWithOdometry(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions);
 };
