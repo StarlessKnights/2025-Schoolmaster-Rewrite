@@ -5,12 +5,12 @@
 #include <string>
 #include <utils/NeoKrakenModule.hpp>
 
+#include "constants/Constants.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/core/CoreCANcoder.hpp"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/geometry/Rotation2d.h"
-#include "global/Globals.h"
 #include "rev/SparkBase.h"
 #include "rev/SparkMax.h"
 #include "rev/config/SparkBaseConfig.h"

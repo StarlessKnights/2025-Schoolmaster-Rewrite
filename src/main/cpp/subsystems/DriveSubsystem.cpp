@@ -2,12 +2,13 @@
 
 #include <array>
 
+#include "constants/Constants.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
-#include "global/Globals.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/StructArrayTopic.h"
 #include "units/length.h"
@@ -42,7 +43,7 @@ DriveSubsystem::DriveSubsystem()
 
 void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
   m_cmdSpeeds = speeds;
-  auto states = DriveSubsystemConstants::swerveKinematics.ToSwerveModuleStates(speeds);
+  auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
   SetModuleStates(states);
 
   m_swerveStatesPublisher.Set(states);
@@ -56,6 +57,8 @@ void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4>
   bright.SetModuleState(states[3]);
 }
 
+void DriveSubsystem::DriverGryoZero() { driverGyroOffset = GetAngle(); }
+
 std::array<frc::SwerveModuleState, 4> DriveSubsystem::GetModuleStates() {
   return {fleft.GetModuleState(), fright.GetModuleState(), bleft.GetModuleState(), bright.GetModuleState()};
 }
@@ -67,8 +70,10 @@ std::array<frc::SwerveModulePosition, 4> DriveSubsystem::GetModulePositions() {
 frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() { return GetAngle() - driverGyroOffset; }
 
 void DriveSubsystem::Periodic() {
-  estimator.UpdateWithOdometry(GetAngle(), GetModulePositions());
+  estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
   m_posePublisher.Set(estimator.getPose2D());
+
+  frc::SmartDashboard::PutNumber("Gryo", GetAngle().Degrees().value());
 }
 
 void DriveSubsystem::SimulationPeriodic() {

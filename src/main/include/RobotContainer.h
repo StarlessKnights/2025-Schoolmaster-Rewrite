@@ -7,7 +7,7 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandXboxController.h>
 
-#include "global/Globals.h"
+#include "constants/Constants.h"
 #include "subsystems/DriveSubsystem.hpp"
 
 /**

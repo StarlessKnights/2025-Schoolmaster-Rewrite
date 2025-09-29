@@ -7,7 +7,7 @@
 #include <frc2/command/button/Trigger.h>
 
 #include "commands/FieldDriveCommand.hpp"
-#include "frc/smartdashboard/SmartDashboard.h"
+#include "frc/DataLogManager.h"
 #include "frc2/command/Commands.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem() {
@@ -16,18 +16,15 @@ RobotContainer::RobotContainer() : m_driveSubsystem() {
 }
 
 void RobotContainer::ConfigureBindings() {
-  m_driverController.Button(1).OnTrue(
-      frc2::cmd::RunOnce([] { frc::SmartDashboard::PutString("Hello", "World"); }, {}));
+  m_driverController.Button(1).OnTrue(frc2::cmd::RunOnce([] { frc::DataLogManager::Log("Button 1 pressed"); }, {}));
+  m_driverController.Y().OnTrue(frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }));
 }
 
-void RobotContainer::ConfigureDefaultCommands() {
-  m_driveSubsystem.SetDefaultCommand(GetDefaultDriveCommand());
-}
+void RobotContainer::ConfigureDefaultCommands() { m_driveSubsystem.SetDefaultCommand(GetDefaultDriveCommand()); }
 
 frc2::CommandPtr RobotContainer::GetDefaultDriveCommand() {
   return FieldDriveCommand(
              &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
-             [this] { return m_driverController.GetLeftX(); },
-             [this] { return m_driverController.GetRightX(); })
+             [this] { return m_driverController.GetLeftX(); }, [this] { return m_driverController.GetRightX(); })
       .ToPtr();
 }

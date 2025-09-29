@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "constants/Constants.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -9,7 +10,6 @@
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
 #include "frc2/command/SubsystemBase.h"
-#include "global/Globals.h"
 #include "networktables/StructArrayTopic.h"
 #include "networktables/StructTopic.h"
 #include "units/time.h"
@@ -36,6 +36,7 @@ public:
 
   void Drive(frc::ChassisSpeeds speeds);
   void SetModuleStates(const std::array<frc::SwerveModuleState, 4> &states);
+  void DriverGryoZero();
   frc::Rotation2d GetDriverGyroAngle();
   frc::Rotation2d GetAngle() { return pigeon.GetRotation2d(); }
   std::array<frc::SwerveModuleState, 4> GetModuleStates();
