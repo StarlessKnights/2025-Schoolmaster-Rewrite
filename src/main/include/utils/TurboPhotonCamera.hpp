@@ -1,6 +1,7 @@
 #pragma once
 
 #include "frc/apriltag/AprilTagFieldLayout.h"
+#include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform3d.h"
 #include "networktables/StructArrayTopic.h"
@@ -14,7 +15,7 @@
 
 class TurboPhotonCamera {
 private:
-  frc::AprilTagFieldLayout layout;
+  frc::AprilTagFieldLayout layout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
   photon::PhotonCamera camera;
   photon::PhotonPoseEstimator poseEstimator;
 
@@ -26,8 +27,8 @@ private:
 public:
   TurboPhotonCamera(const std::string &cameraName, frc::Transform3d cameraInBotSpace);
   void updateSim(frc::Pose2d robotPose);
-  frc::AprilTagFieldLayout getLayout();
   photon::PhotonPipelineResult getLatestResult();
   std::optional<photon::EstimatedRobotPose> getCameraEstimatedPose3d();
   std::optional<PoseTimestampPair> fetchPose();
+  int getNumTargets();
 };

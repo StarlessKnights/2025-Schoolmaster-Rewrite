@@ -23,6 +23,8 @@ void TurboPoseEstimator::UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
                                                      std::array<frc::SwerveModulePosition, 4> modulePositions) {
   UpdateWithAllAvailableVisionMeasurements();
   poseEstimator.Update(gyroAngle, modulePositions);
+
+  posePublisher.Set(poseEstimator.GetEstimatedPosition());
 }
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera &camera) {

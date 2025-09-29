@@ -24,8 +24,7 @@
 #include <vector>
 
 TurboPhotonCamera::TurboPhotonCamera(const std::string &cameraName, frc::Transform3d cameraInBotSpace)
-    : layout(getLayout()), camera(cameraName),
-      poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
+    : camera(cameraName), poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
   if (frc::RobotBase::IsSimulation()) {
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
@@ -85,54 +84,31 @@ photon::PhotonPipelineResult TurboPhotonCamera::getLatestResult() {
 
 std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::getCameraEstimatedPose3d() {
   auto result = getLatestResult();
+  auto poseEstimate = poseEstimator.Update(result);
 
-  frc::SmartDashboard::PutNumber("Number of targets", result.GetTargets().size());
-  frc::SmartDashboard::PutNumber("Best target ID", result.GetBestTarget().GetFiducialId());
-  frc::SmartDashboard::PutNumber("Timestamp", double(result.GetTimestamp().value()));
-
-  if (result.GetTimestamp() == units::second_t{-1}) {
-    frc::DataLogManager::Log("Photon result not valid");
-    return std::nullopt;
-  }
-
-  return poseEstimator.Update(result);
+  return poseEstimate;
 }
 
 std::optional<PoseTimestampPair> TurboPhotonCamera::fetchPose() {
   std::optional<photon::EstimatedRobotPose> ret = std::nullopt;
 
   try {
-    ret = getCameraEstimatedPose3d();
-  } catch (std::exception &e) {
-    frc::DataLogManager::Log("Failed to get camera estimated pose: " + std::string(e.what()));
-    return std::nullopt;
+    ret = getCameraEstimatedPose3d().value();
+  } catch (std::exception e) {
   }
 
-  if (ret.has_value() && getLatestResult().GetTargets().size() >= 1) {
-    units::second_t currentTime = frc::Timer::GetFPGATimestamp();
-    units::second_t poseTime = ret->timestamp;
-
-    frc::SmartDashboard::PutNumber("photon pose X", ret->estimatedPose.X().to<double>());
-    frc::SmartDashboard::PutNumber("photon pose Y", ret->estimatedPose.Y().to<double>());
-    frc::SmartDashboard::PutNumber("photon pose Rotation",
-                                   ret->estimatedPose.ToPose2d().Rotation().Degrees().to<double>());
-    frc::SmartDashboard::PutNumber("photon pose Timestamp", poseTime.to<double>());
-    frc::SmartDashboard::PutNumber("photon current Time", currentTime.to<double>());
-    frc::SmartDashboard::PutNumber("photon time Diff", (currentTime - poseTime).to<double>());
-
-    if (currentTime.value() - poseTime.value() > 0.5) {
-      frc::DataLogManager::Log("Photon pose too late, Time Diff: " +
-                               std::to_string(currentTime.value() - poseTime.value()));
-      return std::nullopt;
-    }
-
-    if (poseTime.value() == -1) {
-      frc::DataLogManager::Log("Photon pose has invalid timestamp");
-      return std::nullopt;
-    }
-
-    return PoseTimestampPair{ret->estimatedPose.ToPose2d(), poseTime};
+  if (ret.has_value() && getNumTargets() >= 1) {
+    return PoseTimestampPair{ret->estimatedPose.ToPose2d(), ret->timestamp};
   }
 
   return std::nullopt;
+}
+
+int TurboPhotonCamera::getNumTargets() {
+  auto result = getLatestResult();
+  if (!result.HasTargets()) {
+    return 0;
+  }
+
+  return result.GetTargets().size();
 }
