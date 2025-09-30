@@ -10,7 +10,7 @@ private:
 public:
   TurboLaserCAN(int id) : laserCan(id) {}
 
-  int getProximity() {
+  int GetProximity() {
     std::optional<grpl::LaserCanMeasurement> measurement = laserCan.get_measurement();
     if (measurement && measurement->status == grpl::LASERCAN_STATUS_VALID_MEASUREMENT) {
       return measurement->distance_mm;
