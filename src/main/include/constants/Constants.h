@@ -87,3 +87,42 @@ inline const frc::Transform3d kLocalizationCamTwoOffset{
     frc::Translation3d(0.2159_m, -0.279_m, 0.1143_m),
     frc::Rotation3d(0_rad, units::radian_t{units::degree_t{20}}, units::radian_t{units::degree_t{37}})};
 } // namespace CameraConstants
+
+namespace ElevatorSubsystemConstants {
+inline constexpr int kPrimaryMotorID = 51;
+inline constexpr int kSecondaryMotorID = 50;
+inline constexpr int kCoralMotorID = 58;
+
+inline constexpr int kCoralSensorID = 37;
+inline constexpr int kCoralSensorProximityThreshold = 20;
+
+inline constexpr int kNEO550CurrentLimit = 30;
+
+inline constexpr double kL1EncoderPosition = 0.0;
+inline constexpr double kL2EncoderPosition = 8.5;
+inline constexpr double kL3EncoderPosition = 25.0;
+inline constexpr double kL4EncoderPosition = 52.0;
+
+inline constexpr double kHPEncoderPosition = 0.1;
+inline constexpr double kDefaultEncoderPosition = 1.5; // Prevents carriage from hitting base
+
+inline constexpr double kHighAlgaePosition = 44.0;
+inline constexpr double kLowAlgaePosition = 28.0;
+inline constexpr double kProcessorScorePosition = 4.0;
+inline constexpr double kGroundIntakePosition = 1.5;
+
+inline constexpr double kGrabberSpeed = 0.2;
+inline constexpr double kL1GrabberSpeed = 0.15;
+inline constexpr double kL4GrabberSpeed = 0.30;
+inline constexpr double kAutoL4GrabberSpeed = 0.25;
+
+inline constexpr double kIntakeGrabberSpeed = 0.2;
+
+inline constexpr double kHomedCurrentDraw = 60.0;
+
+inline constexpr double kMaxAcceleration = 6000.0;
+inline constexpr double kMaxVelocity = 15000.0;
+inline constexpr double kAtSetpointTolerance = 1.0;
+
+inline constexpr double kArbitraryFeedforward = 0.44;
+} // namespace ElevatorSubsystemConstants
