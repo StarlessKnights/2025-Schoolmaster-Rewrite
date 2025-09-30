@@ -12,7 +12,7 @@ private:
 public:
   explicit ElevatorRetractCommand(ElevatorSubsystem *elevator) : elevator(elevator) { AddRequirements(elevator); };
 
-  void Initialize() override;
+  void Initialize() override {};
   void Execute() override { elevator->SetPosition(ElevatorSubsystemConstants::kDefaultEncoderPosition); };
   void End(bool interrupted) override { elevator->StopAll(); };
   bool IsFinished() override { return false; };

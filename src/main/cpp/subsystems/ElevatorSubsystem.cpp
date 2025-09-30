@@ -1,5 +1,6 @@
 #include "subsystems/ElevatorSubsystem.hpp"
 #include "constants/Constants.h"
+#include "frc/DataLogManager.h"
 #include "rev/ClosedLoopSlot.h"
 #include "rev/SparkBase.h"
 #include "rev/SparkClosedLoopController.h"
@@ -13,6 +14,8 @@ ElevatorSubsystem::ElevatorSubsystem() {
   ConfigureCoralMotor();
 
   primaryEncoder.SetPosition(0.0);
+
+  frc::DataLogManager::Log("ElevatorSubsystem Constructor");
 }
 
 void ElevatorSubsystem::ConfigurePrimaryMotor() {
