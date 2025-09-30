@@ -1,12 +1,16 @@
 #include "subsystems/ElevatorSubsystem.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
+#include "frc/RobotBase.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "rev/ClosedLoopSlot.h"
 #include "rev/SparkBase.h"
 #include "rev/SparkClosedLoopController.h"
 #include "rev/SparkLowLevel.h"
 #include "rev/config/SparkBaseConfig.h"
 #include "rev/config/SparkMaxConfig.h"
+#include "units/length.h"
+#include "units/voltage.h"
 
 ElevatorSubsystem::ElevatorSubsystem() {
   ConfigurePrimaryMotor();
@@ -61,9 +65,12 @@ double ElevatorSubsystem::GetPosition() { return -primaryEncoder.GetPosition(); 
 
 void ElevatorSubsystem::SetPosition(double position) {
   currentSetpoint = position;
-  onboardClosedLoop.SetReference(-position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
-                                 rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
-                                 rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
+
+  if (frc::RobotBase::IsReal()) {
+    onboardClosedLoop.SetReference(-position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
+                                   rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
+                                   rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
+  }
 }
 
 void ElevatorSubsystem::ZeroEncoder() { primaryEncoder.SetPosition(0.0); }
@@ -84,3 +91,17 @@ bool ElevatorSubsystem::IsElevatorPIDAtSetpoint() {
 }
 
 double ElevatorSubsystem::GetElevatorCurrentDraw() { return primaryMotor.GetOutputCurrent(); }
+
+void ElevatorSubsystem::SimulationPeriodic() {
+  double pidOutput = m_simPID.Calculate(simPosition.value(), EncoderRotationToMeters(currentSetpoint).value());
+
+  units::volt_t appliedVoltage = units::volt_t{pidOutput};
+  m_elevatorSim.SetInputVoltage(appliedVoltage);
+
+  m_elevatorSim.Update(20_ms);
+
+  simPosition = units::meter_t{m_elevatorSim.GetOutput(0)};
+
+  frc::SmartDashboard::PutNumber("Sim Elevator Position", simPosition.value());
+  frc::SmartDashboard::PutNumber("Setpoint", EncoderRotationToMeters(currentSetpoint).value());
+}

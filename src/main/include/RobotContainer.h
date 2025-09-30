@@ -32,5 +32,6 @@ private:
   ElevatorSubsystem m_elevatorSubsystem;
 
   void ConfigureBindings();
+  void ConfigureElevatorBindings();
   void ConfigureDefaultCommands();
 };
