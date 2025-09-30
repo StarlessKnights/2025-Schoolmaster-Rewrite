@@ -7,20 +7,22 @@
 #include <frc2/command/button/Trigger.h>
 
 #include "commands/FieldDriveCommand.hpp"
-#include "frc/DataLogManager.h"
+#include "commands/elevator/ElevatorRetractCommand.hpp"
 #include "frc2/command/Commands.h"
 
-RobotContainer::RobotContainer() : m_driveSubsystem() {
+RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
   ConfigureBindings();
   ConfigureDefaultCommands();
 }
 
 void RobotContainer::ConfigureBindings() {
-  m_driverController.Button(1).OnTrue(frc2::cmd::RunOnce([] { frc::DataLogManager::Log("Button 1 pressed"); }, {}));
   m_driverController.Y().OnTrue(frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }));
 }
 
-void RobotContainer::ConfigureDefaultCommands() { m_driveSubsystem.SetDefaultCommand(GetDefaultDriveCommand()); }
+void RobotContainer::ConfigureDefaultCommands() {
+  m_driveSubsystem.SetDefaultCommand(GetDefaultDriveCommand());
+  m_elevatorSubsystem.SetDefaultCommand(ElevatorRetractCommand(&m_elevatorSubsystem).ToPtr());
+}
 
 frc2::CommandPtr RobotContainer::GetDefaultDriveCommand() {
   return FieldDriveCommand(
