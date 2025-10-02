@@ -9,8 +9,11 @@
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
+#include "commands/algaegrabber/AlgaeGrabberAndElevatorPositionAndIntakeCommand.hpp"
 #include "commands/algaegrabber/AlgaeGrabberGoToPositionCommand.hpp"
 #include "commands/algaegrabber/ElevatorPopUpAndAlgaeGrabberGoToPositionCommand.hpp"
+#include "commands/algaegrabber/PositionHoldAndEjectCommand.hpp"
+#include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
@@ -21,6 +24,7 @@
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
   ConfigureBindings();
   ConfigureElevatorBindings();
+  ConfigureAlgaeGrabberBindings();
   ConfigureDefaultCommands();
 }
 
@@ -86,6 +90,57 @@ void RobotContainer::ConfigureElevatorBindings() {
   // HP Intake
   m_driverController.RightBumper().ToggleOnTrue(
       ElevatorHPIntakeCommand(&m_elevatorSubsystem).ToPtr());
+}
+
+void RobotContainer::ConfigureAlgaeGrabberBindings() {
+  std::function<bool()> runOuttake = [this]() {
+    return m_driverController.GetLeftTriggerAxis() > 0.25;
+  };
+
+  m_driverController.X().OnTrue(frc2::cmd::Parallel(
+      frc2::cmd::Sequence(
+          AlgaeGrabberAndElevatorPositionAndIntakeCommand(
+              &m_elevatorSubsystem, &m_algaeGrabberSubsystem,
+              ElevatorSubsystemConstants::kHighAlgaePosition,
+              AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition)
+              .ToPtr(),
+          PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem,
+                                      &m_elevatorSubsystem, runOuttake)
+              .ToPtr()),
+      SlowFieldDriveCommand(
+          &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
+          [this] { return m_driverController.GetLeftX(); },
+          [this] { return m_driverController.GetRightX(); })
+          .ToPtr()));
+
+  m_driverController.A().OnTrue(frc2::cmd::Parallel(
+      frc2::cmd::Sequence(
+          AlgaeGrabberAndElevatorPositionAndIntakeCommand(
+              &m_elevatorSubsystem, &m_algaeGrabberSubsystem,
+              ElevatorSubsystemConstants::kLowAlgaePosition,
+              AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition)
+              .ToPtr(),
+          PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem,
+                                      &m_elevatorSubsystem, runOuttake)
+              .ToPtr()),
+      SlowFieldDriveCommand(
+          &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
+          [this] { return m_driverController.GetLeftX(); },
+          [this] { return m_driverController.GetRightX(); })
+          .ToPtr()));
+
+  m_driverController.B().OnTrue(frc2::cmd::Sequence(
+      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
+          &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+          AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition)
+          .ToPtr(),
+      UnsafeProcessorScoreCommand(&m_algaeGrabberSubsystem,
+                                  &m_elevatorSubsystem, runOuttake)
+          .ToPtr(),
+      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
+          &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+          AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
+          .ToPtr()));
 }
 
 void RobotContainer::ConfigureDefaultCommands() {

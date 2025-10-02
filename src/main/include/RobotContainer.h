@@ -26,8 +26,10 @@ public:
   frc2::CommandPtr GetDefaultDriveCommand();
 
 private:
-  frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};
-  frc2::CommandXboxController m_operatorController{OperatorConstants::kOperatorControllerPort};
+  frc2::CommandXboxController m_driverController{
+      OperatorConstants::kDriverControllerPort};
+  frc2::CommandXboxController m_operatorController{
+      OperatorConstants::kOperatorControllerPort};
 
   DriveSubsystem m_driveSubsystem;
   ElevatorSubsystem m_elevatorSubsystem;
@@ -35,5 +37,6 @@ private:
 
   void ConfigureBindings();
   void ConfigureElevatorBindings();
+  void ConfigureAlgaeGrabberBindings();
   void ConfigureDefaultCommands();
 };
