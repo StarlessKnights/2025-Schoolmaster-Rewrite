@@ -3,9 +3,9 @@
 
 #include <commands/SlowFieldDriveCommand.hpp>
 
-void FieldDriveCommand::Initialize() {};
+void SlowFieldDriveCommand::Initialize() {};
 
-void FieldDriveCommand::Execute() {
+void SlowFieldDriveCommand::Execute() {
   frc::ChassisSpeeds fieldRelativeSpeeds =
       frc::ChassisSpeeds::FromFieldRelativeSpeeds(
           ySpeed() * 0.5_mps, xSpeed() * 0.5_mps,
@@ -15,6 +15,6 @@ void FieldDriveCommand::Execute() {
   drive->Drive(fieldRelativeSpeeds);
 }
 
-void FieldDriveCommand::End(bool interrupted) {};
+void SlowFieldDriveCommand::End(bool interrupted) {};
 
-bool FieldDriveCommand::IsFinished() { return false; }
+bool SlowFieldDriveCommand::IsFinished() { return false; }
