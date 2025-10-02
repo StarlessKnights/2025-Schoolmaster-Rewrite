@@ -131,3 +131,25 @@ inline constexpr double kAtSetpointTolerance = 1.0;
 
 inline constexpr double kArbitraryFeedforward = 0.44;
 } // namespace ElevatorSubsystemConstants
+
+namespace AlgaeGrabberSubsystemsConstants {
+inline constexpr int kPivotMotorID = 41;
+inline constexpr int kSpinMotorID = 40;
+
+inline constexpr int kThruBoreEncoderID = 0;
+
+inline constexpr double kAlgaeRemovalEncoderPosition = -0.25;
+inline constexpr double kProcessorScoringEncoderPosition = -0.3;
+inline constexpr double kRetractedEncoderPosition = 0.3;
+inline constexpr double kEjectEncoderPosition = 0.3;
+inline constexpr double kGroundIntakeEncoderPosition = -0.3;
+
+inline constexpr double kMinimumSafeElevatorEncoderPosition = 12.0;
+
+inline constexpr double kIntakeMotorSpeed = 1.0;
+
+inline constexpr double kIntakeCurrentDraw = 40.0;
+
+inline const frc::ChassisSpeeds kIntakeChassisSpeeds{-0.5_mps, 0.0_mps, 0.0_rad_per_s};
+inline const frc::ChassisSpeeds kRetractChassisSpeeds{1.0_mps, 0.0_mps, 0.0_rad_per_s};
+} // namespace AlgaeGrabberSubsystemsConstants

@@ -8,6 +8,7 @@
 #include <frc2/command/button/CommandXboxController.h>
 
 #include "constants/Constants.h"
+#include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
 
@@ -30,6 +31,7 @@ private:
 
   DriveSubsystem m_driveSubsystem;
   ElevatorSubsystem m_elevatorSubsystem;
+  AlgaeGrabberSubsystem m_algaeGrabberSubsystem;
 
   void ConfigureBindings();
   void ConfigureElevatorBindings();
