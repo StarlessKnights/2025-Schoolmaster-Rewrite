@@ -1,3 +1,6 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include "constants/Constants.h"
@@ -9,7 +12,7 @@
 #include "utils/TurboLaserCAN.hpp"
 
 class ElevatorSubsystem : public frc2::SubsystemBase {
-private:
+ private:
   rev::spark::SparkMax primaryMotor{ElevatorSubsystemConstants::kPrimaryMotorID,
                                     rev::spark::SparkLowLevel::MotorType::kBrushless};
   rev::spark::SparkMax secondaryMotor{ElevatorSubsystemConstants::kSecondaryMotorID,
@@ -24,7 +27,7 @@ private:
 
   double currentSetpoint = 0.0;
 
-public:
+ public:
   ElevatorSubsystem();
 
   void ConfigurePrimaryMotor();

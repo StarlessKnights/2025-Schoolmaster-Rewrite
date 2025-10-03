@@ -1,13 +1,17 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
-#include "grpl/LaserCan.h"
 #include <optional>
 
+#include "grpl/LaserCan.h"
+
 class TurboLaserCAN {
-private:
+ private:
   grpl::LaserCan laserCan;
 
-public:
+ public:
   TurboLaserCAN(int id) : laserCan(id) {}
 
   int GetProximity() {

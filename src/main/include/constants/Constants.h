@@ -1,6 +1,5 @@
 // Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Turbo Torque 7492
 
 #pragma once
 
@@ -22,20 +21,20 @@
 
 namespace RobotConstants {
 inline constexpr int kNominalVoltage = 12;
-}
+}  // namespace RobotConstants
 
 namespace OperatorConstants {
 
 inline constexpr int kDriverControllerPort = 0;
 inline constexpr int kOperatorControllerPort = 1;
 
-} // namespace OperatorConstants
+}  // namespace OperatorConstants
 
 namespace NeoKrakenModuleConstants {
 
 inline constexpr double kNominalVoltage = 12.8;
 
-} // namespace NeoKrakenModuleConstants
+}  // namespace NeoKrakenModuleConstants
 
 namespace DriveSubsystemConstants {
 inline constexpr int kPigeonID = 10;
@@ -69,29 +68,31 @@ inline constexpr units::meters_per_second_t kMaxLinearSpeed = 4.5_mps;
 inline constexpr units::radians_per_second_t kMaxAngularSpeed = 570_deg_per_s;
 
 inline constexpr frc::Translation2d kModulePositions[] = {
-    {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},  // Front Left
-    {units::meter_t{kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}}, // Front Right
-    {units::meter_t{-kRobotLength / 2}, units::meter_t{kRobotWidth / 2}}, // Back Left
-    {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}} // Back Right
+    {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},   // Front Left
+    {units::meter_t{kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}},  // Front Right
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},  // Back Left
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}}  // Back Right
 };
 
-inline frc::SwerveDriveKinematics<4> kKinematics{kModulePositions[0], kModulePositions[1], kModulePositions[2],
-                                                 kModulePositions[3]};
-} // namespace DriveSubsystemConstants
+inline frc::SwerveDriveKinematics<4> kKinematics{kModulePositions[0], kModulePositions[1],
+                                                 kModulePositions[2], kModulePositions[3]};
+}  // namespace DriveSubsystemConstants
 
 namespace CameraConstants {
-inline const std::string kPathToAprilTagLayout = "/home/lvuser/deploy/files/2025-reefscape-welded.json";
+inline const std::string kPathToAprilTagLayout =
+    "/home/lvuser/deploy/files/2025-reefscape-welded.json";
 
 inline const std::string kLocalizationCamOneName = "lc1";
 inline const std::string kLocalizationCamTwoName = "lc2";
 
-inline const frc::Transform3d kLocalizationCamOneOffset{frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m),
-                                                        frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
+inline const frc::Transform3d kLocalizationCamOneOffset{
+    frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m), frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
 
 inline const frc::Transform3d kLocalizationCamTwoOffset{
     frc::Translation3d(0.2159_m, -0.279_m, 0.1143_m),
-    frc::Rotation3d(0_rad, units::radian_t{units::degree_t{20}}, units::radian_t{units::degree_t{37}})};
-} // namespace CameraConstants
+    frc::Rotation3d(0_rad, units::radian_t{units::degree_t{20}},
+                    units::radian_t{units::degree_t{37}})};
+}  // namespace CameraConstants
 
 namespace ElevatorSubsystemConstants {
 inline constexpr int kPrimaryMotorID = 51;
@@ -109,7 +110,7 @@ inline constexpr double kL3EncoderPosition = 25.0;
 inline constexpr double kL4EncoderPosition = 52.0;
 
 inline constexpr double kHPEncoderPosition = 0.1;
-inline constexpr double kDefaultEncoderPosition = 1.5; // Prevents carriage from hitting base
+inline constexpr double kDefaultEncoderPosition = 1.5;  // Prevents carriage from hitting base
 
 inline constexpr double kHighAlgaePosition = 44.0;
 inline constexpr double kLowAlgaePosition = 28.0;
@@ -130,7 +131,7 @@ inline constexpr double kMaxVelocity = 15000.0;
 inline constexpr double kAtSetpointTolerance = 1.0;
 
 inline constexpr double kArbitraryFeedforward = 0.44;
-} // namespace ElevatorSubsystemConstants
+}  // namespace ElevatorSubsystemConstants
 
 namespace AlgaeGrabberSubsystemsConstants {
 inline constexpr int kPivotMotorID = 41;
@@ -152,4 +153,4 @@ inline constexpr double kIntakeCurrentDraw = 40.0;
 
 inline const frc::ChassisSpeeds kIntakeChassisSpeeds{-0.5_mps, 0.0_mps, 0.0_rad_per_s};
 inline const frc::ChassisSpeeds kRetractChassisSpeeds{1.0_mps, 0.0_mps, 0.0_rad_per_s};
-} // namespace AlgaeGrabberSubsystemsConstants
+}  // namespace AlgaeGrabberSubsystemsConstants

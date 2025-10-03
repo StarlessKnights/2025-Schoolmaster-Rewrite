@@ -1,4 +1,14 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "utils/TurboPhotonCamera.hpp"
+
+#include <exception>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
@@ -16,14 +26,11 @@
 #include "units/frequency.h"
 #include "units/time.h"
 #include "utils/PoseTimestampPair.hpp"
-#include <exception>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
 
-TurboPhotonCamera::TurboPhotonCamera(const std::string &cameraName, frc::Transform3d cameraInBotSpace)
-    : camera(cameraName), poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
+TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName,
+                                     frc::Transform3d cameraInBotSpace)
+    : camera(cameraName),
+      poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
   if (frc::RobotBase::IsSimulation()) {
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
@@ -40,8 +47,9 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string &cameraName, frc::Transfo
     systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
   }
 
-  visionTargetPublisher =
-      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets").Publish();
+  visionTargetPublisher = nt::NetworkTableInstance::GetDefault()
+                              .GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets")
+                              .Publish();
 }
 
 void TurboPhotonCamera::updateSim(frc::Pose2d robotPose) {
@@ -55,8 +63,9 @@ frc::AprilTagFieldLayout TurboPhotonCamera::getLayout() {
   try {
     layout = frc::AprilTagFieldLayout{CameraConstants::kPathToAprilTagLayout};
     frc::DataLogManager::Log("Successfully loaded edited json (April tag field layout)");
-  } catch (std::exception &e) {
-    frc::DataLogManager::Log("Failed to load edited json (April tag field layout): " + std::string(e.what()));
+  } catch (std::exception& e) {
+    frc::DataLogManager::Log("Failed to load edited json (April tag field layout): " +
+                             std::string(e.what()));
     layout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
   }
 
@@ -67,7 +76,7 @@ photon::PhotonPipelineResult TurboPhotonCamera::getLatestResult() {
   auto result = camera.GetLatestResult();
   std::vector<frc::Pose2d> targetPoses;
 
-  for (const auto &target : result.GetTargets()) {
+  for (const auto& target : result.GetTargets()) {
     if (target.GetFiducialId() >= 0) {
       auto tagPose = layout.GetTagPose(target.GetFiducialId());
       if (tagPose.has_value()) {

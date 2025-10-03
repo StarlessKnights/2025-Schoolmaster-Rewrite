@@ -1,4 +1,8 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "subsystems/ElevatorSubsystem.hpp"
+
 #include "constants/Constants.h"
 #include "rev/ClosedLoopSlot.h"
 #include "rev/SparkBase.h"
@@ -50,22 +54,33 @@ void ElevatorSubsystem::ConfigureCoralMotor() {
                        rev::spark::SparkBase::PersistMode::kPersistParameters);
 }
 
-void ElevatorSubsystem::SetSpin(double percent) { primaryMotor.Set(-percent); }
+void ElevatorSubsystem::SetSpin(double percent) {
+  primaryMotor.Set(-percent);
+}
 
-void ElevatorSubsystem::SetCoralGrabber(double percent) { coralMotor.Set(percent); }
+void ElevatorSubsystem::SetCoralGrabber(double percent) {
+  coralMotor.Set(percent);
+}
 
-double ElevatorSubsystem::GetPosition() { return -primaryEncoder.GetPosition(); }
+double ElevatorSubsystem::GetPosition() {
+  return -primaryEncoder.GetPosition();
+}
 
 void ElevatorSubsystem::SetPosition(double position) {
   currentSetpoint = position;
-  onboardClosedLoop.SetReference(-position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
-                                 rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
-                                 rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
+  onboardClosedLoop.SetReference(
+      -position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
+      rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
+      rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
 }
 
-void ElevatorSubsystem::ZeroEncoder() { primaryEncoder.SetPosition(0.0); }
+void ElevatorSubsystem::ZeroEncoder() {
+  primaryEncoder.SetPosition(0.0);
+}
 
-void ElevatorSubsystem::ZeroEncoder(double customZero) { primaryEncoder.SetPosition(customZero); }
+void ElevatorSubsystem::ZeroEncoder(double customZero) {
+  primaryEncoder.SetPosition(customZero);
+}
 
 void ElevatorSubsystem::StopAll() {
   SetSpin(0.0);
@@ -77,7 +92,10 @@ bool ElevatorSubsystem::GetIsCoralInHoldingPosition() {
 }
 
 bool ElevatorSubsystem::IsElevatorPIDAtSetpoint() {
-  return std::abs(currentSetpoint - GetPosition()) < ElevatorSubsystemConstants::kAtSetpointTolerance;
+  return std::abs(currentSetpoint - GetPosition()) <
+         ElevatorSubsystemConstants::kAtSetpointTolerance;
 }
 
-double ElevatorSubsystem::GetElevatorCurrentDraw() { return primaryMotor.GetOutputCurrent(); }
+double ElevatorSubsystem::GetElevatorCurrentDraw() {
+  return primaryMotor.GetOutputCurrent();
+}

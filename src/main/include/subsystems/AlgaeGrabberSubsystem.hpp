@@ -1,3 +1,6 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include "constants/Constants.h"
@@ -8,7 +11,7 @@
 #include "rev/SparkMax.h"
 
 class AlgaeGrabberSubsystem : public frc2::SubsystemBase {
-private:
+ private:
   rev::spark::SparkMax pivotMotor{AlgaeGrabberSubsystemsConstants::kPivotMotorID,
                                   rev::spark::SparkLowLevel::MotorType::kBrushless};
   rev::spark::SparkMax spinMotor{AlgaeGrabberSubsystemsConstants::kSpinMotorID,
@@ -18,7 +21,7 @@ private:
 
   frc::PIDController controller{1.0, 0, 0};
 
-public:
+ public:
   AlgaeGrabberSubsystem();
 
   void ConfigurePivotMotor();

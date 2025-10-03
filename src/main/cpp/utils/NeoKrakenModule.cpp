@@ -1,9 +1,13 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
+#include "utils/NeoKrakenModule.hpp"
+
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
 
 #include <string>
-#include <utils/NeoKrakenModule.hpp>
 
 #include "constants/Constants.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
@@ -19,9 +23,14 @@
 #include "units/base.h"
 #include "units/length.h"
 
-NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string &can)
-    : driveMotor(driveID, can), steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
-      encoderObject(encoderID, can), offset(offset), ff(0_V, 0_V / 1_mps), driveController(0.0, 0.0, 0.0),
+NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset,
+                                 const std::string& can)
+    : driveMotor(driveID, can),
+      steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
+      encoderObject(encoderID, can),
+      offset(offset),
+      ff(0_V, 0_V / 1_mps),
+      driveController(0.0, 0.0, 0.0),
       steerController(0.0, 0.0, 0.0) {
   SetupEncoder(encoderObject);
   ConfigDriveMotor(driveMotor);
@@ -29,8 +38,8 @@ NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double
   ConfigPIDInternal();
 }
 
-void NeoKrakenModule::SetupEncoder(ctre::phoenix6::hardware::CANcoder &encoder) {
-  ctre::phoenix6::configs::CANcoderConfigurator &configPls = encoder.GetConfigurator();
+void NeoKrakenModule::SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder) {
+  ctre::phoenix6::configs::CANcoderConfigurator& configPls = encoder.GetConfigurator();
   ctre::phoenix6::configs::CANcoderConfiguration config{};
   config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = units::turn_t{0.5};
 
@@ -46,7 +55,7 @@ void NeoKrakenModule::ConfigPIDInternal() {
   this->steerController.EnableContinuousInput(-M_PI, M_PI);
 }
 
-void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX &target) {
+void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target) {
   ctre::phoenix6::configs::TalonFXConfiguration config{};
   config.MotorOutput.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Brake;
 
@@ -55,7 +64,7 @@ void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX &target
   target.GetConfigurator().Apply(config);
 }
 
-void NeoKrakenModule::ConfigSteerMotor(rev::spark::SparkMax &target) {
+void NeoKrakenModule::ConfigSteerMotor(rev::spark::SparkMax& target) {
   rev::spark::SparkBaseConfig config;
   config.Inverted(false);
   config.VoltageCompensation(NeoKrakenModuleConstants::kNominalVoltage);
@@ -65,7 +74,7 @@ void NeoKrakenModule::ConfigSteerMotor(rev::spark::SparkMax &target) {
                    rev::spark::SparkBase::PersistMode::kPersistParameters);
 }
 
-void NeoKrakenModule::CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration &config) {
+void NeoKrakenModule::CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config) {
   config.CurrentLimits.SupplyCurrentLimitEnable = true;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
 

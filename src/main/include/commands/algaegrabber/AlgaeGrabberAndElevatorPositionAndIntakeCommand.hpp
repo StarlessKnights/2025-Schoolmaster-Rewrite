@@ -1,3 +1,6 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include "constants/Constants.h"
@@ -7,24 +10,25 @@
 #include "subsystems/ElevatorSubsystem.hpp"
 
 class AlgaeGrabberAndElevatorPositionAndIntakeCommand
-    : public frc2::CommandHelper<
-          frc2::Command, AlgaeGrabberAndElevatorPositionAndIntakeCommand> {
-private:
-  ElevatorSubsystem *elevator;
-  AlgaeGrabberSubsystem *grabber;
+    : public frc2::CommandHelper<frc2::Command, AlgaeGrabberAndElevatorPositionAndIntakeCommand> {
+ private:
+  ElevatorSubsystem* elevator;
+  AlgaeGrabberSubsystem* grabber;
 
   double elevatorPosition;
   double grabberPosition;
 
-public:
-  AlgaeGrabberAndElevatorPositionAndIntakeCommand(
-      ElevatorSubsystem *elevator, AlgaeGrabberSubsystem *grabber,
-      double elevatorPosition, double grabberPosition)
-      : elevator(elevator), grabber(grabber),
-        elevatorPosition(elevatorPosition), grabberPosition(grabberPosition) {
+ public:
+  AlgaeGrabberAndElevatorPositionAndIntakeCommand(ElevatorSubsystem* elevator,
+                                                  AlgaeGrabberSubsystem* grabber,
+                                                  double elevatorPosition, double grabberPosition)
+      : elevator(elevator),
+        grabber(grabber),
+        elevatorPosition(elevatorPosition),
+        grabberPosition(grabberPosition) {
     AddRequirements(elevator);
     AddRequirements(grabber);
-  };
+  }
 
   void Initialize() override {};
   void Execute() override {
@@ -37,8 +41,7 @@ public:
       grabber->SetPivotMotor(0.0);
     }
 
-    if (grabber->IsAlgaeGrabberPIDAtSetpoint() &&
-        elevator->IsElevatorPIDAtSetpoint()) {
+    if (grabber->IsAlgaeGrabberPIDAtSetpoint() && elevator->IsElevatorPIDAtSetpoint()) {
       grabber->SetSpinMotor(AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed);
     }
   }
@@ -47,7 +50,6 @@ public:
     grabber->StopAll();
   };
   bool IsFinished() override {
-    return grabber->GetSpinMotorCurrentDraw() >
-           AlgaeGrabberSubsystemsConstants::kIntakeCurrentDraw;
+    return grabber->GetSpinMotorCurrentDraw() > AlgaeGrabberSubsystemsConstants::kIntakeCurrentDraw;
   }
 };

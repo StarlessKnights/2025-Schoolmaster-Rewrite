@@ -1,4 +1,8 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
+
 #include "constants/Constants.h"
 #include "rev/SparkBase.h"
 #include "rev/config/SparkBaseConfig.h"
@@ -30,9 +34,13 @@ void AlgaeGrabberSubsystem::ConfigureSpinMotor() {
                       rev::spark::SparkBase::PersistMode::kPersistParameters);
 }
 
-void AlgaeGrabberSubsystem::SetSpinMotor(double percent) { spinMotor.Set(-percent); }
+void AlgaeGrabberSubsystem::SetSpinMotor(double percent) {
+  spinMotor.Set(-percent);
+}
 
-void AlgaeGrabberSubsystem::SetPivotMotor(double percent) { pivotMotor.Set(percent); }
+void AlgaeGrabberSubsystem::SetPivotMotor(double percent) {
+  pivotMotor.Set(percent);
+}
 
 double AlgaeGrabberSubsystem::LinearizeEncoderOutput(double currentPosition) {
   if (currentPosition > 0.5) {
@@ -53,10 +61,18 @@ void AlgaeGrabberSubsystem::StopAll() {
   pivotMotor.Set(0.0);
 }
 
-double AlgaeGrabberSubsystem::GetPosition() { return thruBore.Get(); }
+double AlgaeGrabberSubsystem::GetPosition() {
+  return thruBore.Get();
+}
 
-double AlgaeGrabberSubsystem::GetLinearizedPosition() { return LinearizeEncoderOutput(GetPosition()); }
+double AlgaeGrabberSubsystem::GetLinearizedPosition() {
+  return LinearizeEncoderOutput(GetPosition());
+}
 
-double AlgaeGrabberSubsystem::GetSpinMotorCurrentDraw() { return spinMotor.GetOutputCurrent(); }
+double AlgaeGrabberSubsystem::GetSpinMotorCurrentDraw() {
+  return spinMotor.GetOutputCurrent();
+}
 
-bool AlgaeGrabberSubsystem::IsAlgaeGrabberPIDAtSetpoint() { return controller.AtSetpoint(); }
+bool AlgaeGrabberSubsystem::IsAlgaeGrabberPIDAtSetpoint() {
+  return controller.AtSetpoint();
+}

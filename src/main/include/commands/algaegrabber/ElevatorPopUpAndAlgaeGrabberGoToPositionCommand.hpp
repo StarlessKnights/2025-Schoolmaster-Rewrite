@@ -1,3 +1,6 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include "constants/Constants.h"
@@ -8,13 +11,14 @@
 
 class ElevatorPopUpAndAlgaeGrabberGoToPositionCommand
     : public frc2::CommandHelper<frc2::Command, ElevatorPopUpAndAlgaeGrabberGoToPositionCommand> {
-  AlgaeGrabberSubsystem *algaeGrabber;
-  ElevatorSubsystem *elevator;
+  AlgaeGrabberSubsystem* algaeGrabber;
+  ElevatorSubsystem* elevator;
   double algaeGrabberEncoderPosition;
   double homePosition = AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition;
 
-public:
-  ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(AlgaeGrabberSubsystem *algaeGrabber, ElevatorSubsystem *elevator,
+ public:
+  ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(AlgaeGrabberSubsystem* algaeGrabber,
+                                                  ElevatorSubsystem* elevator,
                                                   double algaeEncoderPosition);
 
   void Initialize() override;

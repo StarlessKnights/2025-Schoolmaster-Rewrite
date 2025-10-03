@@ -1,3 +1,6 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include "constants/Constants.h"
@@ -5,13 +8,12 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/ElevatorSubsystem.hpp"
 
-class ElevatorHPIntakeCommand
-    : public frc2::CommandHelper<frc2::Command, ElevatorHPIntakeCommand> {
-private:
-  ElevatorSubsystem *elevator;
+class ElevatorHPIntakeCommand : public frc2::CommandHelper<frc2::Command, ElevatorHPIntakeCommand> {
+ private:
+  ElevatorSubsystem* elevator;
 
-public:
-  ElevatorHPIntakeCommand(ElevatorSubsystem *elevator) : elevator(elevator) {
+ public:
+  ElevatorHPIntakeCommand(ElevatorSubsystem* elevator) : elevator(elevator) {
     AddRequirements(elevator);
   }
 

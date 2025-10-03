@@ -1,9 +1,15 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "commands/algaegrabber/ElevatorPopUpAndAlgaeGrabberGoToPositionCommand.hpp"
+
 #include "constants/Constants.h"
 
 ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
-    AlgaeGrabberSubsystem *algaeGrabber, ElevatorSubsystem *elevator, double algaeEncoderPosition)
-    : algaeGrabber(algaeGrabber), elevator(elevator), algaeGrabberEncoderPosition(algaeEncoderPosition) {
+    AlgaeGrabberSubsystem* algaeGrabber, ElevatorSubsystem* elevator, double algaeEncoderPosition)
+    : algaeGrabber(algaeGrabber),
+      elevator(elevator),
+      algaeGrabberEncoderPosition(algaeEncoderPosition) {
   AddRequirements(algaeGrabber);
   AddRequirements(elevator);
 }
