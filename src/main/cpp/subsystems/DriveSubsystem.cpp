@@ -1,8 +1,12 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "subsystems/DriveSubsystem.hpp"
 
 #include <array>
 
 #include "constants/Constants.h"
+#include "frc/DataLogManager.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -18,27 +22,32 @@ DriveSubsystem::DriveSubsystem()
     : fleft(DriveSubsystemConstants::kFrontLeftDriveID, DriveSubsystemConstants::kFrontLeftSteerID,
             DriveSubsystemConstants::kFrontLeftEncoderID, DriveSubsystemConstants::kFrontLeftOffset,
             DriveSubsystemConstants::kCanivoreName),
-      fright(DriveSubsystemConstants::kFrontRightDriveID, DriveSubsystemConstants::kFrontRightSteerID,
-             DriveSubsystemConstants::kFrontRightEncoderID, DriveSubsystemConstants::kFrontRightOffset,
-             DriveSubsystemConstants::kCanivoreName),
+      fright(DriveSubsystemConstants::kFrontRightDriveID,
+             DriveSubsystemConstants::kFrontRightSteerID,
+             DriveSubsystemConstants::kFrontRightEncoderID,
+             DriveSubsystemConstants::kFrontRightOffset, DriveSubsystemConstants::kCanivoreName),
       bleft(DriveSubsystemConstants::kBackLeftDriveID, DriveSubsystemConstants::kBackLeftSteerID,
             DriveSubsystemConstants::kBackLeftEncoderID, DriveSubsystemConstants::kBackLeftOffset,
             DriveSubsystemConstants::kCanivoreName),
       bright(DriveSubsystemConstants::kBackRightDriveID, DriveSubsystemConstants::kBackRightSteerID,
-             DriveSubsystemConstants::kBackRightEncoderID, DriveSubsystemConstants::kBackRightOffset,
-             DriveSubsystemConstants::kCanivoreName),
+             DriveSubsystemConstants::kBackRightEncoderID,
+             DriveSubsystemConstants::kBackRightOffset, DriveSubsystemConstants::kCanivoreName),
       estimator(GetAngle(), GetModulePositions(), frc::Pose2d()) {
-
-  m_posePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Publish();
-  m_speedsPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("Speeds").Publish();
-  m_swerveStatesPublisher =
-      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::SwerveModuleState>("SwerveStates").Publish();
+  m_posePublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Publish();
+  m_speedsPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("Speeds").Publish();
+  m_swerveStatesPublisher = nt::NetworkTableInstance::GetDefault()
+                                .GetStructArrayTopic<frc::SwerveModuleState>("SwerveStates")
+                                .Publish();
 
   m_posePublisher.Set(frc::Pose2d());
   m_speedsPublisher.Set(frc::ChassisSpeeds());
   m_swerveStatesPublisher.Set(GetModuleStates());
 
   m_lastTime = frc::Timer::GetFPGATimestamp();
+
+  frc::DataLogManager::Log("DriveSubsystem Constructor");
 }
 
 void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
@@ -50,24 +59,30 @@ void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
   m_speedsPublisher.Set(speeds);
 }
 
-void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4> &states) {
+void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states) {
   fleft.SetModuleState(states[0]);
   fright.SetModuleState(states[1]);
   bleft.SetModuleState(states[2]);
   bright.SetModuleState(states[3]);
 }
 
-void DriveSubsystem::DriverGryoZero() { driverGyroOffset = GetAngle(); }
+void DriveSubsystem::DriverGryoZero() {
+  driverGyroOffset = GetAngle();
+}
 
 std::array<frc::SwerveModuleState, 4> DriveSubsystem::GetModuleStates() {
-  return {fleft.GetModuleState(), fright.GetModuleState(), bleft.GetModuleState(), bright.GetModuleState()};
+  return {fleft.GetModuleState(), fright.GetModuleState(), bleft.GetModuleState(),
+          bright.GetModuleState()};
 }
 
 std::array<frc::SwerveModulePosition, 4> DriveSubsystem::GetModulePositions() {
-  return {fleft.GetModulePosition(), fright.GetModulePosition(), bleft.GetModulePosition(), bright.GetModulePosition()};
+  return {fleft.GetModulePosition(), fright.GetModulePosition(), bleft.GetModulePosition(),
+          bright.GetModulePosition()};
 }
 
-frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() { return GetAngle() - driverGyroOffset; }
+frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() {
+  return GetAngle() - driverGyroOffset;
+}
 
 void DriveSubsystem::Periodic() {
   estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
@@ -81,7 +96,8 @@ void DriveSubsystem::SimulationPeriodic() {
   auto dt = currentTime - m_lastTime;
   m_lastTime = currentTime;
 
-  auto fieldRelSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(m_cmdSpeeds, m_simPose.Rotation());
+  auto fieldRelSpeeds =
+      frc::ChassisSpeeds::FromRobotRelativeSpeeds(m_cmdSpeeds, m_simPose.Rotation());
 
   auto newX = m_simPose.X() + fieldRelSpeeds.vx * dt;
   auto newY = m_simPose.Y() + fieldRelSpeeds.vy * dt;
@@ -90,6 +106,6 @@ void DriveSubsystem::SimulationPeriodic() {
 
   m_posePublisher.Set(m_simPose);
 
-  auto &simGyro = pigeon.GetSimState();
+  auto& simGyro = pigeon.GetSimState();
   simGyro.SetRawYaw(m_simPose.Rotation().Degrees());
 }

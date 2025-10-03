@@ -1,4 +1,9 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
+
+#include <optional>
 
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
@@ -11,11 +16,11 @@
 #include "photon/simulation/VisionSystemSim.h"
 #include "photon/targeting/PhotonPipelineResult.h"
 #include "utils/PoseTimestampPair.hpp"
-#include <optional>
 
 class TurboPhotonCamera {
-private:
-  frc::AprilTagFieldLayout layout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
+ private:
+  frc::AprilTagFieldLayout layout =
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
   photon::PhotonCamera camera;
   photon::PhotonPoseEstimator poseEstimator;
 
@@ -24,8 +29,8 @@ private:
 
   nt::StructArrayPublisher<frc::Pose2d> visionTargetPublisher;
 
-public:
-  TurboPhotonCamera(const std::string &cameraName, frc::Transform3d cameraInBotSpace);
+ public:
+  TurboPhotonCamera(const std::string& cameraName, frc::Transform3d cameraInBotSpace);
   void updateSim(frc::Pose2d robotPose);
   frc::AprilTagFieldLayout getLayout();
   photon::PhotonPipelineResult getLatestResult();

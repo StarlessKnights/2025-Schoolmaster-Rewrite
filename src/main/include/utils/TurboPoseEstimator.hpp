@@ -1,4 +1,9 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
+
+#include <array>
 
 #include "constants/Constants.h"
 #include "frc/estimator/SwerveDrivePoseEstimator.h"
@@ -7,28 +12,33 @@
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "networktables/StructTopic.h"
 #include "utils/TurboPhotonCamera.hpp"
-#include <array>
 
 class TurboPoseEstimator {
-private:
+ private:
   frc::SwerveDrivePoseEstimator<4> poseEstimator;
 
   std::array<class TurboPhotonCamera, 2> localizationCameras = {
-      TurboPhotonCamera(CameraConstants::kLocalizationCamOneName, CameraConstants::kLocalizationCamOneOffset),
-      TurboPhotonCamera(CameraConstants::kLocalizationCamTwoName, CameraConstants::kLocalizationCamTwoOffset)};
+      TurboPhotonCamera(CameraConstants::kLocalizationCamOneName,
+                        CameraConstants::kLocalizationCamOneOffset),
+      TurboPhotonCamera(CameraConstants::kLocalizationCamTwoName,
+                        CameraConstants::kLocalizationCamTwoOffset)};
 
   nt::StructPublisher<frc::Pose2d> posePublisher =
       nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Vision Pose").Publish();
 
-public:
-  TurboPoseEstimator(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
+ public:
+  TurboPoseEstimator(frc::Rotation2d gyroAngle,
+                     std::array<frc::SwerveModulePosition, 4> modulePositions,
                      frc::Pose2d initialPose)
-      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions, initialPose) {}
+      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions,
+                      initialPose) {}
 
   frc::Pose2d getPose2D();
-  void ResetEstimatorPosition(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
+  void ResetEstimatorPosition(frc::Rotation2d gyroAngle,
+                              std::array<frc::SwerveModulePosition, 4> modulePositions,
                               frc::Pose2d pose);
-  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions);
-  void TryVisionUpdateWithCamera(TurboPhotonCamera &camera);
+  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
+                                   std::array<frc::SwerveModulePosition, 4> modulePositions);
+  void TryVisionUpdateWithCamera(TurboPhotonCamera& camera);
   void UpdateWithAllAvailableVisionMeasurements();
 };

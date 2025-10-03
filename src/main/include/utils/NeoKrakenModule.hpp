@@ -1,12 +1,16 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <rev/SparkMax.h>
 
+#include <string>
+
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
-#include <string>
 
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
@@ -29,13 +33,13 @@ class NeoKrakenModule {
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
  public:
-  NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string &can);
+  NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string& can);
 
   void ConfigPIDInternal();
-  void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX &target);
-  void ConfigSteerMotor(rev::spark::SparkMax &target);
-  void SetupEncoder(ctre::phoenix6::hardware::CANcoder &target);
-  void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration &config);
+  void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
+  void ConfigSteerMotor(rev::spark::SparkMax& target);
+  void SetupEncoder(ctre::phoenix6::hardware::CANcoder& target);
+  void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config);
   void SetModuleState(frc::SwerveModuleState state);
   double GetEncoderPosition();
   double GetPosition();

@@ -1,3 +1,6 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include <array>
@@ -17,9 +20,10 @@
 #include "utils/TurboPoseEstimator.hpp"
 
 class DriveSubsystem : public frc2::SubsystemBase {
-private:
+ private:
   NeoKrakenModule fleft, fright, bleft, bright;
-  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID, DriveSubsystemConstants::kCanivoreName};
+  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID,
+                                           DriveSubsystemConstants::kCanivoreName};
   frc::Rotation2d driverGyroOffset{};
   TurboPoseEstimator estimator;
 
@@ -31,11 +35,11 @@ private:
   nt::StructPublisher<frc::ChassisSpeeds> m_speedsPublisher;
   nt::StructArrayPublisher<frc::SwerveModuleState> m_swerveStatesPublisher;
 
-public:
+ public:
   DriveSubsystem();
 
   void Drive(frc::ChassisSpeeds speeds);
-  void SetModuleStates(const std::array<frc::SwerveModuleState, 4> &states);
+  void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states);
   void DriverGryoZero();
   frc::Rotation2d GetDriverGyroAngle();
   frc::Rotation2d GetAngle() { return pigeon.GetRotation2d(); }
