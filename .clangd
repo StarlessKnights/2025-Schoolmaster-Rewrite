@@ -1,7 +1,2 @@
 CompileFlags:
   Add: [-Wall, -Wextra, -Wpedantic]
-
-ClangTidy:
-  Add: modernize-*, readability-*, performance-*
-  Remove: cppcoreguidelines-pro-bounds-array-to-pointer-decay
-  Checks: 'clang-diagnostic-*,clang-analyzer-*,modernize-*'

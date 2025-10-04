@@ -19,13 +19,9 @@ class AlgaeGrabberAndElevatorPositionAndIntakeCommand
   double grabberPosition;
 
  public:
-  AlgaeGrabberAndElevatorPositionAndIntakeCommand(ElevatorSubsystem* elevator,
-                                                  AlgaeGrabberSubsystem* grabber,
+  AlgaeGrabberAndElevatorPositionAndIntakeCommand(ElevatorSubsystem* elevator, AlgaeGrabberSubsystem* grabber,
                                                   double elevatorPosition, double grabberPosition)
-      : elevator(elevator),
-        grabber(grabber),
-        elevatorPosition(elevatorPosition),
-        grabberPosition(grabberPosition) {
+      : elevator(elevator), grabber(grabber), elevatorPosition(elevatorPosition), grabberPosition(grabberPosition) {
     AddRequirements(elevator);
     AddRequirements(grabber);
   }
@@ -34,8 +30,7 @@ class AlgaeGrabberAndElevatorPositionAndIntakeCommand
   void Execute() override {
     elevator->SetPosition(elevatorPosition);
 
-    if (elevator->GetPosition() >
-        AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition) {
+    if (elevator->GetPosition() > AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition) {
       grabber->SetPosition(grabberPosition);
     } else {
       grabber->SetPivotMotor(0.0);
@@ -45,7 +40,7 @@ class AlgaeGrabberAndElevatorPositionAndIntakeCommand
       grabber->SetSpinMotor(AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed);
     }
   }
-  void End(bool interrupted) override {
+  void End(bool) override {
     elevator->StopAll();
     grabber->StopAll();
   };

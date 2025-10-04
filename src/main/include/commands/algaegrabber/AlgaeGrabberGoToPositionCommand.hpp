@@ -7,8 +7,7 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 
-class AlgaeGrabberGoToPositionCommand
-    : public frc2::CommandHelper<frc2::Command, AlgaeGrabberGoToPositionCommand> {
+class AlgaeGrabberGoToPositionCommand : public frc2::CommandHelper<frc2::Command, AlgaeGrabberGoToPositionCommand> {
  private:
   AlgaeGrabberSubsystem* grabber;
   double position;
@@ -21,6 +20,6 @@ class AlgaeGrabberGoToPositionCommand
 
   void Initialize() override {};
   void Execute() override { grabber->SetPosition(position); }
-  void End(bool interrupted) override { grabber->StopAll(); }
+  void End(bool) override { grabber->StopAll(); }
   bool IsFinished() override { return false; }
 };

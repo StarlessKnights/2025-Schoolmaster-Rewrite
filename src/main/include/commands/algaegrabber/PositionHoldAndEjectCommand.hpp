@@ -12,8 +12,7 @@
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
 
-class PositionHoldAndEjectCommand
-    : public frc2::CommandHelper<frc2::Command, PositionHoldAndEjectCommand> {
+class PositionHoldAndEjectCommand : public frc2::CommandHelper<frc2::Command, PositionHoldAndEjectCommand> {
  private:
   AlgaeGrabberSubsystem* grabber;
   ElevatorSubsystem* elevator;
@@ -37,10 +36,9 @@ class PositionHoldAndEjectCommand
   void Execute() override {
     grabber->SetPosition(currentGrabberPosition);
     elevator->SetPosition(currentElevatorPosition);
-    grabber->SetSpinMotor(runExtruder() ? -AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed
-                                        : 0.0);
+    grabber->SetSpinMotor(runExtruder() ? -AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed : 0.0);
   };
-  void End(bool interrupted) override {
+  void End(bool) override {
     grabber->StopAll();
     elevator->StopAll();
   };

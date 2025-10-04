@@ -1,0 +1,9 @@
+Checks: >
+  modernize-*,
+  readability-*,
+  performance-*,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle: file

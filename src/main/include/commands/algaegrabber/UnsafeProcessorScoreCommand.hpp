@@ -13,8 +13,7 @@
 
 // ! If grabber is not in the right position, this will damage the mechanism
 
-class UnsafeProcessorScoreCommand
-    : public frc2::CommandHelper<frc2::Command, UnsafeProcessorScoreCommand> {
+class UnsafeProcessorScoreCommand : public frc2::CommandHelper<frc2::Command, UnsafeProcessorScoreCommand> {
  private:
   AlgaeGrabberSubsystem* grabber;
   ElevatorSubsystem* elevator;
@@ -23,17 +22,16 @@ class UnsafeProcessorScoreCommand
  public:
   UnsafeProcessorScoreCommand(AlgaeGrabberSubsystem* grabber, ElevatorSubsystem* elevator,
                               std::function<bool()> runExtruder)
-      : grabber(grabber), elevator(elevator), runExtruder(runExtruder){};
+      : grabber(grabber), elevator(elevator), runExtruder(runExtruder) {};
 
   void Initialize() override {};
   void Execute() override {
     elevator->SetPosition(ElevatorSubsystemConstants::kProcessorScorePosition);
     grabber->SetPosition(AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition);
 
-    grabber->SetSpinMotor(runExtruder() ? -AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed
-                                        : 0.0);
+    grabber->SetSpinMotor(runExtruder() ? -AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed : 0.0);
   }
-  void End(bool interrupted) override {
+  void End(bool) override {
     elevator->StopAll();
     grabber->StopAll();
   }

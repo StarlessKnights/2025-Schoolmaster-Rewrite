@@ -13,14 +13,10 @@ class ElevatorRetractCommand : public frc2::CommandHelper<frc2::Command, Elevato
   ElevatorSubsystem* elevator;
 
  public:
-  explicit ElevatorRetractCommand(ElevatorSubsystem* elevator) : elevator(elevator) {
-    AddRequirements(elevator);
-  }
+  explicit ElevatorRetractCommand(ElevatorSubsystem* elevator) : elevator(elevator) { AddRequirements(elevator); }
 
   void Initialize() override {};
-  void Execute() override {
-    elevator->SetPosition(ElevatorSubsystemConstants::kDefaultEncoderPosition);
-  };
-  void End(bool interrupted) override { elevator->StopAll(); };
+  void Execute() override { elevator->SetPosition(ElevatorSubsystemConstants::kDefaultEncoderPosition); };
+  void End(bool) override { elevator->StopAll(); };
   bool IsFinished() override { return false; };
 };
