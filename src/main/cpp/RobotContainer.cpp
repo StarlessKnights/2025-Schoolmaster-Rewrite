@@ -19,9 +19,9 @@
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
 #include "constants/Constants.h"
-#include "frc/geometry/Pose2d.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
+#include "utils/AutoAlignCommandFactory.hpp"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
   ConfigureBindings();
@@ -42,8 +42,7 @@ void RobotContainer::ConfigureElevatorBindings() {
   // m_driverController.POVLeft().OnTrue(
   //     MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL2EncoderPosition, runElevatorExtruder)
   //         .AlongWith(MakeSlowFieldDriveCommand()));
-  m_driverController.Button(1).OnTrue(
-      FollowPrecisePathCommand(&m_driveSubsystem, frc::Pose2d{1_m, 1_m, 180_deg}).ToPtr());
+  m_driverController.Button(1).OnTrue(MakeAutoCommand());
 
   // L3 Score
   m_driverController.POVUp().OnTrue(
@@ -139,4 +138,10 @@ frc2::CommandPtr RobotContainer::MakeCancelCommand() {
           .AlongWith(AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
                                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
                          .ToPtr()));
+}
+
+frc2::CommandPtr RobotContainer::MakeAutoCommand() {
+  return FollowPrecisePathCommand(&m_driveSubsystem, AutoAlignCommandFactory::GetClosestScoringPose(
+                                                         m_driveSubsystem.GetSimPose(), true, true))
+      .ToPtr();
 }

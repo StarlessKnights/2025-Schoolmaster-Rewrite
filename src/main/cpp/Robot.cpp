@@ -6,9 +6,11 @@
 #include <frc/DataLogManager.h>
 #include <frc2/command/CommandScheduler.h>
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "utils/AutoAlignCommandFactory.hpp"
 
 Robot::Robot() {
   frc::DataLogManager::Start();
+  AutoAlignCommandFactory::Initialize();
   frc::DataLogManager::Log("Robot initialized");
 }
 

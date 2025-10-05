@@ -24,14 +24,13 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr MakeAlgaeGrabberSequence(double elevatorPosition,
-                                            std::function<bool()> runExtruder);
+  frc2::CommandPtr MakeAlgaeGrabberSequence(double elevatorPosition, std::function<bool()> runExtruder);
   frc2::CommandPtr MakeFieldDriveCommand();
   frc2::CommandPtr MakeSlowFieldDriveCommand();
   frc2::CommandPtr MakeProcessorScoreSequence(std::function<bool()> runOuttake);
-  frc2::CommandPtr MakeElevatorScoreSequence(double elevatorPosition,
-                                             std::function<bool()> runExtruder);
+  frc2::CommandPtr MakeElevatorScoreSequence(double elevatorPosition, std::function<bool()> runExtruder);
   frc2::CommandPtr MakeCancelCommand();
+  frc2::CommandPtr MakeAutoCommand();  // THIS IS FOR DEVELOPMENT DONT INCLUDE IN REAL ROBOT
 
  private:
   frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};

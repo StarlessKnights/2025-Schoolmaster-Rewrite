@@ -14,7 +14,9 @@
  */
 
 #include <string>
+#include <vector>
 
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
@@ -157,7 +159,7 @@ inline const frc::ChassisSpeeds kRetractChassisSpeeds{1.0_mps, 0.0_mps, 0.0_rad_
 
 namespace PathingConstants {
 inline const pathplanner::PathConstraints kPathFindingConstraints{3.0_mps, 4.0_mps_sq, 540_deg_per_s, 270_deg_per_s_sq};
-inline const std::array<frc::Pose2d, 12> kBlueSidedScoringPositions = {
+inline const std::vector<frc::Pose2d> kBlueSidedScoringPositions = {
     frc::Pose2d{units::meter_t{3.826}, units::meter_t{5.174}, frc::Rotation2d{units::degree_t{-60}}},
     frc::Pose2d{units::meter_t{4.108}, units::meter_t{5.335}, frc::Rotation2d{units::degree_t{-60}}},
     frc::Pose2d{units::meter_t{3.163}, units::meter_t{4.356}, frc::Rotation2d{units::degree_t{0.0}}},
@@ -171,7 +173,7 @@ inline const std::array<frc::Pose2d, 12> kBlueSidedScoringPositions = {
     frc::Pose2d{units::meter_t{5.438}, units::meter_t{5.007}, frc::Rotation2d{units::degree_t{240}}},
     frc::Pose2d{units::meter_t{5.154}, units::meter_t{5.167}, frc::Rotation2d{units::degree_t{240}}}};
 
-inline const std::array<frc::Pose2d, 6> kLeftBlueSidedScoringPositions = {
+inline const std::vector<frc::Pose2d> kLeftBlueSidedScoringPositions = {
     frc::Pose2d{units::meter_t{3.811}, units::meter_t{5.161}, frc::Rotation2d{units::degree_t{-60}}},
     frc::Pose2d{units::meter_t{3.169}, units::meter_t{4.010}, frc::Rotation2d{units::degree_t{0.0}}},
     frc::Pose2d{units::meter_t{3.840}, units::meter_t{2.875}, frc::Rotation2d{units::degree_t{60}}},
@@ -179,7 +181,7 @@ inline const std::array<frc::Pose2d, 6> kLeftBlueSidedScoringPositions = {
     frc::Pose2d{units::meter_t{5.808}, units::meter_t{4.040}, frc::Rotation2d{units::degree_t{180}}},
     frc::Pose2d{units::meter_t{5.135}, units::meter_t{5.175}, frc::Rotation2d{units::degree_t{240}}}};
 
-inline const std::array<frc::Pose2d, 6> kRightBlueSidedScoringPositions = {
+inline const std::vector<frc::Pose2d> kRightBlueSidedScoringPositions = {
     frc::Pose2d{units::meter_t{3.525}, units::meter_t{5.004}, frc::Rotation2d{units::degree_t{-60}}},
     frc::Pose2d{units::meter_t{3.167}, units::meter_t{3.679}, frc::Rotation2d{units::degree_t{0.0}}},
     frc::Pose2d{units::meter_t{4.126}, units::meter_t{2.711}, frc::Rotation2d{units::degree_t{60}}},
