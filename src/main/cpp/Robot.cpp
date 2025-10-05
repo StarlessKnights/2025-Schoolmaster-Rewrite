@@ -5,6 +5,7 @@
 
 #include <frc/DataLogManager.h>
 #include <frc2/command/CommandScheduler.h>
+#include "frc/smartdashboard/SmartDashboard.h"
 
 Robot::Robot() {
   frc::DataLogManager::Start();
@@ -13,6 +14,8 @@ Robot::Robot() {
 
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
+
+  frc::SmartDashboard::PutData(&frc2::CommandScheduler::GetInstance());
 }
 
 void Robot::DisabledInit() {}

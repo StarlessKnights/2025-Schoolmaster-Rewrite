@@ -15,6 +15,7 @@
 #include "frc2/command/SubsystemBase.h"
 #include "networktables/StructArrayTopic.h"
 #include "networktables/StructTopic.h"
+#include "units/angular_velocity.h"
 #include "units/time.h"
 #include "utils/NeoKrakenModule.hpp"
 #include "utils/TurboPoseEstimator.hpp"
@@ -22,8 +23,7 @@
 class DriveSubsystem : public frc2::SubsystemBase {
  private:
   NeoKrakenModule fleft, fright, bleft, bright;
-  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID,
-                                           DriveSubsystemConstants::kCanivoreName};
+  ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID, DriveSubsystemConstants::kCanivoreName};
   frc::Rotation2d driverGyroOffset{};
   TurboPoseEstimator estimator;
 
@@ -45,6 +45,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::Rotation2d GetAngle() { return pigeon.GetRotation2d(); }
   std::array<frc::SwerveModuleState, 4> GetModuleStates();
   std::array<frc::SwerveModulePosition, 4> GetModulePositions();
+
+  frc::Pose2d GetPose() { return estimator.getPose2D(); }
+  frc::Pose2d GetSimPose() { return m_simPose; }
 
   void Periodic() override;
   void SimulationPeriodic() override;
