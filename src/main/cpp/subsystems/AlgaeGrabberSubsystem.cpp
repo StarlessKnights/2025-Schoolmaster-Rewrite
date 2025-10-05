@@ -12,6 +12,8 @@ AlgaeGrabberSubsystem::AlgaeGrabberSubsystem() {
   ConfigurePivotMotor();
   ConfigureSpinMotor();
 
+  SetName("AlgaeGrabberSubsystem");
+
   controller.SetTolerance(0.1);
 }
 

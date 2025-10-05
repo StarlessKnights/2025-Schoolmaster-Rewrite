@@ -19,6 +19,8 @@
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
 #include "constants/Constants.h"
+#include "frc/DataLogManager.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "utils/AutoAlignCommandFactory.hpp"
@@ -27,7 +29,14 @@ RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
   ConfigureBindings();
   ConfigureElevatorBindings();
   ConfigureAlgaeGrabberBindings();
+  ConfigureManualOverrideBindings();
   ConfigureDefaultCommands();
+
+  frc::SmartDashboard::PutBoolean("Manual Override", isManuallyOverridden);
+
+  frc::SmartDashboard::PutData(&m_driveSubsystem);
+  frc::SmartDashboard::PutData(&m_elevatorSubsystem);
+  frc::SmartDashboard::PutData(&m_algaeGrabberSubsystem);
 }
 
 void RobotContainer::ConfigureBindings() {
@@ -38,23 +47,40 @@ void RobotContainer::ConfigureBindings() {
 void RobotContainer::ConfigureElevatorBindings() {
   // Outtake
   std::function<bool()> runElevatorExtruder = [this]() { return m_driverController.GetRightTriggerAxis() > 0.25; };
+  std::function<bool()> isManuallyOverridden = [this]() { return this->isManuallyOverridden; };
 
   // L2 Score
-  m_driverController.Button(1).OnTrue(AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
-      [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
-      ElevatorSubsystemConstants::kL2EncoderPosition, true, true));
+  m_driverController.Button(1).OnTrue(
+      frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL2EncoderPosition, runElevatorExtruder)
+                            .AlongWith(MakeSlowFieldDriveCommand())
+                            .WithName("L2 Manual Score"),
+                        AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+                            [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL2EncoderPosition, true, true),
+                        isManuallyOverridden)
+          .WithName("L2 Score"));
 
   // L3 Score
-  m_driverController.POVUp().OnTrue(
-      MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL3EncoderPosition, runElevatorExtruder)
-          .AlongWith(MakeSlowFieldDriveCommand())
-          .WithName("L3 Manual Score"));
+  m_driverController.Button(2).OnTrue(
+      frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL3EncoderPosition, runElevatorExtruder)
+                            .AlongWith(MakeSlowFieldDriveCommand())
+                            .WithName("L3 Manual Score"),
+                        AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+                            [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL3EncoderPosition, true, true),
+                        isManuallyOverridden)
+          .WithName("L3 Score"));
 
   // L4 Score
   m_driverController.POVRight().OnTrue(
-      MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL4EncoderPosition, runElevatorExtruder)
-          .AlongWith(MakeSlowFieldDriveCommand())
-          .WithName("L4 Manual Score"));
+      frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL4EncoderPosition, runElevatorExtruder)
+                            .AlongWith(MakeSlowFieldDriveCommand())
+                            .WithName("L4 Manual Score"),
+                        AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+                            [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL4EncoderPosition, true, true),
+                        isManuallyOverridden)
+          .WithName("L4 Score"));
 
   // Cancel Command
   m_driverController.POVDown().OnTrue(MakeCancelCommand());
@@ -79,6 +105,13 @@ void RobotContainer::ConfigureAlgaeGrabberBindings() {
 
   // Processor Score
   m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake));
+}
+
+void RobotContainer::ConfigureManualOverrideBindings() {
+  m_driverController.Back().OnTrue(frc2::cmd::RunOnce([this] {
+                                     isManuallyOverridden = !isManuallyOverridden;
+                                     frc::DataLogManager::Log("Manual Override changed");
+                                   }).WithName("Toggle Manual Override"));
 }
 
 void RobotContainer::ConfigureDefaultCommands() {

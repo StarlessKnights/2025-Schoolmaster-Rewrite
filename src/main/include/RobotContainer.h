@@ -42,5 +42,9 @@ class RobotContainer {
   void ConfigureBindings();
   void ConfigureElevatorBindings();
   void ConfigureAlgaeGrabberBindings();
+  void ConfigureManualOverrideBindings();
   void ConfigureDefaultCommands();
+
+  bool scoringOnLeft = true;
+  bool isManuallyOverridden = false;
 };

@@ -19,6 +19,8 @@ ElevatorSubsystem::ElevatorSubsystem() {
   ConfigureSecondaryMotor();
   ConfigureCoralMotor();
 
+  SetName("ElevatorSubsystem");
+
   primaryEncoder.SetPosition(0.0);
 }
 

@@ -43,6 +43,8 @@ DriveSubsystem::DriveSubsystem()
 
   m_lastTime = frc::Timer::GetFPGATimestamp();
 
+  SetName("DriveSubsystem");
+
   frc::DataLogManager::Log("DriveSubsystem Constructor");
 }
 
