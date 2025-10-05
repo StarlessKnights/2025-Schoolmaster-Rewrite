@@ -6,7 +6,6 @@
 #include <array>
 
 #include "constants/Constants.h"
-#include "frc/DataLogManager.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -44,8 +43,6 @@ DriveSubsystem::DriveSubsystem()
   m_lastTime = frc::Timer::GetFPGATimestamp();
 
   SetName("DriveSubsystem");
-
-  frc::DataLogManager::Log("DriveSubsystem Constructor");
 }
 
 void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {

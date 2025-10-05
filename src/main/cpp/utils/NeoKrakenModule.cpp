@@ -22,9 +22,10 @@
 #include "units/angular_velocity.h"
 #include "units/base.h"
 #include "units/length.h"
+#include "wpi/sendable/Sendable.h"
+#include "wpi/sendable/SendableBuilder.h"
 
-NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset,
-                                 const std::string& can)
+NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string& can)
     : driveMotor(driveID, can),
       steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
       encoderObject(encoderID, can),
@@ -96,6 +97,14 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
 
   driveMotor.Set(drivePercent + ff.Calculate(speed).value());
   steerMotor.Set(-steerPercent);
+}
+
+void NeoKrakenModule::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("SwerveModule");
+  builder.AddDoubleProperty("Drive Velocity (m/s)", [this]() { return GetVelocity().value(); }, nullptr);
+  builder.AddDoubleProperty("Drive Position (m)", [this]() { return GetPosition(); }, nullptr);
+  builder.AddDoubleProperty("Steer Angle (rad)", [this]() { return GetEncoderPosition(); }, nullptr);
+  builder.AddDoubleProperty("Steer Setpoint (rad)", [this]() { return setPoint; }, nullptr);
 }
 
 double NeoKrakenModule::GetEncoderPosition() {
