@@ -25,6 +25,8 @@ class PositionHoldAndEjectCommand : public frc2::CommandHelper<frc2::Command, Po
   PositionHoldAndEjectCommand(AlgaeGrabberSubsystem* grabber, ElevatorSubsystem* elevator,
                               std::function<bool()> runExtruder)
       : grabber(grabber), elevator(elevator), runExtruder(runExtruder) {
+    SetName("PositionHoldAndEjectCommand");
+
     AddRequirements(grabber);
     AddRequirements(elevator);
   };

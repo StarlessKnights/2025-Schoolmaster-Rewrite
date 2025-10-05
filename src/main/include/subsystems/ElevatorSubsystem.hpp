@@ -4,6 +4,7 @@
 #pragma once
 
 #include "constants/Constants.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/SubsystemBase.h"
 #include "rev/SparkClosedLoopController.h"
 #include "rev/SparkLowLevel.h"
@@ -49,4 +50,6 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   bool IsElevatorPIDAtSetpoint();
 
   double GetElevatorCurrentDraw();
+
+  frc2::CommandPtr MoveElevatorToPositionCommand(double position);
 };

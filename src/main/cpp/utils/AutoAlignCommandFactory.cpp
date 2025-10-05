@@ -1,10 +1,14 @@
 #include "utils/AutoAlignCommandFactory.hpp"
 #include <cmath>
+#include <functional>
 #include <vector>
+#include "commands/autoalign/FollowPrecisePathCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc2/command/CommandPtr.h"
+#include "frc2/command/InstantCommand.h"
 #include "units/length.h"
 
 bool AutoAlignCommandFactory::initialized = false;
@@ -80,4 +84,31 @@ frc::Pose2d AutoAlignCommandFactory::GetClosestScoringPose(const frc::Pose2d& cu
                            ", Rotation=" + std::to_string(nearest.Rotation().Degrees().to<double>()));
 
   return nearest;
+}
+
+bool AutoAlignCommandFactory::IsPoseSafeToDriveTo(const frc::Pose2d& currentPose, const frc::Pose2d& goalPose) {
+  double distSquared = std::pow(currentPose.X().value() - goalPose.X().value(), 2) +
+                       std::pow(currentPose.Y().value() - goalPose.Y().value(), 2);
+  frc::DataLogManager::Log("Distance to goal pose: " + std::to_string(std::sqrt(distSquared)) + " meters");
+  return std::sqrt(distSquared) < PathingConstants::kMaxPathingDistance;
+}
+
+frc2::CommandPtr AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(std::function<frc::Pose2d()> poseSupplier,
+                                                                       ElevatorSubsystem* elevator,
+                                                                       DriveSubsystem* drive,
+                                                                       double elevatorEncoderPosition,
+                                                                       bool isRedAlliance, bool isLeftSide) {
+  Initialize();
+
+  auto goalSupplier = [poseSupplier, isRedAlliance, isLeftSide]() {
+    return GetClosestScoringPose(poseSupplier(), isRedAlliance, isLeftSide);
+  };
+
+  return FollowPrecisePathCommand(drive, goalSupplier)
+      .AlongWith(elevator->MoveElevatorToPositionCommand(elevatorEncoderPosition))
+      .AndThen(frc2::InstantCommand([elevator] {
+                 elevator->SetCoralGrabber(ElevatorSubsystemConstants::kGrabberSpeed);
+               }).ToPtr())
+      .OnlyIf([poseSupplier, goalSupplier] { return IsPoseSafeToDriveTo(poseSupplier(), goalSupplier()); })
+      .WithName("AutoAlignAndScoreCommand");
 }

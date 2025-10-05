@@ -1,15 +1,15 @@
 #pragma once
 
-#include "frc/controller/PIDController.h"
+#include <functional>
 #include "frc/geometry/Pose2d.h"
-#include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
-#include "networktables/StructTopic.h"
+
 #include "subsystems/DriveSubsystem.hpp"
 
 class FollowPrecisePathCommand : public frc2::CommandHelper<frc2::Command, FollowPrecisePathCommand> {
  private:
   DriveSubsystem* drive;
+  std::function<frc::Pose2d()> goalSupplier;
   frc::Pose2d goalPose;
 
   frc::PIDController kXPrecisePathPID{3, 0, 0};
@@ -20,7 +20,7 @@ class FollowPrecisePathCommand : public frc2::CommandHelper<frc2::Command, Follo
       nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("GoalPose").Publish();
 
  public:
-  FollowPrecisePathCommand(DriveSubsystem* drive, frc::Pose2d goalPose);
+  FollowPrecisePathCommand(DriveSubsystem* drive, std::function<frc::Pose2d()> goalSupplier);
 
   void Initialize() override;
   void Execute() override;

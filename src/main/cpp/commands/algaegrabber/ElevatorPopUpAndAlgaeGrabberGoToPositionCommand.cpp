@@ -7,9 +7,9 @@
 
 ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
     AlgaeGrabberSubsystem* algaeGrabber, ElevatorSubsystem* elevator, double algaeEncoderPosition)
-    : algaeGrabber(algaeGrabber),
-      elevator(elevator),
-      algaeGrabberEncoderPosition(algaeEncoderPosition) {
+    : algaeGrabber(algaeGrabber), elevator(elevator), algaeGrabberEncoderPosition(algaeEncoderPosition) {
+  SetName("ElevatorPopUpAndAlgaeGrabberGoToPositionCommand");
+
   AddRequirements(algaeGrabber);
   AddRequirements(elevator);
 }
@@ -31,7 +31,7 @@ void ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::Execute() {
   }
 }
 
-void ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::End(bool interrupted) {
+void ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::End(bool) {
   elevator->StopAll();
   algaeGrabber->StopAll();
 }

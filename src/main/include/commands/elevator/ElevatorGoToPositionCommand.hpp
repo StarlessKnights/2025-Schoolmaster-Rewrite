@@ -21,6 +21,8 @@ class ElevatorGoToPositionCommand : public frc2::CommandHelper<frc2::Command, El
   explicit ElevatorGoToPositionCommand(ElevatorSubsystem* elevator, std::function<bool()> runExtruder,
                                        double positionSetpoint)
       : elevator(elevator), positionSetpoint(positionSetpoint), runCoralExtruder(runExtruder) {
+    SetName("ElevatorGoToPositionCommand");
+
     AddRequirements(elevator);
   };
 

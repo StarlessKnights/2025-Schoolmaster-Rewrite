@@ -1,7 +1,11 @@
 #pragma once
 
+#include <functional>
 #include <vector>
 #include "frc/geometry/Pose2d.h"
+#include "frc2/command/CommandPtr.h"
+#include "subsystems/DriveSubsystem.hpp"
+#include "subsystems/ElevatorSubsystem.hpp"
 
 class AutoAlignCommandFactory {
  private:
@@ -20,4 +24,10 @@ class AutoAlignCommandFactory {
   static void Initialize();
 
   static frc::Pose2d GetClosestScoringPose(const frc::Pose2d& currentPose, bool isRedAlliance, bool isLeftSide);
+  static bool IsPoseSafeToDriveTo(const frc::Pose2d& currentPose, const frc::Pose2d& goalPose);
+
+  static frc2::CommandPtr MakeAutoAlignAndScoreCommand(std::function<frc::Pose2d()> poseSupplier,
+                                                       ElevatorSubsystem* elevator, DriveSubsystem* drive,
+                                                       double elevatorEncoderPosition, bool isRedAlliance,
+                                                       bool isLeftSide);
 };

@@ -15,6 +15,8 @@ class AlgaeGrabberGoToPositionCommand : public frc2::CommandHelper<frc2::Command
  public:
   AlgaeGrabberGoToPositionCommand(AlgaeGrabberSubsystem* grabber, double position)
       : grabber(grabber), position(position) {
+    SetName("AlgaeGrabberGoToPositionCommand");
+
     AddRequirements(grabber);
   }
 

@@ -14,7 +14,7 @@
 #include "commands/algaegrabber/ElevatorPopUpAndAlgaeGrabberGoToPositionCommand.hpp"
 #include "commands/algaegrabber/PositionHoldAndEjectCommand.hpp"
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
-#include "commands/autoalign/FollowPrecisePathCommand.hpp"
+
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
@@ -31,7 +31,8 @@ RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
 }
 
 void RobotContainer::ConfigureBindings() {
-  m_driverController.Y().OnTrue(frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }));
+  m_driverController.Y().OnTrue(
+      frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }).WithName("Reset Gyro"));
 }
 
 void RobotContainer::ConfigureElevatorBindings() {
@@ -39,20 +40,21 @@ void RobotContainer::ConfigureElevatorBindings() {
   std::function<bool()> runElevatorExtruder = [this]() { return m_driverController.GetRightTriggerAxis() > 0.25; };
 
   // L2 Score
-  // m_driverController.POVLeft().OnTrue(
-  //     MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL2EncoderPosition, runElevatorExtruder)
-  //         .AlongWith(MakeSlowFieldDriveCommand()));
-  m_driverController.Button(1).OnTrue(MakeAutoCommand());
+  m_driverController.Button(1).OnTrue(AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+      [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+      ElevatorSubsystemConstants::kL2EncoderPosition, true, true));
 
   // L3 Score
   m_driverController.POVUp().OnTrue(
       MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL3EncoderPosition, runElevatorExtruder)
-          .AlongWith(MakeSlowFieldDriveCommand()));
+          .AlongWith(MakeSlowFieldDriveCommand())
+          .WithName("L3 Manual Score"));
 
   // L4 Score
   m_driverController.POVRight().OnTrue(
       MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL4EncoderPosition, runElevatorExtruder)
-          .AlongWith(MakeSlowFieldDriveCommand()));
+          .AlongWith(MakeSlowFieldDriveCommand())
+          .WithName("L4 Manual Score"));
 
   // Cancel Command
   m_driverController.POVDown().OnTrue(MakeCancelCommand());
@@ -138,10 +140,4 @@ frc2::CommandPtr RobotContainer::MakeCancelCommand() {
           .AlongWith(AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
                                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
                          .ToPtr()));
-}
-
-frc2::CommandPtr RobotContainer::MakeAutoCommand() {
-  return FollowPrecisePathCommand(&m_driveSubsystem, AutoAlignCommandFactory::GetClosestScoringPose(
-                                                         m_driveSubsystem.GetSimPose(), true, true))
-      .ToPtr();
 }

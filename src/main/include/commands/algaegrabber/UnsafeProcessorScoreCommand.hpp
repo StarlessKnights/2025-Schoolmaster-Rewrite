@@ -22,7 +22,9 @@ class UnsafeProcessorScoreCommand : public frc2::CommandHelper<frc2::Command, Un
  public:
   UnsafeProcessorScoreCommand(AlgaeGrabberSubsystem* grabber, ElevatorSubsystem* elevator,
                               std::function<bool()> runExtruder)
-      : grabber(grabber), elevator(elevator), runExtruder(runExtruder) {};
+      : grabber(grabber), elevator(elevator), runExtruder(runExtruder) {
+    SetName("UnsafeProcessorScoreCommand");
+  };
 
   void Initialize() override {};
   void Execute() override {

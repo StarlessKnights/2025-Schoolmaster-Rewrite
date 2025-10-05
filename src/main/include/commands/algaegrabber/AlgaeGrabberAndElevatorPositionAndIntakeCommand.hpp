@@ -22,6 +22,8 @@ class AlgaeGrabberAndElevatorPositionAndIntakeCommand
   AlgaeGrabberAndElevatorPositionAndIntakeCommand(ElevatorSubsystem* elevator, AlgaeGrabberSubsystem* grabber,
                                                   double elevatorPosition, double grabberPosition)
       : elevator(elevator), grabber(grabber), elevatorPosition(elevatorPosition), grabberPosition(grabberPosition) {
+    SetName("AlgaeGrabberAndElevatorPositionAndIntakeCommand");
+
     AddRequirements(elevator);
     AddRequirements(grabber);
   }
