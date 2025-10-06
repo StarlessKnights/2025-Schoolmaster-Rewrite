@@ -20,6 +20,7 @@
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "frc/util/Color.h"
 #include "pathplanner/lib/path/PathConstraints.h"
 #include "units/angular_velocity.h"
 
@@ -202,3 +203,25 @@ inline constexpr double kL4YOffset = 0.0;
 inline constexpr double kMaxPathingDistance = 1.5;
 
 }  // namespace PathingConstants
+
+namespace LEDSubsystemConstants {
+inline constexpr int kLEDPort = 4;
+inline constexpr int kBufferLength = 24;
+inline constexpr double kBlinkOnTime = 0.1;
+
+inline constexpr frc::Color kScoringSideColor{0.0, 1.0, 0.0};     // Green
+inline constexpr frc::Color kNonScoringSideColor{1.0, 0.0, 0.0};  // Red
+
+struct LEDPattern {
+  frc::Color color;
+  double blinkSeconds;
+
+  static LEDPattern Solid(const frc::Color& c) { return LEDPattern{c, 0.0}; }
+  static LEDPattern Blink(const frc::Color& c, double seconds) { return LEDPattern{c, seconds}; }
+};
+
+inline const LEDPattern kOperatorFinalFailsafeOn = LEDPattern::Blink(frc::Color{0.0, 0.0, 1.0}, 0.05);  // Blue
+inline const LEDPattern kManualModeOn = LEDPattern::Blink(frc::Color{1.0, 1.0, 0.0}, 0.5);              // Yellow
+inline const LEDPattern kClimbingModeOn = LEDPattern::Blink(frc::Color{1.0, 1.0, 1.0}, 2.0);            // White
+
+}  // namespace LEDSubsystemConstants
