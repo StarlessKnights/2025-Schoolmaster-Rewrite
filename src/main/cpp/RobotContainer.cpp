@@ -20,11 +20,11 @@
 #include "commands/elevator/ElevatorRetractCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
+#include "frc/DriverStation.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "utils/AutoAlignCommandFactory.hpp"
-#include "frc/DriverStation.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
   ConfigureBindings();
