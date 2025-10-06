@@ -6,6 +6,7 @@
 #include <frc2/command/button/Trigger.h>
 
 #include <functional>
+#include <string>
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
@@ -23,6 +24,7 @@
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "utils/AutoAlignCommandFactory.hpp"
+#include "frc/DriverStation.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
   ConfigureBindings();
@@ -47,45 +49,48 @@ void RobotContainer::ConfigureElevatorBindings() {
   // Outtake
   std::function<bool()> runElevatorExtruder = [this]() { return m_driverController.GetRightTriggerAxis() > 0.25; };
   std::function<bool()> isManuallyOverridden = [this]() { return this->isManuallyOverridden; };
+  std::function<bool()> scoringOnLeftProvider = [this]() { return this->scoringOnLeft; };
+  std::function<bool()> isRedAlliance = []() { return frc::DriverStation::GetAlliance() == frc::DriverStation::kRed; };
 
   // L2 Score
-  m_driverController.Button(1).OnTrue(
+  m_driverController.POVRight().OnTrue(
       frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL2EncoderPosition, runElevatorExtruder)
-                            .AlongWith(MakeSlowFieldDriveCommand())
                             .WithName("L2 Manual Score"),
                         AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
-                            [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
-                            ElevatorSubsystemConstants::kL2EncoderPosition, true, true),
+                            [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL2EncoderPosition, isRedAlliance, scoringOnLeftProvider),
                         isManuallyOverridden)
+          .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
           .WithName("L2 Score"));
 
   // L3 Score
-  m_driverController.Button(2).OnTrue(
+  m_driverController.POVUp().OnTrue(
       frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL3EncoderPosition, runElevatorExtruder)
-                            .AlongWith(MakeSlowFieldDriveCommand())
                             .WithName("L3 Manual Score"),
                         AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
-                            [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
-                            ElevatorSubsystemConstants::kL3EncoderPosition, true, true),
+                            [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL3EncoderPosition, isRedAlliance, scoringOnLeftProvider),
                         isManuallyOverridden)
+          .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
           .WithName("L3 Score"));
 
   // L4 Score
-  m_driverController.POVRight().OnTrue(
+  m_driverController.POVLeft().OnTrue(
       frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL4EncoderPosition, runElevatorExtruder)
-                            .AlongWith(MakeSlowFieldDriveCommand())
                             .WithName("L4 Manual Score"),
                         AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
-                            [&] { return m_driveSubsystem.GetSimPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
-                            ElevatorSubsystemConstants::kL4EncoderPosition, true, true),
+                            [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL4EncoderPosition, isRedAlliance, scoringOnLeftProvider),
                         isManuallyOverridden)
+          .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
           .WithName("L4 Score"));
 
   // Cancel Command
   m_driverController.POVDown().OnTrue(MakeCancelCommand());
 
   // HP Intake
-  m_driverController.RightBumper().ToggleOnTrue(ElevatorHPIntakeCommand(&m_elevatorSubsystem).ToPtr());
+  m_driverController.RightBumper().ToggleOnTrue(
+      ElevatorHPIntakeCommand(&m_elevatorSubsystem).WithName("ElevatorHPIntakeCommand"));
 }
 
 void RobotContainer::ConfigureAlgaeGrabberBindings() {
@@ -95,21 +100,24 @@ void RobotContainer::ConfigureAlgaeGrabberBindings() {
   // High Algae
   m_driverController.X().OnTrue(
       frc2::cmd::Parallel(MakeAlgaeGrabberSequence(ElevatorSubsystemConstants::kHighAlgaePosition, runOuttake),
-                          MakeSlowFieldDriveCommand()));
+                          MakeSlowFieldDriveCommand())
+          .WithName("HighAlgaeCommand"));
 
   // Low Algae
-  // m_driverController.A().OnTrue(
-  //     frc2::cmd::Parallel(MakeAlgaeGrabberSequence(ElevatorSubsystemConstants::kLowAlgaePosition, runOuttake),
-  //                         MakeSlowFieldDriveCommand()));
+  m_driverController.A().OnTrue(
+      frc2::cmd::Parallel(MakeAlgaeGrabberSequence(ElevatorSubsystemConstants::kLowAlgaePosition, runOuttake),
+                          MakeSlowFieldDriveCommand())
+          .WithName("LowAlgaeCommand"));
 
   // Processor Score
-  m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake));
+  m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake).WithName("ProcessorScoreCommand"));
 }
 
 void RobotContainer::ConfigureManualOverrideBindings() {
   m_driverController.Back().OnTrue(frc2::cmd::RunOnce([this] {
                                      isManuallyOverridden = !isManuallyOverridden;
-                                     frc::DataLogManager::Log("Manual Override changed");
+                                     frc::DataLogManager::Log("Manual Override changed to " +
+                                                              std::string(isManuallyOverridden ? "yes" : "no"));
                                    }).WithName("ToggleManualOverride"));
   m_driverController.Start().OnTrue(frc2::cmd::RunOnce([this] {
                                       scoringOnLeft = !scoringOnLeft;
@@ -161,20 +169,18 @@ frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(std::function<bool()
 }
 
 frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(double elevatorPosition, std::function<bool()> runExtruder) {
-  return frc2::cmd::Sequence(
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-                                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-          .ToPtr(),
-      ElevatorGoToPositionCommand(&m_elevatorSubsystem, runExtruder, elevatorPosition).ToPtr());
+  return frc2::cmd::Parallel(ElevatorGoToPositionCommand(&m_elevatorSubsystem, runExtruder, elevatorPosition).ToPtr(),
+                             MakeSlowFieldDriveCommand());
 }
 
 frc2::CommandPtr RobotContainer::MakeCancelCommand() {
   return frc2::cmd::Sequence(
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-                                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-          .ToPtr(),
-      ElevatorRetractCommand(&m_elevatorSubsystem)
-          .AlongWith(AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
-                                                     AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-                         .ToPtr()));
+             ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                                                             AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
+                 .ToPtr(),
+             ElevatorRetractCommand(&m_elevatorSubsystem)
+                 .AlongWith(AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
+                                                            AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
+                                .ToPtr()))
+      .WithName("ResetAfterMovementCommand");
 }

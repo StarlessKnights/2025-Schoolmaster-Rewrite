@@ -32,6 +32,7 @@ class AutoAlignCommandFactory {
 
   static frc2::CommandPtr MakeAutoAlignAndScoreCommand(std::function<frc::Pose2d()> poseSupplier,
                                                        ElevatorSubsystem* elevator, DriveSubsystem* drive,
-                                                       double elevatorEncoderPosition, bool isRedAlliance,
-                                                       bool isLeftSide);
+                                                       double elevatorEncoderPosition,
+                                                       std::function<bool()> isRedAlliance,
+                                                       std::function<bool()> isLeftSide);
 };

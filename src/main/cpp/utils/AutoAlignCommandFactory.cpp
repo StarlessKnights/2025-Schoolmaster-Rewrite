@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <functional>
+#include <string>
 #include <vector>
 
 #include "commands/autoalign/FollowPrecisePathCommand.hpp"
@@ -13,6 +14,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/InstantCommand.h"
 #include "units/length.h"
 
@@ -72,21 +74,11 @@ frc::Pose2d AutoAlignCommandFactory::GetClosestScoringPose(const frc::Pose2d& cu
                                                            bool isLeftSide) {
   Initialize();
 
-  frc::DataLogManager::Log("Getting closest scoring pose for " + std::string(isRedAlliance ? "Red" : "Blue") +
-                           " alliance, " + std::string(isLeftSide ? "Left" : "Right") + " side");
-  frc::DataLogManager::Log("Current pose: X=" + std::to_string(currentPose.X().to<double>()) +
-                           ", Y=" + std::to_string(currentPose.Y().to<double>()) +
-                           ", Rotation=" + std::to_string(currentPose.Rotation().Degrees().to<double>()));
-
   std::vector<frc::Pose2d> poseList =
       isRedAlliance ? (isLeftSide ? leftRedAllianceScoringPositions : rightRedAllianceScoringPositions)
                     : (isLeftSide ? leftBlueAllianceScoringPositions : rightBlueAllianceScoringPositions);
 
   auto nearest = currentPose.Nearest(poseList);
-
-  frc::DataLogManager::Log("Nearest pose: X=" + std::to_string(nearest.X().to<double>()) +
-                           ", Y=" + std::to_string(nearest.Y().to<double>()) +
-                           ", Rotation=" + std::to_string(nearest.Rotation().Degrees().to<double>()));
 
   return nearest;
 }
@@ -94,19 +86,17 @@ frc::Pose2d AutoAlignCommandFactory::GetClosestScoringPose(const frc::Pose2d& cu
 bool AutoAlignCommandFactory::IsPoseSafeToDriveTo(const frc::Pose2d& currentPose, const frc::Pose2d& goalPose) {
   double distSquared = std::pow(currentPose.X().value() - goalPose.X().value(), 2) +
                        std::pow(currentPose.Y().value() - goalPose.Y().value(), 2);
-  frc::DataLogManager::Log("Distance to goal pose: " + std::to_string(std::sqrt(distSquared)) + " meters");
+  frc::DataLogManager::Log("Distance to target: " + std::to_string(std::sqrt(distSquared)));
   return std::sqrt(distSquared) < PathingConstants::kMaxPathingDistance;
 }
 
-frc2::CommandPtr AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(std::function<frc::Pose2d()> poseSupplier,
-                                                                       ElevatorSubsystem* elevator,
-                                                                       DriveSubsystem* drive,
-                                                                       double elevatorEncoderPosition,
-                                                                       bool isRedAlliance, bool isLeftSide) {
+frc2::CommandPtr AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+    std::function<frc::Pose2d()> poseSupplier, ElevatorSubsystem* elevator, DriveSubsystem* drive,
+    double elevatorEncoderPosition, std::function<bool()> isRedAlliance, std::function<bool()> isLeftSide) {
   Initialize();
 
   auto goalSupplier = [poseSupplier, isRedAlliance, isLeftSide]() {
-    return GetClosestScoringPose(poseSupplier(), isRedAlliance, isLeftSide);
+    return GetClosestScoringPose(poseSupplier(), isRedAlliance(), isLeftSide());
   };
 
   return FollowPrecisePathCommand(drive, goalSupplier)
@@ -114,6 +104,5 @@ frc2::CommandPtr AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(std::func
       .AndThen(frc2::InstantCommand([elevator] {
                  elevator->SetCoralGrabber(ElevatorSubsystemConstants::kGrabberSpeed);
                }).ToPtr())
-      .OnlyIf([poseSupplier, goalSupplier] { return IsPoseSafeToDriveTo(poseSupplier(), goalSupplier()); })
-      .WithName("AutoAlignAndScoreCommand");
+      .OnlyIf([poseSupplier, goalSupplier] { return IsPoseSafeToDriveTo(poseSupplier(), goalSupplier()); });
 }
