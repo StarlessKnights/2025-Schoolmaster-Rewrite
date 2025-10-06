@@ -16,12 +16,15 @@
 #include <string>
 #include <vector>
 
+#include "frc/LEDPattern.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "frc/util/Color.h"
 #include "pathplanner/lib/path/PathConstraints.h"
 #include "units/angular_velocity.h"
+#include "units/time.h"
 
 namespace RobotConstants {
 inline constexpr int kNominalVoltage = 12;
@@ -202,3 +205,15 @@ inline constexpr double kL4YOffset = 0.0;
 inline constexpr double kMaxPathingDistance = 1.5;
 
 }  // namespace PathingConstants
+
+namespace LEDSubsystemConstants {
+inline constexpr int kLEDPort = 4;
+inline constexpr int kBufferLength = 24;
+inline constexpr units::second_t kBlinkOnTime = 0.1_s;
+
+inline constexpr frc::Color kScoringSideColor{0.0, 1.0, 0.0};     // Green
+inline constexpr frc::Color kNonScoringSideColor{1.0, 0.0, 0.0};  // Red
+
+inline const frc::LEDPattern kManualModeOn = frc::LEDPattern::Solid(frc::Color::kYellow).Blink(0.5_s);
+
+}  // namespace LEDSubsystemConstants
