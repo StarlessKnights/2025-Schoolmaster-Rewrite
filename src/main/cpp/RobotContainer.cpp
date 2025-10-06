@@ -18,6 +18,7 @@
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
+#include "commands/led/IndicateSideCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
 #include "frc/DriverStation.h"
@@ -26,18 +27,17 @@
 #include "frc2/command/Commands.h"
 #include "utils/AutoAlignCommandFactory.hpp"
 
-RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
+RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_ledSubsystem() {
   ConfigureBindings();
   ConfigureElevatorBindings();
   ConfigureAlgaeGrabberBindings();
   ConfigureManualOverrideBindings();
   ConfigureDefaultCommands();
 
-  frc::SmartDashboard::PutBoolean("Manual Override", isManuallyOverridden);
-
   frc::SmartDashboard::PutData(&m_driveSubsystem);
   frc::SmartDashboard::PutData(&m_elevatorSubsystem);
   frc::SmartDashboard::PutData(&m_algaeGrabberSubsystem);
+  frc::SmartDashboard::PutData(&m_ledSubsystem);
 }
 
 void RobotContainer::ConfigureBindings() {
@@ -127,12 +127,16 @@ void RobotContainer::ConfigureManualOverrideBindings() {
 }
 
 void RobotContainer::ConfigureDefaultCommands() {
+  std::function<bool()> scoring = [this]() { return this->scoringOnLeft; };
+  std::function<bool()> isManuallyOverridden = [this]() { return this->isManuallyOverridden; };
+
   m_driveSubsystem.SetDefaultCommand(MakeFieldDriveCommand());
   m_elevatorSubsystem.SetDefaultCommand(ElevatorRetractCommand(&m_elevatorSubsystem).ToPtr());
   m_algaeGrabberSubsystem.SetDefaultCommand(
       AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
                                       AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
           .ToPtr());
+  m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverridden));
 }
 
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {

@@ -12,6 +12,7 @@
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
+#include "subsystems/LEDSubsystem.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -38,6 +39,7 @@ class RobotContainer {
   DriveSubsystem m_driveSubsystem;
   ElevatorSubsystem m_elevatorSubsystem;
   AlgaeGrabberSubsystem m_algaeGrabberSubsystem;
+  LEDSubsystem m_ledSubsystem;
 
   void ConfigureBindings();
   void ConfigureElevatorBindings();
