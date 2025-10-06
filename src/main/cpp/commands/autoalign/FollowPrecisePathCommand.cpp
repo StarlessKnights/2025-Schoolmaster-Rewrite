@@ -1,13 +1,18 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "commands/autoalign/FollowPrecisePathCommand.hpp"
+
+#include <algorithm>
+#include <functional>
+
+#include "frc/RobotBase.h"
+#include "frc/geometry/Pose2d.h"
+#include "frc/kinematics/ChassisSpeeds.h"
+#include "subsystems/DriveSubsystem.hpp"
 #include "units/angular_velocity.h"
 #include "units/length.h"
 #include "units/velocity.h"
-#include <functional>
-#include "frc/geometry/Pose2d.h"
-#include <algorithm>
-#include "frc/RobotBase.h"
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "subsystems/DriveSubsystem.hpp"
 
 FollowPrecisePathCommand::FollowPrecisePathCommand(DriveSubsystem* drive, std::function<frc::Pose2d()> goalSupplier)
     : drive(drive), goalSupplier(goalSupplier) {

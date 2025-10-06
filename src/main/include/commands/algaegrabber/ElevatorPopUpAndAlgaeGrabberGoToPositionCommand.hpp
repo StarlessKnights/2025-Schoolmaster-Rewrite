@@ -17,8 +17,7 @@ class ElevatorPopUpAndAlgaeGrabberGoToPositionCommand
   double homePosition = AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition;
 
  public:
-  ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(AlgaeGrabberSubsystem* algaeGrabber,
-                                                  ElevatorSubsystem* elevator,
+  ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(AlgaeGrabberSubsystem* algaeGrabber, ElevatorSubsystem* elevator,
                                                   double algaeEncoderPosition);
 
   void Initialize() override;

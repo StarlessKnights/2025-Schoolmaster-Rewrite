@@ -14,7 +14,6 @@
 #include "commands/algaegrabber/ElevatorPopUpAndAlgaeGrabberGoToPositionCommand.hpp"
 #include "commands/algaegrabber/PositionHoldAndEjectCommand.hpp"
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
-
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
@@ -111,7 +110,12 @@ void RobotContainer::ConfigureManualOverrideBindings() {
   m_driverController.Back().OnTrue(frc2::cmd::RunOnce([this] {
                                      isManuallyOverridden = !isManuallyOverridden;
                                      frc::DataLogManager::Log("Manual Override changed");
-                                   }).WithName("Toggle Manual Override"));
+                                   }).WithName("ToggleManualOverride"));
+  m_driverController.Start().OnTrue(frc2::cmd::RunOnce([this] {
+                                      scoringOnLeft = !scoringOnLeft;
+                                      frc::DataLogManager::Log("Scoring side changed to " +
+                                                               std::string(scoringOnLeft ? "left" : "right"));
+                                    }).WithName("ChangeScoringSide"));
 }
 
 void RobotContainer::ConfigureDefaultCommands() {

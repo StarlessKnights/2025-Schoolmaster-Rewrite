@@ -201,4 +201,4 @@ inline constexpr double kL4YOffset = 0.0;
 
 inline constexpr double kMaxPathingDistance = 1.5;
 
-};  // namespace PathingConstants
+}  // namespace PathingConstants

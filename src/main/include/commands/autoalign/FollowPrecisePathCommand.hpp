@@ -1,9 +1,12 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #pragma once
 
 #include <functional>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc2/command/CommandHelper.h"
-
 #include "subsystems/DriveSubsystem.hpp"
 
 class FollowPrecisePathCommand : public frc2::CommandHelper<frc2::Command, FollowPrecisePathCommand> {

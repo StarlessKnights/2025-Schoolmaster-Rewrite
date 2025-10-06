@@ -1,7 +1,12 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "utils/AutoAlignCommandFactory.hpp"
+
 #include <cmath>
 #include <functional>
 #include <vector>
+
 #include "commands/autoalign/FollowPrecisePathCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
