@@ -4,6 +4,9 @@
 #include "subsystems/ElevatorSubsystem.hpp"
 
 #include "constants/Constants.h"
+#include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
+#include "frc2/command/InstantCommand.h"
 #include "rev/ClosedLoopSlot.h"
 #include "rev/SparkBase.h"
 #include "rev/SparkClosedLoopController.h"
@@ -15,6 +18,8 @@ ElevatorSubsystem::ElevatorSubsystem() {
   ConfigurePrimaryMotor();
   ConfigureSecondaryMotor();
   ConfigureCoralMotor();
+
+  SetName("ElevatorSubsystem");
 
   primaryEncoder.SetPosition(0.0);
 }
@@ -68,10 +73,9 @@ double ElevatorSubsystem::GetPosition() {
 
 void ElevatorSubsystem::SetPosition(double position) {
   currentSetpoint = position;
-  onboardClosedLoop.SetReference(
-      -position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
-      rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
-      rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
+  onboardClosedLoop.SetReference(-position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
+                                 rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
+                                 rev::spark::SparkClosedLoopController::ArbFFUnits::kVoltage);
 }
 
 void ElevatorSubsystem::ZeroEncoder() {
@@ -92,10 +96,17 @@ bool ElevatorSubsystem::GetIsCoralInHoldingPosition() {
 }
 
 bool ElevatorSubsystem::IsElevatorPIDAtSetpoint() {
-  return std::abs(currentSetpoint - GetPosition()) <
-         ElevatorSubsystemConstants::kAtSetpointTolerance;
+  return std::abs(currentSetpoint - GetPosition()) < ElevatorSubsystemConstants::kAtSetpointTolerance;
 }
 
 double ElevatorSubsystem::GetElevatorCurrentDraw() {
   return primaryMotor.GetOutputCurrent();
+}
+
+frc2::CommandPtr ElevatorSubsystem::MoveElevatorToPositionCommand(double position) {
+  return frc2::InstantCommand([this, position] { SetPosition(position); })
+      .WithName("MoveElevatorToPositionCommand")
+      .AndThen(frc2::cmd::WaitUntil([this] {
+                 return IsElevatorPIDAtSetpoint();
+               }).WithName("WaitUntilElevatorAtSetpointCommand"));
 }

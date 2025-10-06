@@ -16,8 +16,9 @@
 #include "frc/kinematics/SwerveModuleState.h"
 #include "units/length.h"
 #include "units/velocity.h"
+#include "wpi/sendable/Sendable.h"
 
-class NeoKrakenModule {
+class NeoKrakenModule : public wpi::Sendable {
  private:
   ctre::phoenix6::hardware::TalonFX driveMotor;
   rev::spark::SparkMax steerMotor;
@@ -46,4 +47,6 @@ class NeoKrakenModule {
   frc::SwerveModuleState GetModuleState();
   frc::SwerveModulePosition GetModulePosition();
   units::meters_per_second_t GetVelocity();
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };

@@ -27,10 +27,8 @@
 #include "units/time.h"
 #include "utils/PoseTimestampPair.hpp"
 
-TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName,
-                                     frc::Transform3d cameraInBotSpace)
-    : camera(cameraName),
-      poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
+TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, frc::Transform3d cameraInBotSpace)
+    : camera(cameraName), poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
   if (frc::RobotBase::IsSimulation()) {
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
@@ -47,9 +45,8 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName,
     systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
   }
 
-  visionTargetPublisher = nt::NetworkTableInstance::GetDefault()
-                              .GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets")
-                              .Publish();
+  visionTargetPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets").Publish();
 }
 
 void TurboPhotonCamera::updateSim(frc::Pose2d robotPose) {
@@ -64,8 +61,7 @@ frc::AprilTagFieldLayout TurboPhotonCamera::getLayout() {
     layout = frc::AprilTagFieldLayout{CameraConstants::kPathToAprilTagLayout};
     frc::DataLogManager::Log("Successfully loaded edited json (April tag field layout)");
   } catch (std::exception& e) {
-    frc::DataLogManager::Log("Failed to load edited json (April tag field layout): " +
-                             std::string(e.what()));
+    frc::DataLogManager::Log("Failed to load edited json (April tag field layout): " + std::string(e.what()));
     layout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
   }
 

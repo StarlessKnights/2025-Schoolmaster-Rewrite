@@ -6,13 +6,19 @@
 #include <frc/DataLogManager.h>
 #include <frc2/command/CommandScheduler.h>
 
+#include "frc/smartdashboard/SmartDashboard.h"
+#include "utils/AutoAlignCommandFactory.hpp"
+
 Robot::Robot() {
   frc::DataLogManager::Start();
+  AutoAlignCommandFactory::Initialize();
   frc::DataLogManager::Log("Robot initialized");
 }
 
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
+
+  frc::SmartDashboard::PutData(&frc2::CommandScheduler::GetInstance());
 }
 
 void Robot::DisabledInit() {}

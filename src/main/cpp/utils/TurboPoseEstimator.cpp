@@ -16,14 +16,14 @@ frc::Pose2d TurboPoseEstimator::getPose2D() {
   return pose;
 }
 
-void TurboPoseEstimator::ResetEstimatorPosition(
-    frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
-    frc::Pose2d pose) {
+void TurboPoseEstimator::ResetEstimatorPosition(frc::Rotation2d gyroAngle,
+                                                std::array<frc::SwerveModulePosition, 4> modulePositions,
+                                                frc::Pose2d pose) {
   poseEstimator.ResetPosition(gyroAngle, modulePositions, pose);
 }
 
-void TurboPoseEstimator::UpdateWithOdometryAndVision(
-    frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions) {
+void TurboPoseEstimator::UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
+                                                     std::array<frc::SwerveModulePosition, 4> modulePositions) {
   UpdateWithAllAvailableVisionMeasurements();
   poseEstimator.Update(gyroAngle, modulePositions);
 
@@ -32,10 +32,8 @@ void TurboPoseEstimator::UpdateWithOdometryAndVision(
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera& camera) {
   if (frc::RobotBase::IsSimulation()) {
-    auto pose = nt::NetworkTableInstance::GetDefault()
-                    .GetStructTopic<frc::Pose2d>("Pose")
-                    .Subscribe(frc::Pose2d{})
-                    .Get();
+    auto pose =
+        nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Subscribe(frc::Pose2d{}).Get();
 
     camera.updateSim(pose);
   }

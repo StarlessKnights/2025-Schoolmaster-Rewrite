@@ -18,27 +18,21 @@ class TurboPoseEstimator {
   frc::SwerveDrivePoseEstimator<4> poseEstimator;
 
   std::array<class TurboPhotonCamera, 2> localizationCameras = {
-      TurboPhotonCamera(CameraConstants::kLocalizationCamOneName,
-                        CameraConstants::kLocalizationCamOneOffset),
-      TurboPhotonCamera(CameraConstants::kLocalizationCamTwoName,
-                        CameraConstants::kLocalizationCamTwoOffset)};
+      TurboPhotonCamera(CameraConstants::kLocalizationCamOneName, CameraConstants::kLocalizationCamOneOffset),
+      TurboPhotonCamera(CameraConstants::kLocalizationCamTwoName, CameraConstants::kLocalizationCamTwoOffset)};
 
   nt::StructPublisher<frc::Pose2d> posePublisher =
       nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Vision Pose").Publish();
 
  public:
-  TurboPoseEstimator(frc::Rotation2d gyroAngle,
-                     std::array<frc::SwerveModulePosition, 4> modulePositions,
+  TurboPoseEstimator(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
                      frc::Pose2d initialPose)
-      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions,
-                      initialPose) {}
+      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions, initialPose) {}
 
   frc::Pose2d getPose2D();
-  void ResetEstimatorPosition(frc::Rotation2d gyroAngle,
-                              std::array<frc::SwerveModulePosition, 4> modulePositions,
+  void ResetEstimatorPosition(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
                               frc::Pose2d pose);
-  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
-                                   std::array<frc::SwerveModulePosition, 4> modulePositions);
+  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions);
   void TryVisionUpdateWithCamera(TurboPhotonCamera& camera);
   void UpdateWithAllAvailableVisionMeasurements();
 };

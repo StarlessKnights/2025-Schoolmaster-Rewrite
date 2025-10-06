@@ -6,6 +6,7 @@
 #include <frc2/command/button/Trigger.h>
 
 #include <functional>
+#include <string>
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
@@ -18,67 +19,111 @@
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
 #include "constants/Constants.h"
+#include "frc/DataLogManager.h"
+#include "frc/DriverStation.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
+#include "utils/AutoAlignCommandFactory.hpp"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem() {
   ConfigureBindings();
   ConfigureElevatorBindings();
   ConfigureAlgaeGrabberBindings();
+  ConfigureManualOverrideBindings();
   ConfigureDefaultCommands();
+
+  frc::SmartDashboard::PutBoolean("Manual Override", isManuallyOverridden);
+
+  frc::SmartDashboard::PutData(&m_driveSubsystem);
+  frc::SmartDashboard::PutData(&m_elevatorSubsystem);
+  frc::SmartDashboard::PutData(&m_algaeGrabberSubsystem);
 }
 
 void RobotContainer::ConfigureBindings() {
-  m_driverController.Y().OnTrue(frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }));
+  m_driverController.Y().OnTrue(
+      frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }).WithName("Reset Gyro"));
 }
 
 void RobotContainer::ConfigureElevatorBindings() {
   // Outtake
-  std::function<bool()> runElevatorExtruder = [this]() {
-    return m_driverController.GetRightTriggerAxis() > 0.25;
-  };
+  std::function<bool()> runElevatorExtruder = [this]() { return m_driverController.GetRightTriggerAxis() > 0.25; };
+  std::function<bool()> isManuallyOverridden = [this]() { return this->isManuallyOverridden; };
+  std::function<bool()> scoringOnLeftProvider = [this]() { return this->scoringOnLeft; };
+  std::function<bool()> isRedAlliance = []() { return frc::DriverStation::GetAlliance() == frc::DriverStation::kRed; };
 
   // L2 Score
-  m_driverController.POVLeft().OnTrue(
-      MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL2EncoderPosition, runElevatorExtruder)
-          .AlongWith(MakeSlowFieldDriveCommand()));
+  m_driverController.POVRight().OnTrue(
+      frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL2EncoderPosition, runElevatorExtruder)
+                            .WithName("L2 Manual Score"),
+                        AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+                            [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL2EncoderPosition, isRedAlliance, scoringOnLeftProvider),
+                        isManuallyOverridden)
+          .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
+          .WithName("L2 Score"));
 
   // L3 Score
   m_driverController.POVUp().OnTrue(
-      MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL3EncoderPosition, runElevatorExtruder)
-          .AlongWith(MakeSlowFieldDriveCommand()));
+      frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL3EncoderPosition, runElevatorExtruder)
+                            .WithName("L3 Manual Score"),
+                        AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+                            [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL3EncoderPosition, isRedAlliance, scoringOnLeftProvider),
+                        isManuallyOverridden)
+          .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
+          .WithName("L3 Score"));
 
   // L4 Score
-  m_driverController.POVRight().OnTrue(
-      MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL4EncoderPosition, runElevatorExtruder)
-          .AlongWith(MakeSlowFieldDriveCommand()));
+  m_driverController.POVLeft().OnTrue(
+      frc2::cmd::Either(MakeElevatorScoreSequence(ElevatorSubsystemConstants::kL4EncoderPosition, runElevatorExtruder)
+                            .WithName("L4 Manual Score"),
+                        AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
+                            [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
+                            ElevatorSubsystemConstants::kL4EncoderPosition, isRedAlliance, scoringOnLeftProvider),
+                        isManuallyOverridden)
+          .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
+          .WithName("L4 Score"));
 
   // Cancel Command
   m_driverController.POVDown().OnTrue(MakeCancelCommand());
 
   // HP Intake
   m_driverController.RightBumper().ToggleOnTrue(
-      ElevatorHPIntakeCommand(&m_elevatorSubsystem).ToPtr());
+      ElevatorHPIntakeCommand(&m_elevatorSubsystem).WithName("ElevatorHPIntakeCommand"));
 }
 
 void RobotContainer::ConfigureAlgaeGrabberBindings() {
   // Outtake
-  std::function<bool()> runOuttake = [this]() {
-    return m_driverController.GetLeftTriggerAxis() > 0.25;
-  };
+  std::function<bool()> runOuttake = [this]() { return m_driverController.GetLeftTriggerAxis() > 0.25; };
 
   // High Algae
-  m_driverController.X().OnTrue(frc2::cmd::Parallel(
-      MakeAlgaeGrabberSequence(ElevatorSubsystemConstants::kHighAlgaePosition, runOuttake),
-      MakeSlowFieldDriveCommand()));
+  m_driverController.X().OnTrue(
+      frc2::cmd::Parallel(MakeAlgaeGrabberSequence(ElevatorSubsystemConstants::kHighAlgaePosition, runOuttake),
+                          MakeSlowFieldDriveCommand())
+          .WithName("HighAlgaeCommand"));
 
   // Low Algae
-  m_driverController.A().OnTrue(frc2::cmd::Parallel(
-      MakeAlgaeGrabberSequence(ElevatorSubsystemConstants::kLowAlgaePosition, runOuttake),
-      MakeSlowFieldDriveCommand()));
+  m_driverController.A().OnTrue(
+      frc2::cmd::Parallel(MakeAlgaeGrabberSequence(ElevatorSubsystemConstants::kLowAlgaePosition, runOuttake),
+                          MakeSlowFieldDriveCommand())
+          .WithName("LowAlgaeCommand"));
 
   // Processor Score
-  m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake));
+  m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake).WithName("ProcessorScoreCommand"));
+}
+
+void RobotContainer::ConfigureManualOverrideBindings() {
+  m_driverController.Back().OnTrue(frc2::cmd::RunOnce([this] {
+                                     isManuallyOverridden = !isManuallyOverridden;
+                                     frc::DataLogManager::Log("Manual Override changed to " +
+                                                              std::string(isManuallyOverridden ? "yes" : "no"));
+                                   }).WithName("ToggleManualOverride"));
+  m_driverController.Start().OnTrue(frc2::cmd::RunOnce([this] {
+                                      scoringOnLeft = !scoringOnLeft;
+                                      frc::DataLogManager::Log("Scoring side changed to " +
+                                                               std::string(scoringOnLeft ? "left" : "right"));
+                                    }).WithName("ChangeScoringSide"));
 }
 
 void RobotContainer::ConfigureDefaultCommands() {
@@ -93,63 +138,49 @@ void RobotContainer::ConfigureDefaultCommands() {
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
   return FieldDriveCommand(
              &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
-             [this] { return m_driverController.GetLeftX(); },
-             [this] { return m_driverController.GetRightX(); })
+             [this] { return m_driverController.GetLeftX(); }, [this] { return m_driverController.GetRightX(); })
       .ToPtr();
 }
 
-frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(double elevatorPosition,
-                                                          std::function<bool()> runExtruder) {
+frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(double elevatorPosition, std::function<bool()> runExtruder) {
   return frc2::cmd::Sequence(
-      AlgaeGrabberAndElevatorPositionAndIntakeCommand(
-          &m_elevatorSubsystem, &m_algaeGrabberSubsystem, elevatorPosition,
-          AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition)
+      AlgaeGrabberAndElevatorPositionAndIntakeCommand(&m_elevatorSubsystem, &m_algaeGrabberSubsystem, elevatorPosition,
+                                                      AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition)
           .ToPtr(),
-      PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runExtruder)
-          .ToPtr());
+      PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runExtruder).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {
   return SlowFieldDriveCommand(
              &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
-             [this] { return m_driverController.GetLeftX(); },
-             [this] { return m_driverController.GetRightX(); })
+             [this] { return m_driverController.GetLeftX(); }, [this] { return m_driverController.GetRightX(); })
       .ToPtr();
 }
 
 frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(std::function<bool()> runOuttake) {
   return frc2::cmd::Sequence(
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
-          &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-          AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition)
+      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                                                      AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition)
           .ToPtr(),
-      UnsafeProcessorScoreCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runOuttake)
-          .ToPtr(),
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
-          &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-          AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
+      UnsafeProcessorScoreCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runOuttake).ToPtr(),
+      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
           .ToPtr());
 }
 
-frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(double elevatorPosition,
-                                                           std::function<bool()> runExtruder) {
-  return frc2::cmd::Sequence(
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
-          &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-          AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-          .ToPtr(),
-      ElevatorGoToPositionCommand(&m_elevatorSubsystem, runExtruder, elevatorPosition).ToPtr());
+frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(double elevatorPosition, std::function<bool()> runExtruder) {
+  return frc2::cmd::Parallel(ElevatorGoToPositionCommand(&m_elevatorSubsystem, runExtruder, elevatorPosition).ToPtr(),
+                             MakeSlowFieldDriveCommand());
 }
 
 frc2::CommandPtr RobotContainer::MakeCancelCommand() {
   return frc2::cmd::Sequence(
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
-          &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-          AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-          .ToPtr(),
-      ElevatorRetractCommand(&m_elevatorSubsystem)
-          .AlongWith(AlgaeGrabberGoToPositionCommand(
-                         &m_algaeGrabberSubsystem,
-                         AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-                         .ToPtr()));
+             ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                                                             AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
+                 .ToPtr(),
+             ElevatorRetractCommand(&m_elevatorSubsystem)
+                 .AlongWith(AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
+                                                            AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
+                                .ToPtr()))
+      .WithName("ResetAfterMovementCommand");
 }

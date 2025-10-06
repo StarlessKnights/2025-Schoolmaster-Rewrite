@@ -19,8 +19,7 @@
 
 class TurboPhotonCamera {
  private:
-  frc::AprilTagFieldLayout layout =
-      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
+  frc::AprilTagFieldLayout layout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
   photon::PhotonCamera camera;
   photon::PhotonPoseEstimator poseEstimator;
 

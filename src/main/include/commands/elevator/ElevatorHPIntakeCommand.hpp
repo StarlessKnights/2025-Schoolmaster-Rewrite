@@ -14,6 +14,8 @@ class ElevatorHPIntakeCommand : public frc2::CommandHelper<frc2::Command, Elevat
 
  public:
   ElevatorHPIntakeCommand(ElevatorSubsystem* elevator) : elevator(elevator) {
+    SetName("ElevatorHPIntakeCommand");
+
     AddRequirements(elevator);
   }
 
@@ -22,6 +24,6 @@ class ElevatorHPIntakeCommand : public frc2::CommandHelper<frc2::Command, Elevat
     elevator->SetPosition(ElevatorSubsystemConstants::kHPEncoderPosition);
     elevator->SetCoralGrabber(ElevatorSubsystemConstants::kIntakeGrabberSpeed);
   };
-  void End(bool interrupted) override { elevator->StopAll(); };
+  void End(bool) override { elevator->StopAll(); };
   bool IsFinished() override { return elevator->GetIsCoralInHoldingPosition(); }
 };

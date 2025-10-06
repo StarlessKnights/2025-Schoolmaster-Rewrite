@@ -14,10 +14,14 @@
  */
 
 #include <string>
+#include <vector>
 
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "pathplanner/lib/path/PathConstraints.h"
+#include "units/angular_velocity.h"
 
 namespace RobotConstants {
 inline constexpr int kNominalVoltage = 12;
@@ -74,24 +78,22 @@ inline constexpr frc::Translation2d kModulePositions[] = {
     {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}}  // Back Right
 };
 
-inline frc::SwerveDriveKinematics<4> kKinematics{kModulePositions[0], kModulePositions[1],
-                                                 kModulePositions[2], kModulePositions[3]};
+inline frc::SwerveDriveKinematics<4> kKinematics{kModulePositions[0], kModulePositions[1], kModulePositions[2],
+                                                 kModulePositions[3]};
 }  // namespace DriveSubsystemConstants
 
 namespace CameraConstants {
-inline const std::string kPathToAprilTagLayout =
-    "/home/lvuser/deploy/files/2025-reefscape-welded.json";
+inline const std::string kPathToAprilTagLayout = "/home/lvuser/deploy/files/2025-reefscape-welded.json";
 
 inline const std::string kLocalizationCamOneName = "lc1";
 inline const std::string kLocalizationCamTwoName = "lc2";
 
-inline const frc::Transform3d kLocalizationCamOneOffset{
-    frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m), frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
+inline const frc::Transform3d kLocalizationCamOneOffset{frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m),
+                                                        frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
 
 inline const frc::Transform3d kLocalizationCamTwoOffset{
     frc::Translation3d(0.2159_m, -0.279_m, 0.1143_m),
-    frc::Rotation3d(0_rad, units::radian_t{units::degree_t{20}},
-                    units::radian_t{units::degree_t{37}})};
+    frc::Rotation3d(0_rad, units::radian_t{units::degree_t{20}}, units::radian_t{units::degree_t{37}})};
 }  // namespace CameraConstants
 
 namespace ElevatorSubsystemConstants {
@@ -154,3 +156,49 @@ inline constexpr double kIntakeCurrentDraw = 40.0;
 inline const frc::ChassisSpeeds kIntakeChassisSpeeds{-0.5_mps, 0.0_mps, 0.0_rad_per_s};
 inline const frc::ChassisSpeeds kRetractChassisSpeeds{1.0_mps, 0.0_mps, 0.0_rad_per_s};
 }  // namespace AlgaeGrabberSubsystemsConstants
+
+namespace PathingConstants {
+inline const pathplanner::PathConstraints kPathFindingConstraints{3.0_mps, 4.0_mps_sq, 540_deg_per_s, 270_deg_per_s_sq};
+inline const std::vector<frc::Pose2d> kBlueSidedScoringPositions = {
+    frc::Pose2d{units::meter_t{3.826}, units::meter_t{5.174}, frc::Rotation2d{units::degree_t{-60}}},
+    frc::Pose2d{units::meter_t{4.108}, units::meter_t{5.335}, frc::Rotation2d{units::degree_t{-60}}},
+    frc::Pose2d{units::meter_t{3.163}, units::meter_t{4.356}, frc::Rotation2d{units::degree_t{0.0}}},
+    frc::Pose2d{units::meter_t{3.163}, units::meter_t{4.031}, frc::Rotation2d{units::degree_t{0.0}}},
+    frc::Pose2d{units::meter_t{3.533}, units::meter_t{3.047}, frc::Rotation2d{units::degree_t{60}}},
+    frc::Pose2d{units::meter_t{3.821}, units::meter_t{2.879}, frc::Rotation2d{units::degree_t{60}}},
+    frc::Pose2d{units::meter_t{4.858}, units::meter_t{2.711}, frc::Rotation2d{units::degree_t{120}}},
+    frc::Pose2d{units::meter_t{5.144}, units::meter_t{2.879}, frc::Rotation2d{units::degree_t{120}}},
+    frc::Pose2d{units::meter_t{5.810}, units::meter_t{3.689}, frc::Rotation2d{units::degree_t{180}}},
+    frc::Pose2d{units::meter_t{5.810}, units::meter_t{4.018}, frc::Rotation2d{units::degree_t{180}}},
+    frc::Pose2d{units::meter_t{5.438}, units::meter_t{5.007}, frc::Rotation2d{units::degree_t{240}}},
+    frc::Pose2d{units::meter_t{5.154}, units::meter_t{5.167}, frc::Rotation2d{units::degree_t{240}}}};
+
+inline const std::vector<frc::Pose2d> kLeftBlueSidedScoringPositions = {
+    frc::Pose2d{units::meter_t{3.811}, units::meter_t{5.161}, frc::Rotation2d{units::degree_t{-60}}},
+    frc::Pose2d{units::meter_t{3.169}, units::meter_t{4.010}, frc::Rotation2d{units::degree_t{0.0}}},
+    frc::Pose2d{units::meter_t{3.840}, units::meter_t{2.875}, frc::Rotation2d{units::degree_t{60}}},
+    frc::Pose2d{units::meter_t{5.161}, units::meter_t{2.890}, frc::Rotation2d{units::degree_t{120}}},
+    frc::Pose2d{units::meter_t{5.808}, units::meter_t{4.040}, frc::Rotation2d{units::degree_t{180}}},
+    frc::Pose2d{units::meter_t{5.135}, units::meter_t{5.175}, frc::Rotation2d{units::degree_t{240}}}};
+
+inline const std::vector<frc::Pose2d> kRightBlueSidedScoringPositions = {
+    frc::Pose2d{units::meter_t{3.525}, units::meter_t{5.004}, frc::Rotation2d{units::degree_t{-60}}},
+    frc::Pose2d{units::meter_t{3.167}, units::meter_t{3.679}, frc::Rotation2d{units::degree_t{0.0}}},
+    frc::Pose2d{units::meter_t{4.126}, units::meter_t{2.711}, frc::Rotation2d{units::degree_t{60}}},
+    frc::Pose2d{units::meter_t{5.446}, units::meter_t{3.051}, frc::Rotation2d{units::degree_t{120}}},
+    frc::Pose2d{units::meter_t{5.808}, units::meter_t{4.370}, frc::Rotation2d{units::degree_t{180}}},
+    frc::Pose2d{units::meter_t{4.849}, units::meter_t{5.341}, frc::Rotation2d{units::degree_t{240}}}};
+
+inline constexpr double kFieldWidthMeters = 17.56;
+inline constexpr double kFieldLengthMeters = 8.05;
+
+// are in bot space
+inline constexpr double kXOffset = 0.06;
+inline constexpr double kYOffset = 0.05;
+
+inline constexpr double kL4XOffset = 0.07;
+inline constexpr double kL4YOffset = 0.0;
+
+inline constexpr double kMaxPathingDistance = 1.5;
+
+}  // namespace PathingConstants

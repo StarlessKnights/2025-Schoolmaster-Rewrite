@@ -15,9 +15,10 @@ class SlowFieldDriveCommand : public frc2::CommandHelper<frc2::Command, SlowFiel
   DriveSubsystem* drive;
 
  public:
-  explicit SlowFieldDriveCommand(DriveSubsystem* drive, std::function<double()> ySpeed,
-                                 std::function<double()> xSpeed, std::function<double()> rotX)
+  explicit SlowFieldDriveCommand(DriveSubsystem* drive, std::function<double()> ySpeed, std::function<double()> xSpeed,
+                                 std::function<double()> rotX)
       : xSpeed(xSpeed), ySpeed(ySpeed), rotX(rotX), drive(drive) {
+    SetName("SlowFieldDriveCommand");
     AddRequirements(drive);
   }
 

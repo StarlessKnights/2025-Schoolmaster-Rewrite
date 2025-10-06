@@ -17,7 +17,7 @@ void SlowFieldDriveCommand::Execute() {
   drive->Drive(fieldRelativeSpeeds);
 }
 
-void SlowFieldDriveCommand::End(bool interrupted) {};
+void SlowFieldDriveCommand::End(bool) {};
 
 bool SlowFieldDriveCommand::IsFinished() {
   return false;

@@ -6,7 +6,6 @@
 #include <array>
 
 #include "constants/Constants.h"
-#include "frc/DataLogManager.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -22,24 +21,20 @@ DriveSubsystem::DriveSubsystem()
     : fleft(DriveSubsystemConstants::kFrontLeftDriveID, DriveSubsystemConstants::kFrontLeftSteerID,
             DriveSubsystemConstants::kFrontLeftEncoderID, DriveSubsystemConstants::kFrontLeftOffset,
             DriveSubsystemConstants::kCanivoreName),
-      fright(DriveSubsystemConstants::kFrontRightDriveID,
-             DriveSubsystemConstants::kFrontRightSteerID,
-             DriveSubsystemConstants::kFrontRightEncoderID,
-             DriveSubsystemConstants::kFrontRightOffset, DriveSubsystemConstants::kCanivoreName),
+      fright(DriveSubsystemConstants::kFrontRightDriveID, DriveSubsystemConstants::kFrontRightSteerID,
+             DriveSubsystemConstants::kFrontRightEncoderID, DriveSubsystemConstants::kFrontRightOffset,
+             DriveSubsystemConstants::kCanivoreName),
       bleft(DriveSubsystemConstants::kBackLeftDriveID, DriveSubsystemConstants::kBackLeftSteerID,
             DriveSubsystemConstants::kBackLeftEncoderID, DriveSubsystemConstants::kBackLeftOffset,
             DriveSubsystemConstants::kCanivoreName),
       bright(DriveSubsystemConstants::kBackRightDriveID, DriveSubsystemConstants::kBackRightSteerID,
-             DriveSubsystemConstants::kBackRightEncoderID,
-             DriveSubsystemConstants::kBackRightOffset, DriveSubsystemConstants::kCanivoreName),
+             DriveSubsystemConstants::kBackRightEncoderID, DriveSubsystemConstants::kBackRightOffset,
+             DriveSubsystemConstants::kCanivoreName),
       estimator(GetAngle(), GetModulePositions(), frc::Pose2d()) {
-  m_posePublisher =
-      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Publish();
-  m_speedsPublisher =
-      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("Speeds").Publish();
-  m_swerveStatesPublisher = nt::NetworkTableInstance::GetDefault()
-                                .GetStructArrayTopic<frc::SwerveModuleState>("SwerveStates")
-                                .Publish();
+  m_posePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Publish();
+  m_speedsPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("Speeds").Publish();
+  m_swerveStatesPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::SwerveModuleState>("SwerveStates").Publish();
 
   m_posePublisher.Set(frc::Pose2d());
   m_speedsPublisher.Set(frc::ChassisSpeeds());
@@ -47,7 +42,7 @@ DriveSubsystem::DriveSubsystem()
 
   m_lastTime = frc::Timer::GetFPGATimestamp();
 
-  frc::DataLogManager::Log("DriveSubsystem Constructor");
+  SetName("DriveSubsystem");
 }
 
 void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
@@ -71,13 +66,11 @@ void DriveSubsystem::DriverGryoZero() {
 }
 
 std::array<frc::SwerveModuleState, 4> DriveSubsystem::GetModuleStates() {
-  return {fleft.GetModuleState(), fright.GetModuleState(), bleft.GetModuleState(),
-          bright.GetModuleState()};
+  return {fleft.GetModuleState(), fright.GetModuleState(), bleft.GetModuleState(), bright.GetModuleState()};
 }
 
 std::array<frc::SwerveModulePosition, 4> DriveSubsystem::GetModulePositions() {
-  return {fleft.GetModulePosition(), fright.GetModulePosition(), bleft.GetModulePosition(),
-          bright.GetModulePosition()};
+  return {fleft.GetModulePosition(), fright.GetModulePosition(), bleft.GetModulePosition(), bright.GetModulePosition()};
 }
 
 frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() {
@@ -96,8 +89,7 @@ void DriveSubsystem::SimulationPeriodic() {
   auto dt = currentTime - m_lastTime;
   m_lastTime = currentTime;
 
-  auto fieldRelSpeeds =
-      frc::ChassisSpeeds::FromRobotRelativeSpeeds(m_cmdSpeeds, m_simPose.Rotation());
+  auto fieldRelSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(m_cmdSpeeds, m_simPose.Rotation());
 
   auto newX = m_simPose.X() + fieldRelSpeeds.vx * dt;
   auto newY = m_simPose.Y() + fieldRelSpeeds.vy * dt;
