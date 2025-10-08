@@ -6,6 +6,7 @@
 #include <array>
 
 #include "constants/Constants.h"
+#include "frc/RobotBase.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -52,6 +53,22 @@ void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
 
   m_swerveStatesPublisher.Set(states);
   m_speedsPublisher.Set(speeds);
+}
+
+void DriveSubsystem::AutoDrive(frc::ChassisSpeeds speeds) {
+  m_cmdSpeeds = speeds;
+
+  speeds.vx *= -1;
+  speeds.vy *= -1;
+  speeds.omega *= -1;
+
+  auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
+  SetModuleStates(states);
+
+  // undo negation to publish correct speeds
+  auto normalStates = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(m_cmdSpeeds);
+  m_swerveStatesPublisher.Set(normalStates);
+  m_speedsPublisher.Set(m_cmdSpeeds);
 }
 
 void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states) {

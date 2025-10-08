@@ -23,11 +23,17 @@
 #include "frc/DataLogManager.h"
 #include "frc/DriverStation.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
+#include "pathplanner/lib/auto/AutoBuilder.h"
 #include "utils/AutoAlignCommandFactory.hpp"
+#include "utils/PathLoader.hpp"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_ledSubsystem() {
+  PathLoader::ConfigurePathPlanner(m_driveSubsystem, m_driveSubsystem.GetPoseEstimator());
+  autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
+
   ConfigureBindings();
   ConfigureElevatorBindings();
   ConfigureAlgaeGrabberBindings();
@@ -38,6 +44,11 @@ RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_
   frc::SmartDashboard::PutData(&m_elevatorSubsystem);
   frc::SmartDashboard::PutData(&m_algaeGrabberSubsystem);
   frc::SmartDashboard::PutData(&m_ledSubsystem);
+  frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
+}
+
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+  return autoChooser.GetSelected();
 }
 
 void RobotContainer::ConfigureBindings() {
