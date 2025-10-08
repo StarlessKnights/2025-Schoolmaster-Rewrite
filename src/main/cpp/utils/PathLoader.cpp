@@ -28,7 +28,7 @@ void PathLoader::ConfigurePathPlanner(DriveSubsystem& drive, TurboPoseEstimator&
         pathplanner::PIDConstants(5.0, 0.0, 0.0), pathplanner::PIDConstants(5.0, 0.0, 0.0));
   } else {
     driveController = std::make_shared<pathplanner::PPHolonomicDriveController>(
-        pathplanner::PIDConstants(0.1, 0.0, 0.0), pathplanner::PIDConstants(0.1, 0.0, 0.0));
+        pathplanner::PIDConstants(0.15, 0.0, 0.0), pathplanner::PIDConstants(0.1, 0.0, 0.0));
   }
 
   pathplanner::RobotConfig config = pathplanner::RobotConfig::fromGUISettings();

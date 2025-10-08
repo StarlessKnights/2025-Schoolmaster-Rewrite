@@ -1,7 +1,7 @@
 {
-  "FMS": {
+  "Keyboard 0 Settings": {
     "window": {
-      "visible": false
+      "visible": true
     }
   },
   "keyboardJoysticks": [
@@ -21,13 +21,12 @@
           "incKey": 82,
           "keyRate": 0.009999999776482582
         },
-        {},
         {
           "decKey": 71,
           "incKey": 84
         }
       ],
-      "axisCount": 5,
+      "axisCount": 4,
       "buttonCount": 4,
       "buttonKeys": [
         90,
@@ -103,6 +102,5 @@
     {
       "guid": "Keyboard0"
     }
-  ],
-  "useEnableDisableHotkeys": true
+  ]
 }

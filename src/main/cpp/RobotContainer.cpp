@@ -18,6 +18,7 @@
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
+#include "commands/elevator/autonomous/ExtendToHeightThenScoreCommand.hpp"
 #include "commands/led/IndicateSideCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
@@ -29,6 +30,7 @@
 #include "pathplanner/lib/auto/AutoBuilder.h"
 #include "utils/AutoAlignCommandFactory.hpp"
 #include "utils/PathLoader.hpp"
+#include "pathplanner/lib/auto/NamedCommands.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_ledSubsystem() {
   PathLoader::ConfigurePathPlanner(m_driveSubsystem, m_driveSubsystem.GetPoseEstimator());
@@ -148,6 +150,19 @@ void RobotContainer::ConfigureDefaultCommands() {
                                       AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
           .ToPtr());
   m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverridden));
+}
+
+void RobotContainer::ConfigureNamedCommands() {
+  pathplanner::NamedCommands::registerCommand(
+      "ScoreL4", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL4EncoderPosition)
+                     .WithTimeout(2.5_s));
+  pathplanner::NamedCommands::registerCommand(
+      "ScoreL3", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL3EncoderPosition)
+                     .WithTimeout(2.5_s));
+  pathplanner::NamedCommands::registerCommand(
+      "ScoreL2", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL2EncoderPosition)
+                     .WithTimeout(2.5_s));
+  pathplanner::NamedCommands::registerCommand("HPIntake", ElevatorHPIntakeCommand(&m_elevatorSubsystem).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {

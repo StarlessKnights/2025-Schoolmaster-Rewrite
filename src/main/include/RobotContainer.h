@@ -51,6 +51,7 @@ class RobotContainer {
   void ConfigureAlgaeGrabberBindings();
   void ConfigureManualOverrideBindings();
   void ConfigureDefaultCommands();
+  void ConfigureNamedCommands();
 
   bool scoringOnLeft = true;
   bool isManuallyOverridden = false;
