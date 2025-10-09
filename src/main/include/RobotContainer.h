@@ -9,6 +9,11 @@
 #include <functional>
 
 #include "constants/Constants.h"
+#include "frc/geometry/Pose2d.h"
+#include "frc/smartdashboard/SendableChooser.h"
+#include "frc2/command/Command.h"
+#include "networktables/StructArrayTopic.h"
+
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
@@ -31,6 +36,9 @@ class RobotContainer {
   frc2::CommandPtr MakeProcessorScoreSequence(std::function<bool()> runOuttake);
   frc2::CommandPtr MakeElevatorScoreSequence(double elevatorPosition, std::function<bool()> runExtruder);
   frc2::CommandPtr MakeCancelCommand();
+  frc2::Command* GetAutonomousCommand();
+
+  frc::SendableChooser<frc2::Command*> autoChooser;
 
  private:
   frc2::CommandXboxController m_driverController{OperatorConstants::kDriverControllerPort};
@@ -46,7 +54,11 @@ class RobotContainer {
   void ConfigureAlgaeGrabberBindings();
   void ConfigureManualOverrideBindings();
   void ConfigureDefaultCommands();
+  void ConfigureNamedCommands();
 
   bool scoringOnLeft = true;
   bool isManuallyOverridden = false;
+
+  nt::StructArrayPublisher<frc::Pose2d> m_pathPosesPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>("Autonomous Poses").Publish();
 };

@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
@@ -17,27 +18,47 @@
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
+#include <pathplanner/lib/util/PathPlannerLogging.h>
 #include "commands/elevator/ElevatorRetractCommand.hpp"
+#include "commands/elevator/autonomous/ExtendToHeightThenScoreCommand.hpp"
 #include "commands/led/IndicateSideCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
 #include "frc/DriverStation.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
+#include "pathplanner/lib/auto/AutoBuilder.h"
 #include "utils/AutoAlignCommandFactory.hpp"
+#include "utils/PathLoader.hpp"
+#include "pathplanner/lib/auto/NamedCommands.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_ledSubsystem() {
+  ConfigureNamedCommands();
+
+  PathLoader::ConfigurePathPlanner(m_driveSubsystem, m_driveSubsystem.GetPoseEstimator());
+  autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
+
   ConfigureBindings();
   ConfigureElevatorBindings();
   ConfigureAlgaeGrabberBindings();
   ConfigureManualOverrideBindings();
   ConfigureDefaultCommands();
 
+  pathplanner::PathPlannerLogging::setLogActivePathCallback(
+      [this](std::vector<frc::Pose2d> poses) { m_pathPosesPublisher.Set(poses); });
+
   frc::SmartDashboard::PutData(&m_driveSubsystem);
   frc::SmartDashboard::PutData(&m_elevatorSubsystem);
   frc::SmartDashboard::PutData(&m_algaeGrabberSubsystem);
   frc::SmartDashboard::PutData(&m_ledSubsystem);
+  frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
+}
+
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+  return autoChooser.GetSelected();
 }
 
 void RobotContainer::ConfigureBindings() {
@@ -137,6 +158,13 @@ void RobotContainer::ConfigureDefaultCommands() {
                                       AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
           .ToPtr());
   m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverridden));
+}
+
+void RobotContainer::ConfigureNamedCommands() {
+  pathplanner::NamedCommands::registerCommand(
+      "ScoreL4", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL4EncoderPosition)
+                     .WithTimeout(2.5_s));
+  pathplanner::NamedCommands::registerCommand("HPIntake", ElevatorHPIntakeCommand(&m_elevatorSubsystem).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {

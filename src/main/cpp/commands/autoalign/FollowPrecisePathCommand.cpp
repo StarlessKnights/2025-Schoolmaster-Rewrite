@@ -3,10 +3,8 @@
 
 #include "commands/autoalign/FollowPrecisePathCommand.hpp"
 
-#include <algorithm>
 #include <functional>
 
-#include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "subsystems/DriveSubsystem.hpp"
@@ -38,21 +36,12 @@ void FollowPrecisePathCommand::Initialize() {
 }
 
 void FollowPrecisePathCommand::Execute() {
-  frc::Pose2d currentPose;
-
-  if (frc::RobotBase::IsReal()) {
-    currentPose = drive->GetPose();
-  } else {
-    currentPose = drive->GetSimPose();
-  }
+  frc::Pose2d currentPose = drive->GetPose();
 
   double xSpeed = kXPrecisePathPID.Calculate(currentPose.X().to<double>(), goalPose.X().to<double>());
   double ySpeed = kYPrecisePathPID.Calculate(currentPose.Y().to<double>(), goalPose.Y().to<double>());
   double rotSpeed = kRotatePrecisePathPID.Calculate(currentPose.Rotation().Radians().to<double>(),
                                                     goalPose.Rotation().Radians().to<double>());
-
-  xSpeed = std::clamp(xSpeed, -0.5, 0.5);
-  ySpeed = std::clamp(ySpeed, -0.5, 0.5);
 
   drive->Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
       units::meters_per_second_t{-xSpeed}, units::meters_per_second_t{-ySpeed}, units::radians_per_second_t{-rotSpeed},

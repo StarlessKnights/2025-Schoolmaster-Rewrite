@@ -54,6 +54,22 @@ void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
   m_speedsPublisher.Set(speeds);
 }
 
+void DriveSubsystem::AutoDrive(frc::ChassisSpeeds speeds) {
+  m_cmdSpeeds = speeds;
+
+  speeds.vx *= -1;
+  speeds.vy *= -1;
+  speeds.omega *= -1;
+
+  auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
+  SetModuleStates(states);
+
+  // undo negation to publish correct speeds
+  auto normalStates = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(m_cmdSpeeds);
+  m_swerveStatesPublisher.Set(normalStates);
+  m_speedsPublisher.Set(m_cmdSpeeds);
+}
+
 void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states) {
   fleft.SetModuleState(states[0]);
   fright.SetModuleState(states[1]);
@@ -79,7 +95,7 @@ frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() {
 
 void DriveSubsystem::Periodic() {
   estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
-  m_posePublisher.Set(estimator.getPose2D());
+  m_posePublisher.Set(estimator.GetPose2D());
 
   frc::SmartDashboard::PutNumber("Gryo", GetAngle().Degrees().value());
 }

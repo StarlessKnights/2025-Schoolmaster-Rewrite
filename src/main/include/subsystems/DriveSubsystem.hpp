@@ -7,6 +7,7 @@
 
 #include "constants/Constants.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
+#include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -39,6 +40,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   DriveSubsystem();
 
   void Drive(frc::ChassisSpeeds speeds);
+  void AutoDrive(frc::ChassisSpeeds speeds);
   void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states);
   void DriverGryoZero();
   frc::Rotation2d GetDriverGyroAngle();
@@ -46,8 +48,23 @@ class DriveSubsystem : public frc2::SubsystemBase {
   std::array<frc::SwerveModuleState, 4> GetModuleStates();
   std::array<frc::SwerveModulePosition, 4> GetModulePositions();
 
-  frc::Pose2d GetPose() { return estimator.getPose2D(); }
-  frc::Pose2d GetSimPose() { return m_simPose; }
+  frc::Pose2d GetPose() {
+    if (frc::RobotBase::IsReal()) {
+      return estimator.GetPose2D();
+    } else {
+      return m_simPose;
+    }
+  }
+
+  frc::ChassisSpeeds GetRobotRelativeChassisSpeeds() {
+    if (frc::RobotBase::IsReal()) {
+      return DriveSubsystemConstants::kKinematics.ToChassisSpeeds(GetModuleStates());
+    } else {
+      return m_cmdSpeeds;
+    }
+  }
+
+  TurboPoseEstimator& GetPoseEstimator() { return estimator; }
 
   void Periodic() override;
   void SimulationPeriodic() override;
