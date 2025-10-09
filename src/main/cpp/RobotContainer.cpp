@@ -36,6 +36,8 @@
 #include "pathplanner/lib/auto/NamedCommands.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_ledSubsystem() {
+  ConfigureNamedCommands();
+
   PathLoader::ConfigurePathPlanner(m_driveSubsystem, m_driveSubsystem.GetPoseEstimator());
   autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
 
@@ -161,12 +163,6 @@ void RobotContainer::ConfigureDefaultCommands() {
 void RobotContainer::ConfigureNamedCommands() {
   pathplanner::NamedCommands::registerCommand(
       "ScoreL4", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL4EncoderPosition)
-                     .WithTimeout(2.5_s));
-  pathplanner::NamedCommands::registerCommand(
-      "ScoreL3", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL3EncoderPosition)
-                     .WithTimeout(2.5_s));
-  pathplanner::NamedCommands::registerCommand(
-      "ScoreL2", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL2EncoderPosition)
                      .WithTimeout(2.5_s));
   pathplanner::NamedCommands::registerCommand("HPIntake", ElevatorHPIntakeCommand(&m_elevatorSubsystem).ToPtr());
 }

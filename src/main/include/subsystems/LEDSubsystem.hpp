@@ -29,6 +29,8 @@ class LEDSubsystem : public frc2::SubsystemBase {
       : viewRight(std::ranges::views::take(ledBuffer, 9)),
         viewLeft(std::ranges::subrange(ledBuffer.begin() + 14, ledBuffer.end())),
         viewCenter(std::ranges::subrange(ledBuffer.begin() + 9, ledBuffer.begin() + 11)) {
+    SetName("LEDSubsystem");
+
     addressableLED.SetLength(ledBuffer.max_size());
     addressableLED.SetData(ledBuffer);
     addressableLED.Start();
