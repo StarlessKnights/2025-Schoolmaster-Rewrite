@@ -11,9 +11,7 @@
 #include "utils/PoseTimestampPair.hpp"
 
 frc::Pose2d TurboPoseEstimator::GetPose2D() {
-  frc::Pose2d pose = poseEstimator.GetEstimatedPosition();
-
-  return pose;
+  return poseEstimator.GetEstimatedPosition();
 }
 
 void TurboPoseEstimator::ResetEstimatorPosition(frc::Rotation2d gyroAngle,

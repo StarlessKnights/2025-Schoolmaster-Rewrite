@@ -13,7 +13,6 @@
 #include "frc/smartdashboard/SendableChooser.h"
 #include "frc2/command/Command.h"
 #include "networktables/StructArrayTopic.h"
-
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"

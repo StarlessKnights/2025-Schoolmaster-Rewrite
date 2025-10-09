@@ -4,6 +4,7 @@
 #include "RobotContainer.h"
 
 #include <frc2/command/button/Trigger.h>
+#include <pathplanner/lib/util/PathPlannerLogging.h>
 
 #include <functional>
 #include <string>
@@ -18,7 +19,6 @@
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
-#include <pathplanner/lib/util/PathPlannerLogging.h>
 #include "commands/elevator/ElevatorRetractCommand.hpp"
 #include "commands/elevator/autonomous/ExtendToHeightThenScoreCommand.hpp"
 #include "commands/led/IndicateSideCommand.hpp"
@@ -31,21 +31,20 @@
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "pathplanner/lib/auto/AutoBuilder.h"
+#include "pathplanner/lib/auto/NamedCommands.h"
 #include "utils/AutoAlignCommandFactory.hpp"
 #include "utils/PathLoader.hpp"
-#include "pathplanner/lib/auto/NamedCommands.h"
 
 RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_ledSubsystem() {
   ConfigureNamedCommands();
-
-  PathLoader::ConfigurePathPlanner(m_driveSubsystem, m_driveSubsystem.GetPoseEstimator());
-  autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
-
   ConfigureBindings();
   ConfigureElevatorBindings();
   ConfigureAlgaeGrabberBindings();
   ConfigureManualOverrideBindings();
   ConfigureDefaultCommands();
+
+  PathLoader::ConfigurePathPlanner(m_driveSubsystem, m_driveSubsystem.GetPoseEstimator());
+  autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
 
   pathplanner::PathPlannerLogging::setLogActivePathCallback(
       [this](std::vector<frc::Pose2d> poses) { m_pathPosesPublisher.Set(poses); });

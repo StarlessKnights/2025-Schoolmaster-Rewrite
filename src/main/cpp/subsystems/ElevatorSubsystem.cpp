@@ -105,7 +105,6 @@ double ElevatorSubsystem::GetElevatorCurrentDraw() {
 
 frc2::CommandPtr ElevatorSubsystem::MoveElevatorToPositionCommand(double position) {
   return frc2::InstantCommand([this, position] { SetPosition(position); })
-      .WithName("MoveElevatorToPositionCommand")
       .AndThen(frc2::cmd::WaitUntil([this] {
                  return IsElevatorPIDAtSetpoint();
                }).WithName("WaitUntilElevatorAtSetpointCommand"));

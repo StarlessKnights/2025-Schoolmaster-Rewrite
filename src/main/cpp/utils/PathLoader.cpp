@@ -1,14 +1,19 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
 #include "utils/PathLoader.hpp"
+
 #include <functional>
 #include <memory>
+
 #include "frc/DriverStation.h"
 #include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "pathplanner/lib/auto/AutoBuilder.h"
 #include "pathplanner/lib/config/PIDConstants.h"
 #include "pathplanner/lib/config/RobotConfig.h"
 #include "pathplanner/lib/controllers/PPHolonomicDriveController.h"
-#include "pathplanner/lib/auto/AutoBuilder.h"
 
 void PathLoader::ConfigurePathPlanner(DriveSubsystem& drive, TurboPoseEstimator& poseEstimator) {
   std::function<void(const frc::Pose2d&)> resetPose = [&](const frc::Pose2d& pose) {
