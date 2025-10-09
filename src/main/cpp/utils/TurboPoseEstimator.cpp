@@ -10,7 +10,7 @@
 #include "networktables/NetworkTableInstance.h"
 #include "utils/PoseTimestampPair.hpp"
 
-frc::Pose2d TurboPoseEstimator::getPose2D() {
+frc::Pose2d TurboPoseEstimator::GetPose2D() {
   frc::Pose2d pose = poseEstimator.GetEstimatedPosition();
 
   return pose;

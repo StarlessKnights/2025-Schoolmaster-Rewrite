@@ -6,7 +6,6 @@
 #include <array>
 
 #include "constants/Constants.h"
-#include "frc/RobotBase.h"
 #include "frc/Timer.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -96,7 +95,7 @@ frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() {
 
 void DriveSubsystem::Periodic() {
   estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
-  m_posePublisher.Set(estimator.getPose2D());
+  m_posePublisher.Set(estimator.GetPose2D());
 
   frc::SmartDashboard::PutNumber("Gryo", GetAngle().Degrees().value());
 }

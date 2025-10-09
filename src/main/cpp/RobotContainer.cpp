@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
@@ -17,12 +18,14 @@
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
+#include <pathplanner/lib/util/PathPlannerLogging.h>
 #include "commands/elevator/ElevatorRetractCommand.hpp"
 #include "commands/elevator/autonomous/ExtendToHeightThenScoreCommand.hpp"
 #include "commands/led/IndicateSideCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
 #include "frc/DriverStation.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandPtr.h"
@@ -41,6 +44,9 @@ RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_
   ConfigureAlgaeGrabberBindings();
   ConfigureManualOverrideBindings();
   ConfigureDefaultCommands();
+
+  pathplanner::PathPlannerLogging::setLogActivePathCallback(
+      [this](std::vector<frc::Pose2d> poses) { m_pathPosesPublisher.Set(poses); });
 
   frc::SmartDashboard::PutData(&m_driveSubsystem);
   frc::SmartDashboard::PutData(&m_elevatorSubsystem);

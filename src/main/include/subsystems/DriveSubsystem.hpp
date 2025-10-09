@@ -48,8 +48,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
   std::array<frc::SwerveModuleState, 4> GetModuleStates();
   std::array<frc::SwerveModulePosition, 4> GetModulePositions();
 
-  frc::Pose2d GetPose() { return estimator.getPose2D(); }
-  frc::Pose2d GetSimPose() { return m_simPose; }
+  frc::Pose2d GetPose() {
+    if (frc::RobotBase::IsReal()) {
+      return estimator.GetPose2D();
+    } else {
+      return m_simPose;
+    }
+  }
 
   frc::ChassisSpeeds GetRobotRelativeChassisSpeeds() {
     if (frc::RobotBase::IsReal()) {

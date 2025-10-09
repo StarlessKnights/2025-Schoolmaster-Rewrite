@@ -9,8 +9,11 @@
 #include <functional>
 
 #include "constants/Constants.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc/smartdashboard/SendableChooser.h"
 #include "frc2/command/Command.h"
+#include "networktables/StructArrayTopic.h"
+
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/DriveSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
@@ -55,4 +58,7 @@ class RobotContainer {
 
   bool scoringOnLeft = true;
   bool isManuallyOverridden = false;
+
+  nt::StructArrayPublisher<frc::Pose2d> m_pathPosesPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>("Autonomous Poses").Publish();
 };
