@@ -4,6 +4,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
@@ -30,10 +31,11 @@ class TurboPhotonCamera {
 
  public:
   TurboPhotonCamera(const std::string& cameraName, frc::Transform3d cameraInBotSpace);
-  void updateSim(frc::Pose2d robotPose);
-  frc::AprilTagFieldLayout getLayout();
-  photon::PhotonPipelineResult getLatestResult();
-  std::optional<photon::EstimatedRobotPose> getCameraEstimatedPose3d();
-  std::optional<PoseTimestampPair> fetchPose();
-  int getNumTargets();
+  void UpdateSim(frc::Pose2d robotPose);
+  const frc::AprilTagFieldLayout& GetLayout();
+  photon::PhotonPipelineResult GetLatestResult();
+  std::optional<photon::EstimatedRobotPose> GetCameraEstimatedPose3D();
+  std::optional<PoseTimestampPair> FetchPose();
+  int GetNumTargets();
+  int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
 };

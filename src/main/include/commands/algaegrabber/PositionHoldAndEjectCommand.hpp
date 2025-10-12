@@ -29,7 +29,7 @@ class PositionHoldAndEjectCommand : public frc2::CommandHelper<frc2::Command, Po
 
     AddRequirements(grabber);
     AddRequirements(elevator);
-  };
+  }
 
   void Initialize() override {
     currentElevatorPosition = elevator->GetPosition();

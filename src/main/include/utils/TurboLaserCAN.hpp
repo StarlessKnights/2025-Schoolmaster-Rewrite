@@ -12,7 +12,7 @@ class TurboLaserCAN {
   grpl::LaserCan laserCan;
 
  public:
-  TurboLaserCAN(int id) : laserCan(id) {}
+  explicit TurboLaserCAN(int id) : laserCan(id) {}
 
   int GetProximity() {
     std::optional<grpl::LaserCanMeasurement> measurement = laserCan.get_measurement();

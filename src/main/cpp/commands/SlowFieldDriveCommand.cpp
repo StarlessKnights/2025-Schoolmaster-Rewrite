@@ -7,7 +7,7 @@
 
 #include "units/angular_velocity.h"
 
-void SlowFieldDriveCommand::Initialize() {};
+void SlowFieldDriveCommand::Initialize() {}
 
 void SlowFieldDriveCommand::Execute() {
   frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
@@ -17,7 +17,7 @@ void SlowFieldDriveCommand::Execute() {
   drive->Drive(fieldRelativeSpeeds);
 }
 
-void SlowFieldDriveCommand::End(bool) {};
+void SlowFieldDriveCommand::End(bool) {}
 
 bool SlowFieldDriveCommand::IsFinished() {
   return false;

@@ -7,41 +7,40 @@
 
 #include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
-#include "networktables/NetworkTableInstance.h"
 #include "utils/PoseTimestampPair.hpp"
 
-frc::Pose2d TurboPoseEstimator::GetPose2D() {
+frc::Pose2d TurboPoseEstimator::GetPose2D() const {
   return poseEstimator.GetEstimatedPosition();
 }
 
 void TurboPoseEstimator::ResetEstimatorPosition(frc::Rotation2d gyroAngle,
-                                                std::array<frc::SwerveModulePosition, 4> modulePositions,
-                                                frc::Pose2d pose) {
+                                                const std::array<frc::SwerveModulePosition, 4>& modulePositions,
+                                                const frc::Pose2d& pose) {
   poseEstimator.ResetPosition(gyroAngle, modulePositions, pose);
 }
 
 void TurboPoseEstimator::UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
-                                                     std::array<frc::SwerveModulePosition, 4> modulePositions) {
-  UpdateWithAllAvailableVisionMeasurements();
+                                                     const std::array<frc::SwerveModulePosition, 4>& modulePositions) {
   poseEstimator.Update(gyroAngle, modulePositions);
+  UpdateWithAllAvailableVisionMeasurements();
 
   posePublisher.Set(poseEstimator.GetEstimatedPosition());
 }
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera& camera) {
   if (frc::RobotBase::IsSimulation()) {
-    auto pose =
-        nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Subscribe(frc::Pose2d{}).Get();
-
-    camera.updateSim(pose);
+    frc::Pose2d pose = simPoseTopic.Get(frc::Pose2d());
+    camera.UpdateSim(pose);
   }
 
-  std::optional<PoseTimestampPair> visionPose = camera.fetchPose();
+  std::optional<PoseTimestampPair> visionPose = camera.FetchPose();
 
-  if (visionPose.has_value()) {
-    posePublisher.Set(visionPose->getPose());
-    poseEstimator.AddVisionMeasurement(visionPose->getPose(), visionPose->getLatency());
+  if (!visionPose.has_value()) {
+    return;
   }
+
+  posePublisher.Set(visionPose->getPose());
+  poseEstimator.AddVisionMeasurement(visionPose->getPose(), visionPose->getLatency());
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {

@@ -13,17 +13,17 @@ class ElevatorHPIntakeCommand : public frc2::CommandHelper<frc2::Command, Elevat
   ElevatorSubsystem* elevator;
 
  public:
-  ElevatorHPIntakeCommand(ElevatorSubsystem* elevator) : elevator(elevator) {
+  explicit ElevatorHPIntakeCommand(ElevatorSubsystem* elevator) : elevator(elevator) {
     SetName("ElevatorHPIntakeCommand");
 
     AddRequirements(elevator);
   }
 
-  void Initialize() override {};
+  void Initialize() override {}
   void Execute() override {
     elevator->SetPosition(ElevatorSubsystemConstants::kHPEncoderPosition);
     elevator->SetCoralGrabber(ElevatorSubsystemConstants::kIntakeGrabberSpeed);
-  };
-  void End(bool) override { elevator->StopAll(); };
+  }
+  void End(bool) override { elevator->StopAll(); }
   bool IsFinished() override { return elevator->GetIsCoralInHoldingPosition(); }
 };

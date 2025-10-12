@@ -41,22 +41,23 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, frc::Transfo
     cameraSim.emplace(photon::PhotonCameraSim(&camera, cameraProp));
     cameraSim->EnableDrawWireframe(true);
 
-    systemSim->AddAprilTags(getLayout());
+    systemSim->AddAprilTags(GetLayout());
     systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
+
+    frc::SmartDashboard::PutData("Sim Field", &systemSim->GetDebugField());
   }
 
   visionTargetPublisher =
       nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets").Publish();
 }
 
-void TurboPhotonCamera::updateSim(frc::Pose2d robotPose) {
+void TurboPhotonCamera::UpdateSim(frc::Pose2d robotPose) {
   if (frc::RobotBase::IsSimulation()) {
-    frc::SmartDashboard::PutData("Sim Field", &systemSim->GetDebugField());
     systemSim->Update(robotPose);
   }
 }
 
-frc::AprilTagFieldLayout TurboPhotonCamera::getLayout() {
+const frc::AprilTagFieldLayout& TurboPhotonCamera::GetLayout() {
   try {
     layout = frc::AprilTagFieldLayout{CameraConstants::kPathToAprilTagLayout};
     frc::DataLogManager::Log("Successfully loaded edited json (April tag field layout)");
@@ -68,7 +69,7 @@ frc::AprilTagFieldLayout TurboPhotonCamera::getLayout() {
   return layout;
 }
 
-photon::PhotonPipelineResult TurboPhotonCamera::getLatestResult() {
+photon::PhotonPipelineResult TurboPhotonCamera::GetLatestResult() {
   auto result = camera.GetLatestResult();
   std::vector<frc::Pose2d> targetPoses;
 
@@ -86,30 +87,24 @@ photon::PhotonPipelineResult TurboPhotonCamera::getLatestResult() {
   return result;
 }
 
-std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::getCameraEstimatedPose3d() {
-  auto result = getLatestResult();
-  auto poseEstimate = poseEstimator.Update(result);
-
-  return poseEstimate;
+std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::GetCameraEstimatedPose3D() {
+  auto result = GetLatestResult();
+  return poseEstimator.Update(result);
 }
 
-std::optional<PoseTimestampPair> TurboPhotonCamera::fetchPose() {
-  std::optional<photon::EstimatedRobotPose> ret = std::nullopt;
+std::optional<PoseTimestampPair> TurboPhotonCamera::FetchPose() {
+  auto result = GetLatestResult();
+  auto poseEstimate = poseEstimator.Update(result);
 
-  try {
-    ret = getCameraEstimatedPose3d().value();
-  } catch (std::exception e) {
-  }
-
-  if (ret.has_value() && getNumTargets() >= 1) {
-    return PoseTimestampPair{ret->estimatedPose.ToPose2d(), ret->timestamp};
+  if (poseEstimate.has_value() && GetNumTargets(result) >= 1) {
+    return PoseTimestampPair{poseEstimate->estimatedPose.ToPose2d(), poseEstimate->timestamp};
   }
 
   return std::nullopt;
 }
 
-int TurboPhotonCamera::getNumTargets() {
-  auto result = getLatestResult();
+int TurboPhotonCamera::GetNumTargets() {
+  auto result = GetLatestResult();
   if (!result.HasTargets()) {
     return 0;
   }

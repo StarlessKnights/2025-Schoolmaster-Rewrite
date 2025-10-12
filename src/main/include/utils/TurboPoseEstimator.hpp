@@ -23,16 +23,19 @@ class TurboPoseEstimator {
 
   nt::StructPublisher<frc::Pose2d> posePublisher =
       nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Vision Pose").Publish();
+  nt::StructSubscriber<frc::Pose2d> simPoseTopic =
+      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Subscribe(frc::Pose2d{});
 
  public:
-  TurboPoseEstimator(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
-                     frc::Pose2d initialPose)
+  TurboPoseEstimator(frc::Rotation2d gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,
+                     const frc::Pose2d& initialPose)
       : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions, initialPose) {}
 
-  frc::Pose2d GetPose2D();
-  void ResetEstimatorPosition(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions,
-                              frc::Pose2d pose);
-  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle, std::array<frc::SwerveModulePosition, 4> modulePositions);
+  frc::Pose2d GetPose2D() const;
+  void ResetEstimatorPosition(frc::Rotation2d gyroAngle,
+                              const std::array<frc::SwerveModulePosition, 4>& modulePositions, const frc::Pose2d& pose);
+  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
+                                   const std::array<frc::SwerveModulePosition, 4>& modulePositions);
   void TryVisionUpdateWithCamera(TurboPhotonCamera& camera);
   void UpdateWithAllAvailableVisionMeasurements();
 };

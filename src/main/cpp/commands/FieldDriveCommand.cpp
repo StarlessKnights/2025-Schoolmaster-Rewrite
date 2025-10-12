@@ -7,7 +7,7 @@
 
 #include "constants/Constants.h"
 
-void FieldDriveCommand::Initialize() {};
+void FieldDriveCommand::Initialize() {}
 
 void FieldDriveCommand::Execute() {
   frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
@@ -17,7 +17,7 @@ void FieldDriveCommand::Execute() {
   drive->Drive(fieldRelativeSpeeds);
 }
 
-void FieldDriveCommand::End(bool) {};
+void FieldDriveCommand::End(bool) {}
 
 bool FieldDriveCommand::IsFinished() {
   return false;
