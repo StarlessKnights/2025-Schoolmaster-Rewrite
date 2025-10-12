@@ -24,7 +24,7 @@ class ElevatorGoToPositionCommand : public frc2::CommandHelper<frc2::Command, El
     SetName("ElevatorGoToPositionCommand");
 
     AddRequirements(elevator);
-  };
+  }
 
   void Initialize() override {
     frc::DataLogManager::Log("ElevatorGoToPositionCommand to " + std::to_string(positionSetpoint) + " started");

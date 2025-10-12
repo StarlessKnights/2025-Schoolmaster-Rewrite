@@ -17,9 +17,9 @@ class ExtendToHeightThenScoreCommand : public frc2::CommandHelper<frc2::Command,
   ExtendToHeightThenScoreCommand(ElevatorSubsystem* elevator, double positionSetpoint)
       : elevator(elevator), positionSetpoint(positionSetpoint) {
     AddRequirements(elevator);
-  };
+  }
 
-  void Initialize() override {};
+  void Initialize() override {}
   void Execute() override {
     elevator->SetPosition(positionSetpoint);
 

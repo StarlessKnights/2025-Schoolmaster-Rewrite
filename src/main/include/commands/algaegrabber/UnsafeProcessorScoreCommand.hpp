@@ -24,7 +24,7 @@ class UnsafeProcessorScoreCommand : public frc2::CommandHelper<frc2::Command, Un
                               std::function<bool()> runExtruder)
       : grabber(grabber), elevator(elevator), runExtruder(runExtruder) {
     SetName("UnsafeProcessorScoreCommand");
-  };
+  }
 
   void Initialize() override {};
   void Execute() override {

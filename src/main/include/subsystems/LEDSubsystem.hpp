@@ -34,21 +34,21 @@ class LEDSubsystem : public frc2::SubsystemBase {
     addressableLED.SetLength(ledBuffer.max_size());
     addressableLED.SetData(ledBuffer);
     addressableLED.Start();
-  };
+  }
 
   void LeftOn() {
     SetLeft(onPattern);
     SetRight(offPattern);
     UpdateBuffer();
-  };
+  }
 
   void RightOn() {
     SetRight(onPattern);
     SetLeft(offPattern);
     UpdateBuffer();
-  };
+  }
 
-  void SetMiddle(frc::LEDPattern pattern) { pattern.ApplyTo(viewCenter); };
+  void SetMiddle(frc::LEDPattern pattern) { pattern.ApplyTo(viewCenter); }
   void SetLeft(frc::LEDPattern pattern) { pattern.ApplyTo(viewLeft); }
   void SetRight(frc::LEDPattern pattern) { pattern.ApplyTo(viewRight); }
 
