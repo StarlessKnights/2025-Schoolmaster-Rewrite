@@ -6,7 +6,7 @@
 #include "constants/Constants.h"
 
 ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(
-    AlgaeGrabberSubsystem* algaeGrabber, ElevatorSubsystem* elevator, double algaeEncoderPosition)
+    AlgaeGrabberSubsystem* algaeGrabber, ElevatorSubsystem* elevator, const double algaeEncoderPosition)
     : algaeGrabber(algaeGrabber), elevator(elevator), algaeGrabberEncoderPosition(algaeEncoderPosition) {
   SetName("ElevatorPopUpAndAlgaeGrabberGoToPositionCommand");
 
@@ -15,8 +15,9 @@ ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::ElevatorPopUpAndAlgaeGrabberGoT
 }
 
 void ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::Initialize() {
-  double currentPosition = elevator->GetPosition();
-  double minPosition = AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition;
+  const double currentPosition = elevator->GetPosition();
+  constexpr double minPosition = AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition;
+
   algaeGrabber->SetPosition(algaeGrabberEncoderPosition);
   homePosition = currentPosition < minPosition ? minPosition : currentPosition;
 }

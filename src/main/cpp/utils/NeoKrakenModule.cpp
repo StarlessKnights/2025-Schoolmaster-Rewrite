@@ -22,10 +22,10 @@
 #include "units/angular_velocity.h"
 #include "units/base.h"
 #include "units/length.h"
-#include "wpi/sendable/Sendable.h"
 #include "wpi/sendable/SendableBuilder.h"
 
-NeoKrakenModule::NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string& can)
+NeoKrakenModule::NeoKrakenModule(const int driveID, const int steerID, const int encoderID, const double offset,
+                                 const std::string& can)
     : driveMotor(driveID, can),
       steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
       encoderObject(encoderID, can),
@@ -84,16 +84,16 @@ void NeoKrakenModule::CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfigu
 }
 
 void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
-  double currentMeasurement = GetEncoderPosition();
-  frc::Rotation2d currentAngle{units::radian_t{currentMeasurement}};
+  const double currentMeasurement = GetEncoderPosition();
+  const frc::Rotation2d currentAngle{units::radian_t{currentMeasurement}};
   state.Optimize(currentAngle);
 
-  units::meters_per_second_t speed = state.speed;
-  units::radian_t angle = state.angle.Radians();
-  setPoint = angle.value();
+  const units::meters_per_second_t speed = state.speed;
+  const units::radian_t angle = state.angle.Radians();
+  setpoint = angle.value();
 
-  double drivePercent = driveController.Calculate(GetVelocity().value(), speed.value());
-  double steerPercent = steerController.Calculate(currentMeasurement, angle.value());
+  const double drivePercent = driveController.Calculate(GetVelocity().value(), speed.value());
+  const double steerPercent = steerController.Calculate(currentMeasurement, angle.value());
 
   driveMotor.Set(drivePercent + ff.Calculate(speed).value());
   steerMotor.Set(-steerPercent);
@@ -104,16 +104,16 @@ void NeoKrakenModule::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty("Drive Velocity (m/s)", [this]() { return GetVelocity().value(); }, nullptr);
   builder.AddDoubleProperty("Drive Position (m)", [this]() { return GetPosition(); }, nullptr);
   builder.AddDoubleProperty("Steer Angle (rad)", [this]() { return GetEncoderPosition(); }, nullptr);
-  builder.AddDoubleProperty("Steer Setpoint (rad)", [this]() { return setPoint; }, nullptr);
+  builder.AddDoubleProperty("Steer Setpoint (rad)", [this]() { return setpoint; }, nullptr);
 }
 
 double NeoKrakenModule::GetEncoderPosition() {
-  ctre::phoenix6::StatusSignal<units::turn_t> angle = encoderObject.GetAbsolutePosition();
+  const ctre::phoenix6::StatusSignal<units::turn_t> angle = encoderObject.GetAbsolutePosition();
   return (angle.GetValueAsDouble() * kCanCoderMultiplier) - offset;
 }
 
 double NeoKrakenModule::GetPosition() {
-  ctre::phoenix6::StatusSignal<units::turn_t> position = driveMotor.GetPosition();
+  const ctre::phoenix6::StatusSignal<units::turn_t> position = driveMotor.GetPosition();
   return position.GetValue().value() * kPositionMultiplier;
 }
 
@@ -126,6 +126,6 @@ frc::SwerveModulePosition NeoKrakenModule::GetModulePosition() {
 }
 
 units::meters_per_second_t NeoKrakenModule::GetVelocity() {
-  ctre::phoenix6::StatusSignal<units::turns_per_second_t> velocity = driveMotor.GetVelocity();
+  const ctre::phoenix6::StatusSignal<units::turns_per_second_t> velocity = driveMotor.GetVelocity();
   return units::meters_per_second_t{velocity.GetValue().value() * kVelocityMultiplier};
 }

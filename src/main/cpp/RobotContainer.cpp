@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "commands/FieldDriveCommand.hpp"
@@ -35,7 +36,7 @@
 #include "utils/AutoAlignCommandFactory.hpp"
 #include "utils/PathLoader.hpp"
 
-RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_ledSubsystem() {
+RobotContainer::RobotContainer() {
   ConfigureNamedCommands();
   ConfigureBindings();
   ConfigureElevatorBindings();
@@ -56,21 +57,21 @@ RobotContainer::RobotContainer() : m_driveSubsystem(), m_elevatorSubsystem(), m_
   frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::Command* RobotContainer::GetAutonomousCommand() const {
   return autoChooser.GetSelected();
 }
 
 void RobotContainer::ConfigureBindings() {
   m_driverController.Y().OnTrue(
-      frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGryoZero(); }).WithName("Reset Gyro"));
+      frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGyroZero(); }).WithName("Reset Gyro"));
 }
 
 void RobotContainer::ConfigureElevatorBindings() {
   // Outtake
-  std::function<bool()> runElevatorExtruder = [this]() { return m_driverController.GetRightTriggerAxis() > 0.25; };
-  std::function<bool()> isManuallyOverridden = [this]() { return this->isManuallyOverridden; };
-  std::function<bool()> scoringOnLeftProvider = [this]() { return this->scoringOnLeft; };
-  std::function<bool()> isRedAlliance = []() { return frc::DriverStation::GetAlliance() == frc::DriverStation::kRed; };
+  const std::function runElevatorExtruder = [this]() { return m_driverController.GetRightTriggerAxis() > 0.25; };
+  const std::function isManuallyOverriddenProvider = [this]() { return this->isManuallyOverridden; };
+  const std::function scoringOnLeftProvider = [this]() { return this->scoringOnLeft; };
+  const std::function isRedAlliance = []() { return frc::DriverStation::GetAlliance() == frc::DriverStation::kRed; };
 
   // L2 Score
   m_driverController.POVRight().OnTrue(
@@ -79,7 +80,7 @@ void RobotContainer::ConfigureElevatorBindings() {
                         AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
                             [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
                             ElevatorSubsystemConstants::kL2EncoderPosition, isRedAlliance, scoringOnLeftProvider),
-                        isManuallyOverridden)
+                        isManuallyOverriddenProvider)
           .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
           .WithName("L2 Score"));
 
@@ -90,7 +91,7 @@ void RobotContainer::ConfigureElevatorBindings() {
                         AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
                             [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
                             ElevatorSubsystemConstants::kL3EncoderPosition, isRedAlliance, scoringOnLeftProvider),
-                        isManuallyOverridden)
+                        isManuallyOverriddenProvider)
           .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
           .WithName("L3 Score"));
 
@@ -101,7 +102,7 @@ void RobotContainer::ConfigureElevatorBindings() {
                         AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(
                             [&] { return m_driveSubsystem.GetPose(); }, &m_elevatorSubsystem, &m_driveSubsystem,
                             ElevatorSubsystemConstants::kL4EncoderPosition, isRedAlliance, scoringOnLeftProvider),
-                        isManuallyOverridden)
+                        isManuallyOverriddenProvider)
           .AndThen(frc2::cmd::WaitUntil([this]() { return m_driverController.POVDown().Get(); }))
           .WithName("L4 Score"));
 
@@ -115,7 +116,7 @@ void RobotContainer::ConfigureElevatorBindings() {
 
 void RobotContainer::ConfigureAlgaeGrabberBindings() {
   // Outtake
-  std::function<bool()> runOuttake = [this]() { return m_driverController.GetLeftTriggerAxis() > 0.25; };
+  const std::function<bool()> runOuttake = [this]() { return m_driverController.GetLeftTriggerAxis() > 0.25; };
 
   // High Algae
   m_driverController.X().OnTrue(
@@ -147,8 +148,8 @@ void RobotContainer::ConfigureManualOverrideBindings() {
 }
 
 void RobotContainer::ConfigureDefaultCommands() {
-  std::function<bool()> scoring = [this]() { return this->scoringOnLeft; };
-  std::function<bool()> isManuallyOverridden = [this]() { return this->isManuallyOverridden; };
+  const std::function<bool()> scoring = [this]() { return this->scoringOnLeft; };
+  const std::function<bool()> isManuallyOverriddenProvider = [this]() { return this->isManuallyOverridden; };
 
   m_driveSubsystem.SetDefaultCommand(MakeFieldDriveCommand());
   m_elevatorSubsystem.SetDefaultCommand(ElevatorRetractCommand(&m_elevatorSubsystem).ToPtr());
@@ -156,7 +157,7 @@ void RobotContainer::ConfigureDefaultCommands() {
       AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
                                       AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
           .ToPtr());
-  m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverridden));
+  m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverriddenProvider));
 }
 
 void RobotContainer::ConfigureNamedCommands() {
@@ -173,12 +174,12 @@ frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
       .ToPtr();
 }
 
-frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(double elevatorPosition, std::function<bool()> runExtruder) {
+frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition, std::function<bool()> runExtruder) {
   return frc2::cmd::Sequence(
       AlgaeGrabberAndElevatorPositionAndIntakeCommand(&m_elevatorSubsystem, &m_algaeGrabberSubsystem, elevatorPosition,
                                                       AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition)
           .ToPtr(),
-      PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runExtruder).ToPtr());
+      PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, std::move(runExtruder)).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {
@@ -188,7 +189,7 @@ frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {
       .ToPtr();
 }
 
-frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(std::function<bool()> runOuttake) {
+frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(const std::function<bool()>& runOuttake) {
   return frc2::cmd::Sequence(
       ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
                                                       AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition)
@@ -199,7 +200,8 @@ frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(std::function<bool()
           .ToPtr());
 }
 
-frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(double elevatorPosition, std::function<bool()> runExtruder) {
+frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(const double elevatorPosition,
+                                                           const std::function<bool()>& runExtruder) {
   return frc2::cmd::Parallel(ElevatorGoToPositionCommand(&m_elevatorSubsystem, runExtruder, elevatorPosition).ToPtr(),
                              MakeSlowFieldDriveCommand());
 }

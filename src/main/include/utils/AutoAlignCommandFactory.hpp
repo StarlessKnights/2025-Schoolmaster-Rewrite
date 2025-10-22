@@ -21,8 +21,8 @@ class AutoAlignCommandFactory {
 
   static bool initialized;
 
-  static std::vector<frc::Pose2d> MirrorBlueSidedPoseList(const std::vector<frc::Pose2d>& list);
-  static std::vector<frc::Pose2d> ApplyXYOffset(const std::vector<frc::Pose2d>& list, double x, double y);
+  static std::vector<frc::Pose2d> MirrorBlueSidedPoseList(const std::vector<frc::Pose2d>& poseList);
+  static std::vector<frc::Pose2d> ApplyXYOffset(const std::vector<frc::Pose2d>& originalPoses, double x, double y);
 
  public:
   static void Initialize();
@@ -30,9 +30,9 @@ class AutoAlignCommandFactory {
   static frc::Pose2d GetClosestScoringPose(const frc::Pose2d& currentPose, bool isRedAlliance, bool isLeftSide);
   static bool IsPoseSafeToDriveTo(const frc::Pose2d& currentPose, const frc::Pose2d& goalPose);
 
-  static frc2::CommandPtr MakeAutoAlignAndScoreCommand(std::function<frc::Pose2d()> poseSupplier,
+  static frc2::CommandPtr MakeAutoAlignAndScoreCommand(const std::function<frc::Pose2d()>& poseSupplier,
                                                        ElevatorSubsystem* elevator, DriveSubsystem* drive,
                                                        double elevatorEncoderPosition,
-                                                       std::function<bool()> isRedAlliance,
-                                                       std::function<bool()> isLeftSide);
+                                                       const std::function<bool()>& isRedAlliance,
+                                                       const std::function<bool()>& isLeftSide);
 };

@@ -8,8 +8,7 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/ElevatorSubsystem.hpp"
 
-class ElevatorHPIntakeCommand : public frc2::CommandHelper<frc2::Command, ElevatorHPIntakeCommand> {
- private:
+class ElevatorHPIntakeCommand final : public frc2::CommandHelper<frc2::Command, ElevatorHPIntakeCommand> {
   ElevatorSubsystem* elevator;
 
  public:

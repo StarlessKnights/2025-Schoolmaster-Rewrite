@@ -21,8 +21,7 @@
 #include "utils/NeoKrakenModule.hpp"
 #include "utils/TurboPoseEstimator.hpp"
 
-class DriveSubsystem : public frc2::SubsystemBase {
- private:
+class DriveSubsystem final : public frc2::SubsystemBase {
   NeoKrakenModule fleft, fright, bleft, bright;
   ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID, DriveSubsystemConstants::kCanivoreName};
   frc::Rotation2d driverGyroOffset{};
@@ -39,17 +38,17 @@ class DriveSubsystem : public frc2::SubsystemBase {
  public:
   DriveSubsystem();
 
-  void Drive(frc::ChassisSpeeds speeds);
+  void Drive(const frc::ChassisSpeeds& speeds);
   void AutoDrive(frc::ChassisSpeeds speeds);
   void SetModuleStates(const std::array<frc::SwerveModuleState, 4>& states);
-  void DriverGryoZero();
-  frc::Rotation2d GetDriverGyroAngle();
-  frc::Rotation2d GetAngle() { return pigeon.GetRotation2d(); }
+  void DriverGyroZero();
+  frc::Rotation2d GetDriverGyroAngle() const;
+  frc::Rotation2d GetAngle() const { return pigeon.GetRotation2d(); }
   std::array<frc::SwerveModuleState, 4> GetModuleStates();
   std::array<frc::SwerveModulePosition, 4> GetModulePositions();
 
-  frc::Pose2d GetPose() {
-    if (frc::RobotBase::IsReal()) {
+  frc::Pose2d GetPose() const {
+    if constexpr (frc::RobotBase::IsReal()) {
       return estimator.GetPose2D();
     } else {
       return m_simPose;
@@ -57,7 +56,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   }
 
   frc::ChassisSpeeds GetRobotRelativeChassisSpeeds() {
-    if (frc::RobotBase::IsReal()) {
+    if constexpr (frc::RobotBase::IsReal()) {
       return DriveSubsystemConstants::kKinematics.ToChassisSpeeds(GetModuleStates());
     } else {
       return m_cmdSpeeds;

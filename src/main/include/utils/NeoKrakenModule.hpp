@@ -24,7 +24,8 @@ class NeoKrakenModule : public wpi::Sendable {
   rev::spark::SparkMax steerMotor;
   ctre::phoenix6::hardware::CANcoder encoderObject;
 
-  double offset, setPoint;
+  double offset;
+  double setpoint{};
 
   frc::SimpleMotorFeedforward<units::meters> ff;
   frc::PIDController driveController, steerController;
@@ -37,10 +38,10 @@ class NeoKrakenModule : public wpi::Sendable {
   NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string& can);
 
   void ConfigPIDInternal();
-  void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
-  void ConfigSteerMotor(rev::spark::SparkMax& target);
-  void SetupEncoder(ctre::phoenix6::hardware::CANcoder& target);
-  void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config);
+  static void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
+  static void ConfigSteerMotor(rev::spark::SparkMax& target);
+  static void SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder);
+  static void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config);
   void SetModuleState(frc::SwerveModuleState state);
   double GetEncoderPosition();
   double GetPosition();

@@ -11,16 +11,16 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/LEDSubsystem.hpp"
 
-class IndicateSideCommand : public frc2::CommandHelper<frc2::Command, IndicateSideCommand> {
+class IndicateSideCommand final : public frc2::CommandHelper<frc2::Command, IndicateSideCommand> {
  private:
   LEDSubsystem* led;
   std::function<bool()> scoringOnLeft;
   std::function<bool()> isManuallyOverridden;
 
  public:
-  explicit IndicateSideCommand(LEDSubsystem* led, std::function<bool()> scoringOnLeft,
+  explicit IndicateSideCommand(LEDSubsystem* led, const std::function<bool()>& scoringOnLeft,
                                std::function<bool()> isManuallyOverridden)
-      : led(led), scoringOnLeft(scoringOnLeft), isManuallyOverridden(isManuallyOverridden) {
+      : led(led), scoringOnLeft(scoringOnLeft), isManuallyOverridden(std::move(isManuallyOverridden)) {
     SetName("IndicateSideCommand");
     AddRequirements(led);
   }
@@ -28,7 +28,7 @@ class IndicateSideCommand : public frc2::CommandHelper<frc2::Command, IndicateSi
   void Initialize() override {};
   void Execute() override {
     if (isManuallyOverridden()) {
-      frc::LEDPattern p = LEDSubsystemConstants::kManualModeOn;
+      const frc::LEDPattern p = LEDSubsystemConstants::kManualModeOn;
       led->SetMiddle(p);
       led->SetLeft(p);
       led->SetRight(p);

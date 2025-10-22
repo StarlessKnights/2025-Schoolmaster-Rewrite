@@ -9,15 +9,16 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/DriveSubsystem.hpp"
 
-class SlowFieldDriveCommand : public frc2::CommandHelper<frc2::Command, SlowFieldDriveCommand> {
+class SlowFieldDriveCommand final : public frc2::CommandHelper<frc2::Command, SlowFieldDriveCommand> {
  private:
   std::function<double()> xSpeed, ySpeed, rotX;
   DriveSubsystem* drive;
 
  public:
-  explicit SlowFieldDriveCommand(DriveSubsystem* drive, std::function<double()> ySpeed, std::function<double()> xSpeed,
+  explicit SlowFieldDriveCommand(DriveSubsystem* drive, const std::function<double()>& ySpeed,
+                                 const std::function<double()>& xSpeed,
                                  std::function<double()> rotX)
-      : xSpeed(xSpeed), ySpeed(ySpeed), rotX(rotX), drive(drive) {
+      : xSpeed(xSpeed), ySpeed(ySpeed), rotX(std::move(rotX)), drive(drive) {
     SetName("SlowFieldDriveCommand");
     AddRequirements(drive);
   }

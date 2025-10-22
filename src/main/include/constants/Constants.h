@@ -91,7 +91,7 @@ inline const std::string kPathToAprilTagLayout = "/home/lvuser/deploy/files/2025
 inline const std::string kLocalizationCamOneName = "lc1";
 inline const std::string kLocalizationCamTwoName = "lc2";
 
-inline const frc::Transform3d kLocalizationCamOneOffset{frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m),
+inline constexpr frc::Transform3d kLocalizationCamOneOffset{frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m),
                                                         frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
 
 inline const frc::Transform3d kLocalizationCamTwoOffset{
@@ -156,8 +156,8 @@ inline constexpr double kIntakeMotorSpeed = 1.0;
 
 inline constexpr double kIntakeCurrentDraw = 40.0;
 
-inline const frc::ChassisSpeeds kIntakeChassisSpeeds{-0.5_mps, 0.0_mps, 0.0_rad_per_s};
-inline const frc::ChassisSpeeds kRetractChassisSpeeds{1.0_mps, 0.0_mps, 0.0_rad_per_s};
+inline constexpr frc::ChassisSpeeds kIntakeChassisSpeeds{-0.5_mps, 0.0_mps, 0.0_rad_per_s};
+inline constexpr frc::ChassisSpeeds kRetractChassisSpeeds{1.0_mps, 0.0_mps, 0.0_rad_per_s};
 }  // namespace AlgaeGrabberSubsystemsConstants
 
 namespace PathingConstants {

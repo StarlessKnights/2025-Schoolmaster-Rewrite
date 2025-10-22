@@ -32,9 +32,9 @@ class TurboPoseEstimator {
       : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions, initialPose) {}
 
   frc::Pose2d GetPose2D() const;
-  void ResetEstimatorPosition(frc::Rotation2d gyroAngle,
+  void ResetEstimatorPosition(const frc::Rotation2d& gyroAngle,
                               const std::array<frc::SwerveModulePosition, 4>& modulePositions, const frc::Pose2d& pose);
-  void UpdateWithOdometryAndVision(frc::Rotation2d gyroAngle,
+  void UpdateWithOdometryAndVision(const frc::Rotation2d& gyroAngle,
                                    const std::array<frc::SwerveModulePosition, 4>& modulePositions);
   void TryVisionUpdateWithCamera(TurboPhotonCamera& camera);
   void UpdateWithAllAvailableVisionMeasurements();
