@@ -192,6 +192,9 @@ inline const std::vector<frc::Pose2d> kRightBlueSidedScoringPositions = {
     frc::Pose2d{units::meter_t{5.808}, units::meter_t{4.370}, frc::Rotation2d{units::degree_t{180}}},
     frc::Pose2d{units::meter_t{4.849}, units::meter_t{5.341}, frc::Rotation2d{units::degree_t{240}}}};
 
+inline const auto kProcessorBlueScoringPosition =
+    frc::Pose2d{units::meter_t{5.96}, units::meter_t{0.57}, frc::Rotation2d{units::degree_t{-90}}};
+
 inline constexpr double kFieldWidthMeters = 17.56;
 inline constexpr double kFieldLengthMeters = 8.05;
 
@@ -203,6 +206,7 @@ inline constexpr double kL4XOffset = 0.07;
 inline constexpr double kL4YOffset = 0.0;
 
 inline constexpr double kMaxPathingDistance = 1.5;
+inline constexpr double kMaxProcessorScoringDistance = 1.5;
 
 }  // namespace PathingConstants
 
