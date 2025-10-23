@@ -8,3 +8,4 @@ A fully fledged rewrite of Cavbots/Turbo Torque's 2025 season robot, Schoolmaste
 * AlgaeGrabber (High, Low)
 * Auto Align to Coral
 * Autonomous Routines
+* Processor Auto Align (Farzaan)
