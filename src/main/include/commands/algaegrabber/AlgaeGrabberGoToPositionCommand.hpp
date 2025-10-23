@@ -7,13 +7,12 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 
-class AlgaeGrabberGoToPositionCommand : public frc2::CommandHelper<frc2::Command, AlgaeGrabberGoToPositionCommand> {
- private:
+class AlgaeGrabberGoToPositionCommand final : public frc2::CommandHelper<frc2::Command, AlgaeGrabberGoToPositionCommand> {
   AlgaeGrabberSubsystem* grabber;
   double position;
 
  public:
-  AlgaeGrabberGoToPositionCommand(AlgaeGrabberSubsystem* grabber, double position)
+  AlgaeGrabberGoToPositionCommand(AlgaeGrabberSubsystem* grabber, const double position)
       : grabber(grabber), position(position) {
     SetName("AlgaeGrabberGoToPositionCommand");
 

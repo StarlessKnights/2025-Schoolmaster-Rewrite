@@ -8,8 +8,7 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/ElevatorSubsystem.hpp"
 
-class ExtendToHeightThenScoreCommand : public frc2::CommandHelper<frc2::Command, ExtendToHeightThenScoreCommand> {
- private:
+class ExtendToHeightThenScoreCommand final : public frc2::CommandHelper<frc2::Command, ExtendToHeightThenScoreCommand> {
   ElevatorSubsystem* elevator;
   double positionSetpoint;
 

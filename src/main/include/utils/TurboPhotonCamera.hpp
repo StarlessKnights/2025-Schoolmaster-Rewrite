@@ -30,8 +30,8 @@ class TurboPhotonCamera {
   nt::StructArrayPublisher<frc::Pose2d> visionTargetPublisher;
 
  public:
-  TurboPhotonCamera(const std::string& cameraName, frc::Transform3d cameraInBotSpace);
-  void UpdateSim(frc::Pose2d robotPose);
+  TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace);
+  void UpdateSim(const frc::Pose2d& robotPose);
   const frc::AprilTagFieldLayout& GetLayout();
   photon::PhotonPipelineResult GetLatestResult();
   std::optional<photon::EstimatedRobotPose> GetCameraEstimatedPose3D();

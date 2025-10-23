@@ -15,7 +15,6 @@
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Transform3d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "networktables/NetworkTableInstance.h"
 #include "photon/PhotonCamera.h"
@@ -27,9 +26,9 @@
 #include "units/time.h"
 #include "utils/PoseTimestampPair.hpp"
 
-TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, frc::Transform3d cameraInBotSpace)
+TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace)
     : camera(cameraName), poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
-  if (frc::RobotBase::IsSimulation()) {
+  if constexpr (frc::RobotBase::IsSimulation()) {
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
     cameraProp.SetCalibError(0.25, 0.08);
@@ -51,8 +50,8 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, frc::Transfo
       nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets").Publish();
 }
 
-void TurboPhotonCamera::UpdateSim(frc::Pose2d robotPose) {
-  if (frc::RobotBase::IsSimulation()) {
+void TurboPhotonCamera::UpdateSim(const frc::Pose2d& robotPose) {
+  if constexpr (frc::RobotBase::IsSimulation()) {
     systemSim->Update(robotPose);
   }
 }
@@ -70,33 +69,49 @@ const frc::AprilTagFieldLayout& TurboPhotonCamera::GetLayout() {
 }
 
 photon::PhotonPipelineResult TurboPhotonCamera::GetLatestResult() {
-  auto result = camera.GetLatestResult();
+  const auto results = camera.GetAllUnreadResults();
+
+  if (results.empty()) {
+    return {};
+  }
+
+  frc::DataLogManager::Log(std::to_string(results.at(0).HasTargets()));
+
+  auto result = results.back();
+
+  if (!result.HasTargets()) {
+    return {};
+  }
+
   std::vector<frc::Pose2d> targetPoses;
 
   for (const auto& target : result.GetTargets()) {
-    if (target.GetFiducialId() >= 0) {
-      auto tagPose = layout.GetTagPose(target.GetFiducialId());
-      if (tagPose.has_value()) {
-        targetPoses.push_back(tagPose->ToPose2d());
-      }
+    if (target.GetFiducialId() < 0) {
+      continue;
     }
+
+    const auto tagPose = layout.GetTagPose(target.GetFiducialId());
+
+    if (!tagPose.has_value()) {
+      continue;
+    }
+
+    targetPoses.push_back(tagPose->ToPose2d());
   }
 
   visionTargetPublisher.Set(targetPoses);
-
   return result;
 }
 
 std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::GetCameraEstimatedPose3D() {
-  auto result = GetLatestResult();
+  const auto result = GetLatestResult();
   return poseEstimator.Update(result);
 }
 
 std::optional<PoseTimestampPair> TurboPhotonCamera::FetchPose() {
-  auto result = GetLatestResult();
-  auto poseEstimate = poseEstimator.Update(result);
+  const auto result = GetLatestResult();
 
-  if (poseEstimate.has_value() && GetNumTargets(result) >= 1) {
+  if (const auto poseEstimate = poseEstimator.Update(result); poseEstimate.has_value() && GetNumTargets(result) >= 1) {
     return PoseTimestampPair{poseEstimate->estimatedPose.ToPose2d(), poseEstimate->timestamp};
   }
 
@@ -104,10 +119,10 @@ std::optional<PoseTimestampPair> TurboPhotonCamera::FetchPose() {
 }
 
 int TurboPhotonCamera::GetNumTargets() {
-  auto result = GetLatestResult();
+  const auto result = GetLatestResult();
   if (!result.HasTargets()) {
     return 0;
   }
 
-  return result.GetTargets().size();
+  return static_cast<int>(result.GetTargets().size());
 }

@@ -9,7 +9,7 @@
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
 
-class ElevatorPopUpAndAlgaeGrabberGoToPositionCommand
+class ElevatorPopUpAndAlgaeGrabberGoToPositionCommand final
     : public frc2::CommandHelper<frc2::Command, ElevatorPopUpAndAlgaeGrabberGoToPositionCommand> {
   AlgaeGrabberSubsystem* algaeGrabber;
   ElevatorSubsystem* elevator;

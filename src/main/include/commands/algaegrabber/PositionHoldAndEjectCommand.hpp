@@ -12,8 +12,7 @@
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
 
-class PositionHoldAndEjectCommand : public frc2::CommandHelper<frc2::Command, PositionHoldAndEjectCommand> {
- private:
+class PositionHoldAndEjectCommand final : public frc2::CommandHelper<frc2::Command, PositionHoldAndEjectCommand> {
   AlgaeGrabberSubsystem* grabber;
   ElevatorSubsystem* elevator;
   std::function<bool()> runExtruder;
@@ -23,7 +22,7 @@ class PositionHoldAndEjectCommand : public frc2::CommandHelper<frc2::Command, Po
 
  public:
   PositionHoldAndEjectCommand(AlgaeGrabberSubsystem* grabber, ElevatorSubsystem* elevator,
-                              std::function<bool()> runExtruder)
+                              const std::function<bool()>& runExtruder)
       : grabber(grabber), elevator(elevator), runExtruder(runExtruder) {
     SetName("PositionHoldAndEjectCommand");
 

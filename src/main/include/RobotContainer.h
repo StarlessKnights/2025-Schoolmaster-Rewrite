@@ -32,10 +32,10 @@ class RobotContainer {
   frc2::CommandPtr MakeAlgaeGrabberSequence(double elevatorPosition, std::function<bool()> runExtruder);
   frc2::CommandPtr MakeFieldDriveCommand();
   frc2::CommandPtr MakeSlowFieldDriveCommand();
-  frc2::CommandPtr MakeProcessorScoreSequence(std::function<bool()> runOuttake);
-  frc2::CommandPtr MakeElevatorScoreSequence(double elevatorPosition, std::function<bool()> runExtruder);
+  frc2::CommandPtr MakeProcessorScoreSequence(const std::function<bool()>& runOuttake);
+  frc2::CommandPtr MakeElevatorScoreSequence(double elevatorPosition, const std::function<bool()>& runExtruder);
   frc2::CommandPtr MakeCancelCommand();
-  frc2::Command* GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand() const;
 
   frc::SendableChooser<frc2::Command*> autoChooser;
 

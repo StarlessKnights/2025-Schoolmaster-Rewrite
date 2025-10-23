@@ -8,18 +8,17 @@
 #include "grpl/LaserCan.h"
 
 class TurboLaserCAN {
- private:
   grpl::LaserCan laserCan;
 
  public:
-  explicit TurboLaserCAN(int id) : laserCan(id) {}
+  explicit TurboLaserCAN(const int id) : laserCan(id) {}
 
-  int GetProximity() {
-    std::optional<grpl::LaserCanMeasurement> measurement = laserCan.get_measurement();
-    if (measurement && measurement->status == grpl::LASERCAN_STATUS_VALID_MEASUREMENT) {
+  [[nodiscard]] int GetProximity() const {
+    if (const std::optional<grpl::LaserCanMeasurement> measurement = laserCan.get_measurement();
+        measurement && measurement->status == grpl::LASERCAN_STATUS_VALID_MEASUREMENT) {
       return measurement->distance_mm;
-    } else {
-      return 1000;
     }
+
+    return 1000;
   }
 };

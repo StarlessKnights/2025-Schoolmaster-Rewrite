@@ -9,7 +9,7 @@
 #include "RobotContainer.h"
 #include "frc2/command/Command.h"
 
-class Robot : public frc::TimedRobot {
+class Robot final : public frc::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
@@ -25,5 +25,5 @@ class Robot : public frc::TimedRobot {
 
  private:
   RobotContainer m_container;
-  frc2::Command* m_autonomousCommand;
+  frc2::Command* m_autonomousCommand = nullptr;
 };

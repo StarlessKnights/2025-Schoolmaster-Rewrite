@@ -59,19 +59,19 @@ void ElevatorSubsystem::ConfigureCoralMotor() {
                        rev::spark::SparkBase::PersistMode::kPersistParameters);
 }
 
-void ElevatorSubsystem::SetSpin(double percent) {
+void ElevatorSubsystem::SetSpin(const double percent) {
   primaryMotor.Set(-percent);
 }
 
-void ElevatorSubsystem::SetCoralGrabber(double percent) {
+void ElevatorSubsystem::SetCoralGrabber(const double percent) {
   coralMotor.Set(percent);
 }
 
-double ElevatorSubsystem::GetPosition() {
+double ElevatorSubsystem::GetPosition() const {
   return -primaryEncoder.GetPosition();
 }
 
-void ElevatorSubsystem::SetPosition(double position) {
+void ElevatorSubsystem::SetPosition(const double position) {
   currentSetpoint = position;
   onboardClosedLoop.SetReference(-position, rev::spark::SparkLowLevel::ControlType::kMAXMotionPositionControl,
                                  rev::spark::kSlot0, -ElevatorSubsystemConstants::kArbitraryFeedforward,
@@ -82,7 +82,7 @@ void ElevatorSubsystem::ZeroEncoder() {
   primaryEncoder.SetPosition(0.0);
 }
 
-void ElevatorSubsystem::ZeroEncoder(double customZero) {
+void ElevatorSubsystem::ZeroEncoder(const double customZero) {
   primaryEncoder.SetPosition(customZero);
 }
 
@@ -95,7 +95,7 @@ bool ElevatorSubsystem::GetIsCoralInHoldingPosition() {
   return coralSensor.GetProximity() < ElevatorSubsystemConstants::kCoralSensorProximityThreshold;
 }
 
-bool ElevatorSubsystem::IsElevatorPIDAtSetpoint() {
+bool ElevatorSubsystem::IsElevatorPIDAtSetpoint() const {
   return std::abs(currentSetpoint - GetPosition()) < ElevatorSubsystemConstants::kAtSetpointTolerance;
 }
 

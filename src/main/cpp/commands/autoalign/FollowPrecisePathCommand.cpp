@@ -4,6 +4,7 @@
 #include "commands/autoalign/FollowPrecisePathCommand.hpp"
 
 #include <functional>
+#include <utility>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -13,7 +14,7 @@
 #include "units/velocity.h"
 
 FollowPrecisePathCommand::FollowPrecisePathCommand(DriveSubsystem* drive, std::function<frc::Pose2d()> goalSupplier)
-    : drive(drive), goalSupplier(goalSupplier) {
+    : drive(drive), goalSupplier(std::move(goalSupplier)) {
   kXPrecisePathPID.SetTolerance(0.01);
   kYPrecisePathPID.SetTolerance(0.01);
   kRotatePrecisePathPID.SetTolerance(0.1);
@@ -36,11 +37,11 @@ void FollowPrecisePathCommand::Initialize() {
 }
 
 void FollowPrecisePathCommand::Execute() {
-  frc::Pose2d currentPose = drive->GetPose();
+  const frc::Pose2d currentPose = drive->GetPose();
 
-  double xSpeed = kXPrecisePathPID.Calculate(currentPose.X().to<double>(), goalPose.X().to<double>());
-  double ySpeed = kYPrecisePathPID.Calculate(currentPose.Y().to<double>(), goalPose.Y().to<double>());
-  double rotSpeed = kRotatePrecisePathPID.Calculate(currentPose.Rotation().Radians().to<double>(),
+  const double xSpeed = kXPrecisePathPID.Calculate(currentPose.X().to<double>(), goalPose.X().to<double>());
+  const double ySpeed = kYPrecisePathPID.Calculate(currentPose.Y().to<double>(), goalPose.Y().to<double>());
+  const double rotSpeed = kRotatePrecisePathPID.Calculate(currentPose.Rotation().Radians().to<double>(),
                                                     goalPose.Rotation().Radians().to<double>());
 
   drive->Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(

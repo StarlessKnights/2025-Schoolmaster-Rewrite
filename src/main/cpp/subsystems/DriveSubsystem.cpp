@@ -45,7 +45,7 @@ DriveSubsystem::DriveSubsystem()
   SetName("DriveSubsystem");
 }
 
-void DriveSubsystem::Drive(frc::ChassisSpeeds speeds) {
+void DriveSubsystem::Drive(const frc::ChassisSpeeds& speeds) {
   m_cmdSpeeds = speeds;
   auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
   SetModuleStates(states);
@@ -61,7 +61,7 @@ void DriveSubsystem::AutoDrive(frc::ChassisSpeeds speeds) {
   speeds.vy *= -1;
   speeds.omega *= -1;
 
-  auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
+  const auto states = DriveSubsystemConstants::kKinematics.ToSwerveModuleStates(speeds);
   SetModuleStates(states);
 
   // undo negation to publish correct speeds
@@ -77,7 +77,7 @@ void DriveSubsystem::SetModuleStates(const std::array<frc::SwerveModuleState, 4>
   bright.SetModuleState(states[3]);
 }
 
-void DriveSubsystem::DriverGryoZero() {
+void DriveSubsystem::DriverGyroZero() {
   driverGyroOffset = GetAngle();
 }
 
@@ -89,27 +89,29 @@ std::array<frc::SwerveModulePosition, 4> DriveSubsystem::GetModulePositions() {
   return {fleft.GetModulePosition(), fright.GetModulePosition(), bleft.GetModulePosition(), bright.GetModulePosition()};
 }
 
-frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() {
+frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() const {
   return GetAngle() - driverGyroOffset;
 }
 
 void DriveSubsystem::Periodic() {
-  estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
-  m_posePublisher.Set(estimator.GetPose2D());
+  if constexpr (frc::RobotBase::IsReal()) {
+    estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
+    m_posePublisher.Set(estimator.GetPose2D());
+  }
 
-  frc::SmartDashboard::PutNumber("Gryo", GetAngle().Degrees().value());
+  frc::SmartDashboard::PutNumber("Gyro", GetAngle().Degrees().value());
 }
 
 void DriveSubsystem::SimulationPeriodic() {
   const auto currentTime = frc::Timer::GetFPGATimestamp();
-  auto dt = currentTime - m_lastTime;
+  const auto dt = currentTime - m_lastTime;
   m_lastTime = currentTime;
 
-  auto fieldRelSpeeds = frc::ChassisSpeeds::FromRobotRelativeSpeeds(m_cmdSpeeds, m_simPose.Rotation());
+  auto [vx, vy, omega] = frc::ChassisSpeeds::FromRobotRelativeSpeeds(m_cmdSpeeds, m_simPose.Rotation());
 
-  auto newX = m_simPose.X() + fieldRelSpeeds.vx * dt;
-  auto newY = m_simPose.Y() + fieldRelSpeeds.vy * dt;
-  auto newTheta = frc::Rotation2d(m_simPose.Rotation().Radians() + fieldRelSpeeds.omega * dt);
+  const auto newX = m_simPose.X() + vx * dt;
+  const auto newY = m_simPose.Y() + vy * dt;
+  const auto newTheta = frc::Rotation2d(m_simPose.Rotation().Radians() + omega * dt);
   m_simPose = frc::Pose2d(newX, newY, newTheta);
 
   m_posePublisher.Set(m_simPose);

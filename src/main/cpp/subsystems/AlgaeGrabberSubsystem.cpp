@@ -36,15 +36,15 @@ void AlgaeGrabberSubsystem::ConfigureSpinMotor() {
                       rev::spark::SparkBase::PersistMode::kPersistParameters);
 }
 
-void AlgaeGrabberSubsystem::SetSpinMotor(double percent) {
+void AlgaeGrabberSubsystem::SetSpinMotor(const double percent) {
   spinMotor.Set(-percent);
 }
 
-void AlgaeGrabberSubsystem::SetPivotMotor(double percent) {
+void AlgaeGrabberSubsystem::SetPivotMotor(const double percent) {
   pivotMotor.Set(percent);
 }
 
-double AlgaeGrabberSubsystem::LinearizeEncoderOutput(double currentPosition) {
+double AlgaeGrabberSubsystem::LinearizeEncoderOutput(const double currentPosition) {
   if (currentPosition > 0.5) {
     return currentPosition - 1.0;
   }
@@ -52,9 +52,9 @@ double AlgaeGrabberSubsystem::LinearizeEncoderOutput(double currentPosition) {
   return currentPosition;
 }
 
-void AlgaeGrabberSubsystem::SetPosition(double position) {
-  double currentPosition = LinearizeEncoderOutput(GetPosition());
-  double speed = controller.Calculate(currentPosition, position);
+void AlgaeGrabberSubsystem::SetPosition(const double position) {
+  const double currentPosition = LinearizeEncoderOutput(GetPosition());
+  const double speed = controller.Calculate(currentPosition, position);
   SetPivotMotor(speed);
 }
 
@@ -63,11 +63,11 @@ void AlgaeGrabberSubsystem::StopAll() {
   pivotMotor.Set(0.0);
 }
 
-double AlgaeGrabberSubsystem::GetPosition() {
+double AlgaeGrabberSubsystem::GetPosition() const {
   return thruBore.Get();
 }
 
-double AlgaeGrabberSubsystem::GetLinearizedPosition() {
+double AlgaeGrabberSubsystem::GetLinearizedPosition() const {
   return LinearizeEncoderOutput(GetPosition());
 }
 
@@ -75,6 +75,6 @@ double AlgaeGrabberSubsystem::GetSpinMotorCurrentDraw() {
   return spinMotor.GetOutputCurrent();
 }
 
-bool AlgaeGrabberSubsystem::IsAlgaeGrabberPIDAtSetpoint() {
+bool AlgaeGrabberSubsystem::IsAlgaeGrabberPIDAtSetpoint() const {
   return controller.AtSetpoint();
 }

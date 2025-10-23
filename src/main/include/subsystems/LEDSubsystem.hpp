@@ -11,8 +11,7 @@
 #include "frc/util/Color.h"
 #include "frc2/command/SubsystemBase.h"
 
-class LEDSubsystem : public frc2::SubsystemBase {
- private:
+class LEDSubsystem final : public frc2::SubsystemBase {
   frc::AddressableLED addressableLED{LEDSubsystemConstants::kLEDPort};
   std::array<frc::AddressableLED::LEDData, LEDSubsystemConstants::kBufferLength> ledBuffer;
 
@@ -48,9 +47,9 @@ class LEDSubsystem : public frc2::SubsystemBase {
     UpdateBuffer();
   }
 
-  void SetMiddle(frc::LEDPattern pattern) { pattern.ApplyTo(viewCenter); }
-  void SetLeft(frc::LEDPattern pattern) { pattern.ApplyTo(viewLeft); }
-  void SetRight(frc::LEDPattern pattern) { pattern.ApplyTo(viewRight); }
+  void SetMiddle(const frc::LEDPattern& pattern) { pattern.ApplyTo(viewCenter); }
+  void SetLeft(const frc::LEDPattern& pattern) { pattern.ApplyTo(viewLeft); }
+  void SetRight(const frc::LEDPattern& pattern) { pattern.ApplyTo(viewRight); }
 
   void UpdateBuffer() { addressableLED.SetData(ledBuffer); }
 

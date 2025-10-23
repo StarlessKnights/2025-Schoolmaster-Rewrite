@@ -4,6 +4,7 @@
 #pragma once
 
 #include <functional>
+#include <utility>
 
 #include "constants/Constants.h"
 #include "frc2/command/Command.h"
@@ -13,8 +14,7 @@
 
 // ! If grabber is not in the right position, this will damage the mechanism
 
-class UnsafeProcessorScoreCommand : public frc2::CommandHelper<frc2::Command, UnsafeProcessorScoreCommand> {
- private:
+class UnsafeProcessorScoreCommand final : public frc2::CommandHelper<frc2::Command, UnsafeProcessorScoreCommand> {
   AlgaeGrabberSubsystem* grabber;
   ElevatorSubsystem* elevator;
   std::function<bool()> runExtruder;
@@ -22,7 +22,7 @@ class UnsafeProcessorScoreCommand : public frc2::CommandHelper<frc2::Command, Un
  public:
   UnsafeProcessorScoreCommand(AlgaeGrabberSubsystem* grabber, ElevatorSubsystem* elevator,
                               std::function<bool()> runExtruder)
-      : grabber(grabber), elevator(elevator), runExtruder(runExtruder) {
+      : grabber(grabber), elevator(elevator), runExtruder(std::move(runExtruder)) {
     SetName("UnsafeProcessorScoreCommand");
   }
 

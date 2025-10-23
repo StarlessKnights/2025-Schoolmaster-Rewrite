@@ -12,8 +12,7 @@
 #include "rev/SparkRelativeEncoder.h"
 #include "utils/TurboLaserCAN.hpp"
 
-class ElevatorSubsystem : public frc2::SubsystemBase {
- private:
+class ElevatorSubsystem final : public frc2::SubsystemBase {
   rev::spark::SparkMax primaryMotor{ElevatorSubsystemConstants::kPrimaryMotorID,
                                     rev::spark::SparkLowLevel::MotorType::kBrushless};
   rev::spark::SparkMax secondaryMotor{ElevatorSubsystemConstants::kSecondaryMotorID,
@@ -38,7 +37,7 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   void SetSpin(double percent);
   void SetCoralGrabber(double percent);
 
-  double GetPosition();
+  double GetPosition() const;
   void SetPosition(double position);
 
   void ZeroEncoder();
@@ -47,7 +46,7 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   void StopAll();
 
   bool GetIsCoralInHoldingPosition();
-  bool IsElevatorPIDAtSetpoint();
+  bool IsElevatorPIDAtSetpoint() const;
 
   double GetElevatorCurrentDraw();
 

@@ -10,7 +10,7 @@
 void FieldDriveCommand::Initialize() {}
 
 void FieldDriveCommand::Execute() {
-  frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+  const frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
       ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed, xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
       rotX() * DriveSubsystemConstants::kMaxAngularSpeed, drive->GetDriverGyroAngle());
 

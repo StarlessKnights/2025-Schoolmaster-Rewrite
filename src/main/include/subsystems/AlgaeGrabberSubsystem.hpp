@@ -10,8 +10,7 @@
 #include "rev/SparkLowLevel.h"
 #include "rev/SparkMax.h"
 
-class AlgaeGrabberSubsystem : public frc2::SubsystemBase {
- private:
+class AlgaeGrabberSubsystem final : public frc2::SubsystemBase {
   rev::spark::SparkMax pivotMotor{AlgaeGrabberSubsystemsConstants::kPivotMotorID,
                                   rev::spark::SparkLowLevel::MotorType::kBrushless};
   rev::spark::SparkMax spinMotor{AlgaeGrabberSubsystemsConstants::kSpinMotorID,
@@ -30,16 +29,16 @@ class AlgaeGrabberSubsystem : public frc2::SubsystemBase {
   void SetSpinMotor(double percent);
   void SetPivotMotor(double percent);
 
-  double LinearizeEncoderOutput(double currentPosition);
+  static double LinearizeEncoderOutput(double currentPosition);
 
   void SetPosition(double position);
 
-  double GetPosition();
-  double GetLinearizedPosition();
+  double GetPosition() const;
+  double GetLinearizedPosition() const;
 
   double GetSpinMotorCurrentDraw();
 
-  bool IsAlgaeGrabberPIDAtSetpoint();
+  bool IsAlgaeGrabberPIDAtSetpoint() const;
 
   void StopAll();
 };

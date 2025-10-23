@@ -9,7 +9,7 @@
 #include "frc2/command/CommandHelper.h"
 #include "subsystems/DriveSubsystem.hpp"
 
-class FollowPrecisePathCommand : public frc2::CommandHelper<frc2::Command, FollowPrecisePathCommand> {
+class FollowPrecisePathCommand final : public frc2::CommandHelper<frc2::Command, FollowPrecisePathCommand> {
  private:
   DriveSubsystem* drive;
   std::function<frc::Pose2d()> goalSupplier;

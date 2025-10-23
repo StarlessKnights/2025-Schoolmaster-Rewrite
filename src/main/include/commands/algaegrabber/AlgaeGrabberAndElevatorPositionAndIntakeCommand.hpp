@@ -9,9 +9,8 @@
 #include "subsystems/AlgaeGrabberSubsystem.hpp"
 #include "subsystems/ElevatorSubsystem.hpp"
 
-class AlgaeGrabberAndElevatorPositionAndIntakeCommand
+class AlgaeGrabberAndElevatorPositionAndIntakeCommand final
     : public frc2::CommandHelper<frc2::Command, AlgaeGrabberAndElevatorPositionAndIntakeCommand> {
- private:
   ElevatorSubsystem* elevator;
   AlgaeGrabberSubsystem* grabber;
 
@@ -20,7 +19,7 @@ class AlgaeGrabberAndElevatorPositionAndIntakeCommand
 
  public:
   AlgaeGrabberAndElevatorPositionAndIntakeCommand(ElevatorSubsystem* elevator, AlgaeGrabberSubsystem* grabber,
-                                                  double elevatorPosition, double grabberPosition)
+                                                  const double elevatorPosition, const double grabberPosition)
       : elevator(elevator), grabber(grabber), elevatorPosition(elevatorPosition), grabberPosition(grabberPosition) {
     SetName("AlgaeGrabberAndElevatorPositionAndIntakeCommand");
 
