@@ -28,10 +28,13 @@ class AutoAlignCommandFactory {
 
   static frc::Pose2d GetClosestScoringPose(const frc::Pose2d& currentPose, bool isRedAlliance, bool isLeftSide);
   static bool IsPoseSafeToDriveTo(const frc::Pose2d& currentPose, const frc::Pose2d& goalPose);
+  static bool IsPoseSafeToDriveTo(const frc::Pose2d& currentPose, const frc::Pose2d& goalPose, double maxSafeDistance);
 
   static frc2::CommandPtr MakeAutoAlignAndScoreCommand(const std::function<frc::Pose2d()>& poseSupplier,
                                                        ElevatorSubsystem* elevator, DriveSubsystem* drive,
                                                        double elevatorEncoderPosition,
                                                        const std::function<bool()>& isRedAlliance,
                                                        const std::function<bool()>& isLeftSide);
+  static frc2::CommandPtr MakeAutoProcessorScoreCommand(DriveSubsystem* drive,
+                                                        const std::function<frc::Pose2d()>& poseSupplier);
 };

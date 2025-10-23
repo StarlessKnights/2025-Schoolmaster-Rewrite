@@ -132,6 +132,9 @@ void RobotContainer::ConfigureAlgaeGrabberBindings() {
 
   // Processor Score
   m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake).WithName("ProcessorScoreCommand"));
+
+  m_driverController.LeftBumper().OnTrue(AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(
+      &m_driveSubsystem, [&]() { return m_driveSubsystem.GetPose(); }));
 }
 
 void RobotContainer::ConfigureManualOverrideBindings() {

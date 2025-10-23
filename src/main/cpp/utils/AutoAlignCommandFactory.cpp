@@ -88,6 +88,15 @@ bool AutoAlignCommandFactory::IsPoseSafeToDriveTo(const frc::Pose2d& currentPose
 
   return std::sqrt(distSquared) < PathingConstants::kMaxPathingDistance;
 }
+bool AutoAlignCommandFactory::IsPoseSafeToDriveTo(const frc::Pose2d& currentPose, const frc::Pose2d& goalPose,
+                                                  const double maxSafeDistance) {
+  const double distSquared = std::pow(currentPose.X().value() - goalPose.X().value(), 2) +
+                             std::pow(currentPose.Y().value() - goalPose.Y().value(), 2);
+
+  frc::DataLogManager::Log("Distance to target: " + std::to_string(distSquared));
+
+  return std::sqrt(distSquared) < maxSafeDistance;
+}
 
 frc2::CommandPtr AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(const std::function<frc::Pose2d()>& poseSupplier,
                                                                        ElevatorSubsystem* elevator,
@@ -107,4 +116,15 @@ frc2::CommandPtr AutoAlignCommandFactory::MakeAutoAlignAndScoreCommand(const std
                  elevator->SetCoralGrabber(ElevatorSubsystemConstants::kGrabberSpeed);
                }).ToPtr())
       .OnlyIf([poseSupplier, goalSupplier] { return IsPoseSafeToDriveTo(poseSupplier(), goalSupplier()); });
+}
+
+frc2::CommandPtr AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(
+    DriveSubsystem* drive, const std::function<frc::Pose2d()>& poseSupplier) {
+  Initialize();
+
+  auto goalSupplier = []() { return PathingConstants::kProcessorBlueScoringPosition; };
+
+  return FollowPrecisePathCommand(drive, goalSupplier).OnlyIf([poseSupplier, goalSupplier] {
+    return IsPoseSafeToDriveTo(poseSupplier(), goalSupplier(), PathingConstants::kMaxProcessorScoringDistance);
+  });
 }
