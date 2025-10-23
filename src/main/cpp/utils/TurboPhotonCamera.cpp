@@ -75,6 +75,8 @@ photon::PhotonPipelineResult TurboPhotonCamera::GetLatestResult() {
     return {};
   }
 
+  frc::DataLogManager::Log(std::to_string(results.at(0).HasTargets()));
+
   auto result = results.back();
 
   if (!result.HasTargets()) {
