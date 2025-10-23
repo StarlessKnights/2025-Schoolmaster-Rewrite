@@ -69,19 +69,35 @@ const frc::AprilTagFieldLayout& TurboPhotonCamera::GetLayout() {
 }
 
 photon::PhotonPipelineResult TurboPhotonCamera::GetLatestResult() {
-  auto result = camera.GetLatestResult();
+  const auto results = camera.GetAllUnreadResults();
+
+  if (results.empty()) {
+    return {};
+  }
+
+  auto result = results.back();
+
+  if (!result.HasTargets()) {
+    return {};
+  }
+
   std::vector<frc::Pose2d> targetPoses;
 
   for (const auto& target : result.GetTargets()) {
-    if (target.GetFiducialId() >= 0) {
-      if (auto tagPose = layout.GetTagPose(target.GetFiducialId()); tagPose.has_value()) {
-        targetPoses.push_back(tagPose->ToPose2d());
-      }
+    if (target.GetFiducialId() < 0) {
+      continue;
     }
+
+    const auto tagPose = layout.GetTagPose(target.GetFiducialId());
+
+    if (!tagPose.has_value()) {
+      continue;
+    }
+
+    targetPoses.push_back(tagPose->ToPose2d());
   }
 
   visionTargetPublisher.Set(targetPoses);
-
   return result;
 }
 

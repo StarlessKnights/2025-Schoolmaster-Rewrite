@@ -12,7 +12,6 @@
 #include "subsystems/ElevatorSubsystem.hpp"
 
 class AutoAlignCommandFactory {
- private:
   static std::vector<frc::Pose2d> leftBlueAllianceScoringPositions;
   static std::vector<frc::Pose2d> rightBlueAllianceScoringPositions;
 

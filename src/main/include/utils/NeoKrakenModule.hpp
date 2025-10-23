@@ -18,8 +18,7 @@
 #include "units/velocity.h"
 #include "wpi/sendable/Sendable.h"
 
-class NeoKrakenModule : public wpi::Sendable {
- private:
+class NeoKrakenModule final : public wpi::Sendable {
   ctre::phoenix6::hardware::TalonFX driveMotor;
   rev::spark::SparkMax steerMotor;
   ctre::phoenix6::hardware::CANcoder encoderObject;

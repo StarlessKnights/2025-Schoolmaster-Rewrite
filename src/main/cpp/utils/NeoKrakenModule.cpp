@@ -75,6 +75,7 @@ void NeoKrakenModule::ConfigSteerMotor(rev::spark::SparkMax& target) {
                    rev::spark::SparkBase::PersistMode::kPersistParameters);
 }
 
+// Configure Kraken Motor's CurrentLimits
 void NeoKrakenModule::CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config) {
   config.CurrentLimits.SupplyCurrentLimitEnable = true;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
