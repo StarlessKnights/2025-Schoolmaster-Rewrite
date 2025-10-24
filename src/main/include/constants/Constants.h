@@ -74,6 +74,9 @@ inline constexpr double kRobotWidth = .5525;
 inline constexpr units::meters_per_second_t kMaxLinearSpeed = 4.5_mps;
 inline constexpr units::radians_per_second_t kMaxAngularSpeed = 570_deg_per_s;
 
+inline constexpr units::meters_per_second_t kProcessorMaxLinearSpeed = 2.5_mps;
+inline constexpr units::radians_per_second_t kProcessorMaxAngularSpeed = 360_deg_per_s;
+
 inline constexpr frc::Translation2d kModulePositions[] = {
     {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},   // Front Left
     {units::meter_t{kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}},  // Front Right
@@ -92,7 +95,7 @@ inline const std::string kLocalizationCamOneName = "lc1";
 inline const std::string kLocalizationCamTwoName = "lc2";
 
 inline constexpr frc::Transform3d kLocalizationCamOneOffset{frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m),
-                                                        frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
+                                                            frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
 
 inline const frc::Transform3d kLocalizationCamTwoOffset{
     frc::Translation3d(0.2159_m, -0.279_m, 0.1143_m),
@@ -206,7 +209,7 @@ inline constexpr double kL4XOffset = 0.07;
 inline constexpr double kL4YOffset = 0.0;
 
 inline constexpr double kMaxPathingDistance = 1.5;
-inline constexpr double kMaxProcessorScoringDistance = 1.5;
+inline constexpr double kMaxProcessorScoringDistance = 2.5;
 
 }  // namespace PathingConstants
 
