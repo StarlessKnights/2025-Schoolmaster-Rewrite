@@ -105,3 +105,9 @@ frc2::CommandPtr AlgaeGrabberSubsystem::PositionAndIntakeCommand(ElevatorSubsyst
       })
       .WithName("PositionAndIntakeAlgae");
 }
+
+frc2::CommandPtr AlgaeGrabberSubsystem::GoToPositionCommand(const double position) {
+  return frc2::RunCommand([this, position] { SetPosition(position); }, {this})
+      .FinallyDo([this](bool) { StopAll(); })
+      .WithName("GoToPosition");
+}

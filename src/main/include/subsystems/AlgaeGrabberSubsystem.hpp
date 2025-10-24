@@ -45,4 +45,5 @@ class AlgaeGrabberSubsystem final : public frc2::SubsystemBase {
 
   frc2::CommandPtr PositionAndIntakeCommand(ElevatorSubsystem* elevator, double elevatorPosition,
                                             double grabberPosition);
+  frc2::CommandPtr GoToPositionCommand(double position);
 };

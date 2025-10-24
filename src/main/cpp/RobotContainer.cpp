@@ -13,7 +13,6 @@
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
-#include "commands/algaegrabber/AlgaeGrabberGoToPositionCommand.hpp"
 #include "commands/algaegrabber/ElevatorPopUpAndAlgaeGrabberGoToPositionCommand.hpp"
 #include "commands/algaegrabber/PositionHoldAndEjectCommand.hpp"
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
@@ -156,9 +155,7 @@ void RobotContainer::ConfigureDefaultCommands() {
   m_driveSubsystem.SetDefaultCommand(MakeFieldDriveCommand());
   m_elevatorSubsystem.SetDefaultCommand(ElevatorRetractCommand(&m_elevatorSubsystem).ToPtr());
   m_algaeGrabberSubsystem.SetDefaultCommand(
-      AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
-                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-          .ToPtr());
+      m_algaeGrabberSubsystem.GoToPositionCommand(AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition));
   m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverriddenProvider));
 }
 
@@ -176,7 +173,8 @@ frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
       .ToPtr();
 }
 
-frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition, std::function<bool()> runExtruder) {
+frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition,
+                                                          std::function<bool()> runExtruder) {
   return frc2::cmd::Sequence(
       m_algaeGrabberSubsystem.PositionAndIntakeCommand(&m_elevatorSubsystem, elevatorPosition,
                                                        AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition),
@@ -213,8 +211,7 @@ frc2::CommandPtr RobotContainer::MakeCancelCommand() {
                                                              AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
                  .ToPtr(),
              ElevatorRetractCommand(&m_elevatorSubsystem)
-                 .AlongWith(AlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem,
-                                                            AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-                                .ToPtr()))
+                 .AlongWith(m_algaeGrabberSubsystem.GoToPositionCommand(
+                     AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)))
       .WithName("ResetAfterMovementCommand");
 }
