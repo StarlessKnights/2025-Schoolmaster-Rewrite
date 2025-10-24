@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "ElevatorSubsystem.hpp"
 #include "constants/Constants.h"
 #include "frc/DutyCycleEncoder.h"
 #include "frc/controller/PIDController.h"
@@ -41,4 +42,7 @@ class AlgaeGrabberSubsystem final : public frc2::SubsystemBase {
   bool IsAlgaeGrabberPIDAtSetpoint() const;
 
   void StopAll();
+
+  frc2::CommandPtr PositionAndIntakeCommand(ElevatorSubsystem* elevator, double elevatorPosition,
+                                            double grabberPosition);
 };

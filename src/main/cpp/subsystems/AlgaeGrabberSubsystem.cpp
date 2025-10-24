@@ -8,6 +8,9 @@
 #include "rev/config/SparkBaseConfig.h"
 #include "rev/config/SparkMaxConfig.h"
 
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/RunCommand.h>
+
 AlgaeGrabberSubsystem::AlgaeGrabberSubsystem() {
   ConfigurePivotMotor();
   ConfigureSpinMotor();
@@ -77,4 +80,28 @@ double AlgaeGrabberSubsystem::GetSpinMotorCurrentDraw() {
 
 bool AlgaeGrabberSubsystem::IsAlgaeGrabberPIDAtSetpoint() const {
   return controller.AtSetpoint();
+}
+
+frc2::CommandPtr AlgaeGrabberSubsystem::PositionAndIntakeCommand(ElevatorSubsystem* elevator,
+                                                                 const double elevatorPosition,
+                                                                 const double grabberPosition) {
+  return frc2::RunCommand(
+             [this, elevator, elevatorPosition, grabberPosition] {
+               elevator->SetPosition(elevatorPosition);
+
+               if (elevator->GetPosition() > AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition)
+                 SetPosition(grabberPosition);
+               else
+                 SetPivotMotor(0.0);
+
+               if (IsAlgaeGrabberPIDAtSetpoint() && elevator->IsElevatorPIDAtSetpoint())
+                 SetSpinMotor(AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed);
+             },
+             {this, elevator})
+      .Until([this] { return GetSpinMotorCurrentDraw() > AlgaeGrabberSubsystemsConstants::kIntakeCurrentDraw; })
+      .FinallyDo([this, elevator](bool) {
+        elevator->StopAll();
+        StopAll();
+      })
+      .WithName("PositionAndIntakeAlgae");
 }
