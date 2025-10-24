@@ -39,14 +39,28 @@ void FollowPrecisePathCommand::Initialize() {
 void FollowPrecisePathCommand::Execute() {
   const frc::Pose2d currentPose = drive->GetPose();
 
-  const double xSpeed = kXPrecisePathPID.Calculate(currentPose.X().to<double>(), goalPose.X().to<double>());
-  const double ySpeed = kYPrecisePathPID.Calculate(currentPose.Y().to<double>(), goalPose.Y().to<double>());
-  const double rotSpeed = kRotatePrecisePathPID.Calculate(currentPose.Rotation().Radians().to<double>(),
+  double xSpeed = kXPrecisePathPID.Calculate(currentPose.X().to<double>(), goalPose.X().to<double>());
+  double ySpeed = kYPrecisePathPID.Calculate(currentPose.Y().to<double>(), goalPose.Y().to<double>());
+  double rotSpeed = kRotatePrecisePathPID.Calculate(currentPose.Rotation().Radians().to<double>(),
                                                     goalPose.Rotation().Radians().to<double>());
 
-  drive->Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-      units::meters_per_second_t{-xSpeed}, units::meters_per_second_t{-ySpeed}, units::radians_per_second_t{-rotSpeed},
-      currentPose.Rotation()));
+  xSpeed = std::clamp(xSpeed, -DriveSubsystemConstants::kProcessorMaxLinearSpeed.value(),
+                      DriveSubsystemConstants::kProcessorMaxLinearSpeed.value());
+  ySpeed = std::clamp(ySpeed, -DriveSubsystemConstants::kProcessorMaxLinearSpeed.value(),
+                      DriveSubsystemConstants::kProcessorMaxLinearSpeed.value());
+  rotSpeed = std::clamp(rotSpeed, -DriveSubsystemConstants::kProcessorMaxAngularSpeed.value(),
+                        DriveSubsystemConstants::kProcessorMaxAngularSpeed.value());
+
+  if constexpr (frc::RobotBase::IsReal()) {
+    drive->Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+        units::meters_per_second_t{-xSpeed}, units::meters_per_second_t{-ySpeed},
+        units::radians_per_second_t{-rotSpeed}, currentPose.Rotation()));
+
+  } else {
+    drive->Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+        units::meters_per_second_t{xSpeed}, units::meters_per_second_t{ySpeed}, units::radians_per_second_t{rotSpeed},
+        currentPose.Rotation()));
+  }
 }
 
 void FollowPrecisePathCommand::End(bool) {
