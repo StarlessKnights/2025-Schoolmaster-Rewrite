@@ -150,7 +150,8 @@ frc2::CommandPtr AlgaeGrabberSubsystem::UnsafeProcessorScoreCommand(ElevatorSubs
                elevator->StopAll();
                StopAll();
              },
-             [this]() { return GetSpinMotorCurrentDraw() > AlgaeGrabberSubsystemsConstants::kIntakeCurrentDraw; })
+             [this]() { return GetSpinMotorCurrentDraw() > AlgaeGrabberSubsystemsConstants::kIntakeCurrentDraw; },
+             {this, elevator})
       .ToPtr()
       .WithName("UnsafeProcessorScore");
 }

@@ -15,9 +15,6 @@
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
-#include "commands/elevator/ElevatorHPIntakeCommand.hpp"
-#include "commands/elevator/ElevatorRetractCommand.hpp"
-#include "commands/elevator/autonomous/ExtendToHeightThenScoreCommand.hpp"
 #include "commands/led/IndicateSideCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
@@ -106,8 +103,7 @@ void RobotContainer::ConfigureElevatorBindings() {
   m_driverController.POVDown().OnTrue(MakeCancelCommand());
 
   // HP Intake
-  m_driverController.RightBumper().ToggleOnTrue(
-      ElevatorHPIntakeCommand(&m_elevatorSubsystem).WithName("ElevatorHPIntakeCommand"));
+  m_driverController.RightBumper().ToggleOnTrue(m_elevatorSubsystem.HPIntakeCommand());
 }
 
 void RobotContainer::ConfigureAlgaeGrabberBindings() {
@@ -151,7 +147,7 @@ void RobotContainer::ConfigureDefaultCommands() {
   const std::function<bool()> isManuallyOverriddenProvider = [this]() { return this->isManuallyOverridden; };
 
   m_driveSubsystem.SetDefaultCommand(MakeFieldDriveCommand());
-  m_elevatorSubsystem.SetDefaultCommand(ElevatorRetractCommand(&m_elevatorSubsystem).ToPtr());
+  m_elevatorSubsystem.SetDefaultCommand(m_elevatorSubsystem.RetractCommand());
   m_algaeGrabberSubsystem.SetDefaultCommand(
       m_algaeGrabberSubsystem.GoToPositionCommand(AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition));
   m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverriddenProvider));
@@ -159,9 +155,9 @@ void RobotContainer::ConfigureDefaultCommands() {
 
 void RobotContainer::ConfigureNamedCommands() {
   pathplanner::NamedCommands::registerCommand(
-      "ScoreL4", ExtendToHeightThenScoreCommand(&m_elevatorSubsystem, ElevatorSubsystemConstants::kL4EncoderPosition)
+      "ScoreL4", m_elevatorSubsystem.ExtendToHeightAndScoreCommand(ElevatorSubsystemConstants::kL4EncoderPosition)
                      .WithTimeout(2.5_s));
-  pathplanner::NamedCommands::registerCommand("HPIntake", ElevatorHPIntakeCommand(&m_elevatorSubsystem).ToPtr());
+  pathplanner::NamedCommands::registerCommand("HPIntake", m_elevatorSubsystem.HPIntakeCommand());
 }
 
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
@@ -187,14 +183,13 @@ frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {
 }
 
 frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(const std::function<bool()>& runOuttake) {
-  return frc2::cmd::Sequence(
-             CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
-                 &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-                 AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition),
-             m_algaeGrabberSubsystem.UnsafeProcessorScoreCommand(&m_elevatorSubsystem, runOuttake),
-             CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
-                 &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-                 AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition))
+  return frc2::cmd::Sequence(CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
+                                 &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                                 AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition),
+                             m_algaeGrabberSubsystem.UnsafeProcessorScoreCommand(&m_elevatorSubsystem, runOuttake),
+                             CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
+                                 &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                                 AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition))
       .WithName("ProcessorScore");
 }
 
@@ -208,7 +203,7 @@ frc2::CommandPtr RobotContainer::MakeCancelCommand() {
   return frc2::cmd::Sequence(CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
                                  &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
                                  AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition),
-                             ElevatorRetractCommand(&m_elevatorSubsystem)
+                             m_elevatorSubsystem.RetractCommand()
                                  .AlongWith(m_algaeGrabberSubsystem.GoToPositionCommand(
                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)))
       .WithName("ResetAfterMovementCommand");

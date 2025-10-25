@@ -14,6 +14,8 @@
 #include "rev/config/SparkBaseConfig.h"
 #include "rev/config/SparkMaxConfig.h"
 
+#include <frc2/command/RunCommand.h>
+
 ElevatorSubsystem::ElevatorSubsystem() {
   ConfigurePrimaryMotor();
   ConfigureSecondaryMotor();
@@ -91,7 +93,7 @@ void ElevatorSubsystem::StopAll() {
   SetCoralGrabber(0.0);
 }
 
-bool ElevatorSubsystem::GetIsCoralInHoldingPosition() {
+bool ElevatorSubsystem::GetIsCoralInHoldingPosition() const {
   return coralSensor.GetProximity() < ElevatorSubsystemConstants::kCoralSensorProximityThreshold;
 }
 
@@ -104,8 +106,41 @@ double ElevatorSubsystem::GetElevatorCurrentDraw() {
 }
 
 frc2::CommandPtr ElevatorSubsystem::MoveElevatorToPositionCommand(double position) {
-  return frc2::InstantCommand([this, position] { SetPosition(position); })
-      .AndThen(frc2::cmd::WaitUntil([this] {
-                 return IsElevatorPIDAtSetpoint();
-               }).WithName("WaitUntilElevatorAtSetpointCommand"));
+  return frc2::InstantCommand([this, position] { SetPosition(position); }, {this})
+      .AndThen(
+          frc2::cmd::WaitUntil([this] { return IsElevatorPIDAtSetpoint(); }).WithName("MoveElevatorToPositionCommand"));
+}
+
+frc2::CommandPtr ElevatorSubsystem::ExtendToHeightAndScoreCommand(double positionSetpoint) {
+  return frc2::FunctionalCommand([]() {},
+                                 [this, positionSetpoint] {
+                                   SetPosition(positionSetpoint);
+
+                                   if (IsElevatorPIDAtSetpoint()) {
+                                     SetCoralGrabber(ElevatorSubsystemConstants::kGrabberSpeed);
+                                   } else {
+                                     SetCoralGrabber(0.0);
+                                   }
+                                 },
+                                 [this](bool) { StopAll(); }, [] { return false; }, {this})
+      .ToPtr()
+      .WithName("ExtendToHeightAndScoreCommand");
+}
+
+frc2::CommandPtr ElevatorSubsystem::HPIntakeCommand() {
+  return frc2::FunctionalCommand([] {},
+                                 [this] {
+                                   SetPosition(ElevatorSubsystemConstants::kHPEncoderPosition);
+                                   SetCoralGrabber(ElevatorSubsystemConstants::kIntakeGrabberSpeed);
+                                 },
+                                 [this](bool) { StopAll(); }, [this] { return GetIsCoralInHoldingPosition(); }, {this})
+      .ToPtr()
+      .WithName("HPIntakeCommand");
+}
+
+frc2::CommandPtr ElevatorSubsystem::RetractCommand() {
+  return frc2::RunCommand([this] { SetPosition(ElevatorSubsystemConstants::kDefaultEncoderPosition); }, {this})
+      .ToPtr()
+      .WithName("RetractCommand")
+      .FinallyDo([this] { StopAll(); });
 }
