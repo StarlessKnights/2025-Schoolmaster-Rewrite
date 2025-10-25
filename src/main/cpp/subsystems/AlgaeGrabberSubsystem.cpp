@@ -135,3 +135,22 @@ frc2::CommandPtr AlgaeGrabberSubsystem::PositionHoldAndEjectCommand(ElevatorSubs
       .ToPtr()
       .WithName("PositionHoldAndEject");
 }
+
+frc2::CommandPtr AlgaeGrabberSubsystem::UnsafeProcessorScoreCommand(ElevatorSubsystem* elevator,
+                                                                    const std::function<bool()>& runExtruder) {
+  return frc2::FunctionalCommand(
+             []() {},
+             [this, elevator, runExtruder] {
+               elevator->SetPosition(ElevatorSubsystemConstants::kProcessorScorePosition);
+               SetPosition(AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition);
+
+               SetSpinMotor(runExtruder() ? -AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed : 0.0);
+             },
+             [this, elevator](bool) {
+               elevator->StopAll();
+               StopAll();
+             },
+             [this]() { return GetSpinMotorCurrentDraw() > AlgaeGrabberSubsystemsConstants::kIntakeCurrentDraw; })
+      .ToPtr()
+      .WithName("UnsafeProcessorScore");
+}

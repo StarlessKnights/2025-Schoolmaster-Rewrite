@@ -8,14 +8,12 @@
 
 #include <functional>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "factory/CommandFactory.h"
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
-#include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
 #include "commands/elevator/ElevatorRetractCommand.hpp"
@@ -193,7 +191,7 @@ frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(const std::function<
              CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
                  &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
                  AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition),
-             UnsafeProcessorScoreCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runOuttake).ToPtr(),
+             m_algaeGrabberSubsystem.UnsafeProcessorScoreCommand(&m_elevatorSubsystem, runOuttake),
              CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
                  &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
                  AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition))

@@ -47,4 +47,5 @@ class AlgaeGrabberSubsystem final : public frc2::SubsystemBase {
                                             double grabberPosition);
   frc2::CommandPtr GoToPositionCommand(double position);
   frc2::CommandPtr PositionHoldAndEjectCommand(ElevatorSubsystem* elevator, const std::function<bool()>& runExtruder);
+  frc2::CommandPtr UnsafeProcessorScoreCommand(ElevatorSubsystem* elevator, const std::function<bool()>& runExtruder);
 };
