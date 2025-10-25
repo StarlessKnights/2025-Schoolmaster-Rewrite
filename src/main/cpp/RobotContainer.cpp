@@ -15,7 +15,6 @@
 
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
-#include "commands/algaegrabber/PositionHoldAndEjectCommand.hpp"
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
 #include "commands/elevator/ElevatorHPIntakeCommand.hpp"
@@ -179,7 +178,7 @@ frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorP
   return frc2::cmd::Sequence(
       m_algaeGrabberSubsystem.PositionAndIntakeCommand(&m_elevatorSubsystem, elevatorPosition,
                                                        AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition),
-      PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runExtruder).ToPtr());
+      m_algaeGrabberSubsystem.PositionHoldAndEjectCommand(&m_elevatorSubsystem, runExtruder));
 }
 
 frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {

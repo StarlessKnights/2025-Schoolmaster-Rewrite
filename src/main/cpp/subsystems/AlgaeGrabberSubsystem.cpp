@@ -111,3 +111,27 @@ frc2::CommandPtr AlgaeGrabberSubsystem::GoToPositionCommand(const double positio
       .FinallyDo([this](bool) { StopAll(); })
       .WithName("GoToPosition");
 }
+
+frc2::CommandPtr AlgaeGrabberSubsystem::PositionHoldAndEjectCommand(ElevatorSubsystem* elevator,
+                                                                    const std::function<bool()>& runExtruder) {
+  double currentElevatorPosition = 5.0;
+  double currentGrabberPosition = 0.3;
+
+  return frc2::FunctionalCommand(
+             [this, &currentElevatorPosition, &currentGrabberPosition, elevator] {
+               currentElevatorPosition = elevator->GetPosition();
+               currentGrabberPosition = GetLinearizedPosition();
+             },
+             [this, elevator, &currentGrabberPosition, &currentElevatorPosition, runExtruder] {
+               SetPosition(currentGrabberPosition);
+               elevator->SetPosition(currentElevatorPosition);
+               SetSpinMotor(runExtruder() ? -AlgaeGrabberSubsystemsConstants::kIntakeMotorSpeed : 0.0);
+             },
+             [=, this](bool) {
+               StopAll();
+               elevator->StopAll();
+             },
+             [] { return false; }, {this, elevator})
+      .ToPtr()
+      .WithName("PositionHoldAndEject");
+}
