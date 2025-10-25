@@ -11,9 +11,10 @@
 #include <utility>
 #include <vector>
 
+#include "factory/CommandFactory.h"
+
 #include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
-#include "commands/algaegrabber/ElevatorPopUpAndAlgaeGrabberGoToPositionCommand.hpp"
 #include "commands/algaegrabber/PositionHoldAndEjectCommand.hpp"
 #include "commands/algaegrabber/UnsafeProcessorScoreCommand.hpp"
 #include "commands/elevator/ElevatorGoToPositionCommand.hpp"
@@ -174,11 +175,11 @@ frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
 }
 
 frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition,
-                                                          std::function<bool()> runExtruder) {
+                                                          const std::function<bool()>& runExtruder) {
   return frc2::cmd::Sequence(
       m_algaeGrabberSubsystem.PositionAndIntakeCommand(&m_elevatorSubsystem, elevatorPosition,
                                                        AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition),
-      PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, std::move(runExtruder)).ToPtr());
+      PositionHoldAndEjectCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runExtruder).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {
@@ -190,13 +191,14 @@ frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {
 
 frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(const std::function<bool()>& runOuttake) {
   return frc2::cmd::Sequence(
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-                                                      AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition)
-          .ToPtr(),
-      UnsafeProcessorScoreCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runOuttake).ToPtr(),
-      ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-                                                      AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-          .ToPtr());
+             CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
+                 &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                 AlgaeGrabberSubsystemsConstants::kProcessorScoringEncoderPosition),
+             UnsafeProcessorScoreCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem, runOuttake).ToPtr(),
+             CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
+                 &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                 AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition))
+      .WithName("ProcessorScore");
 }
 
 frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(const double elevatorPosition,
@@ -206,12 +208,11 @@ frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(const double elevator
 }
 
 frc2::CommandPtr RobotContainer::MakeCancelCommand() {
-  return frc2::cmd::Sequence(
-             ElevatorPopUpAndAlgaeGrabberGoToPositionCommand(&m_algaeGrabberSubsystem, &m_elevatorSubsystem,
-                                                             AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
-                 .ToPtr(),
-             ElevatorRetractCommand(&m_elevatorSubsystem)
-                 .AlongWith(m_algaeGrabberSubsystem.GoToPositionCommand(
-                     AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)))
+  return frc2::cmd::Sequence(CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
+                                 &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
+                                 AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition),
+                             ElevatorRetractCommand(&m_elevatorSubsystem)
+                                 .AlongWith(m_algaeGrabberSubsystem.GoToPositionCommand(
+                                     AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)))
       .WithName("ResetAfterMovementCommand");
 }

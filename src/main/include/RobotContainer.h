@@ -29,7 +29,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  frc2::CommandPtr MakeAlgaeGrabberSequence(double elevatorPosition, std::function<bool()> runExtruder);
+  frc2::CommandPtr MakeAlgaeGrabberSequence(double elevatorPosition, const std::function<bool()>& runExtruder);
   frc2::CommandPtr MakeFieldDriveCommand();
   frc2::CommandPtr MakeSlowFieldDriveCommand();
   frc2::CommandPtr MakeProcessorScoreSequence(const std::function<bool()>& runOuttake);
