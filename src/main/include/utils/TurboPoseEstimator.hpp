@@ -38,7 +38,5 @@ class TurboPoseEstimator {
   void TryVisionUpdateWithCamera(TurboPhotonCamera& camera);
   void UpdateWithAllAvailableVisionMeasurements();
 
-  bool SeesTag() const {
-    return seesTag;
-  }
+  bool SeesTag() const { return seesTag; }
 };
