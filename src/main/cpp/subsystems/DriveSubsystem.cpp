@@ -102,7 +102,8 @@ frc2::CommandPtr DriveSubsystem::DriveCommand(const std::function<double()>& xSp
                rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed, GetDriverGyroAngle());
 
            Drive(fieldRelativeSpeeds);
-         })
+             },
+             {this})
       .ToPtr()
       .WithName("DriveCommand");
 }
@@ -116,7 +117,7 @@ frc2::CommandPtr DriveSubsystem::SlowDriveCommand(const std::function<double()>&
                GetDriverGyroAngle());
 
            Drive(fieldRelativeSpeeds);
-         })
+             }, {this})
       .ToPtr()
       .WithName("SlowDriveCommand");
 }

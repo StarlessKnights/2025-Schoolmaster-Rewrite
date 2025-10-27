@@ -77,7 +77,7 @@ class LEDSubsystem final : public frc2::SubsystemBase {
              } else {
                RightOn();
              }
-           })
+           }, {this})
         .ToPtr()
         .WithName("IndicateSideCommand");
   }
