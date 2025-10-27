@@ -17,6 +17,8 @@
 #include "units/length.h"
 #include "utils/TurboPoseEstimator.hpp"
 
+#include <frc/DataLogManager.h>
+
 DriveSubsystem::DriveSubsystem()
     : fleft(DriveSubsystemConstants::kFrontLeftDriveID, DriveSubsystemConstants::kFrontLeftSteerID,
             DriveSubsystemConstants::kFrontLeftEncoderID, DriveSubsystemConstants::kFrontLeftOffset,
@@ -96,6 +98,7 @@ frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() const {
 void DriveSubsystem::Periodic() {
   if constexpr (frc::RobotBase::IsReal()) {
     estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());
+
     m_posePublisher.Set(estimator.GetPose2D());
   }
 

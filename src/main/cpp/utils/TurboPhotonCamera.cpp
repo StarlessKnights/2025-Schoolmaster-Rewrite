@@ -68,61 +68,14 @@ const frc::AprilTagFieldLayout& TurboPhotonCamera::GetLayout() {
   return layout;
 }
 
-photon::PhotonPipelineResult TurboPhotonCamera::GetLatestResult() {
-  const auto results = camera.GetAllUnreadResults();
+std::vector<PoseTimestampPair> TurboPhotonCamera::FetchPose() {
+  std::vector<PoseTimestampPair> poses;
 
-  if (results.empty()) {
-    return {};
-  }
-
-  frc::DataLogManager::Log(std::to_string(results.at(0).HasTargets()));
-
-  auto result = results.back();
-
-  if (!result.HasTargets()) {
-    return {};
-  }
-
-  std::vector<frc::Pose2d> targetPoses;
-
-  for (const auto& target : result.GetTargets()) {
-    if (target.GetFiducialId() < 0) {
-      continue;
+  for (const auto& result : camera.GetAllUnreadResults()) {
+    if (auto visionEst = poseEstimator.Update(result)) {
+      poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
     }
-
-    const auto tagPose = layout.GetTagPose(target.GetFiducialId());
-
-    if (!tagPose.has_value()) {
-      continue;
-    }
-
-    targetPoses.push_back(tagPose->ToPose2d());
   }
 
-  visionTargetPublisher.Set(targetPoses);
-  return result;
-}
-
-std::optional<photon::EstimatedRobotPose> TurboPhotonCamera::GetCameraEstimatedPose3D() {
-  const auto result = GetLatestResult();
-  return poseEstimator.Update(result);
-}
-
-std::optional<PoseTimestampPair> TurboPhotonCamera::FetchPose() {
-  const auto result = GetLatestResult();
-
-  if (const auto poseEstimate = poseEstimator.Update(result); poseEstimate.has_value() && GetNumTargets(result) >= 1) {
-    return PoseTimestampPair{poseEstimate->estimatedPose.ToPose2d(), poseEstimate->timestamp};
-  }
-
-  return std::nullopt;
-}
-
-int TurboPhotonCamera::GetNumTargets() {
-  const auto result = GetLatestResult();
-  if (!result.HasTargets()) {
-    return 0;
-  }
-
-  return static_cast<int>(result.GetTargets().size());
+  return poses;
 }

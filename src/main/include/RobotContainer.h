@@ -36,6 +36,7 @@ class RobotContainer {
   frc2::CommandPtr MakeElevatorScoreSequence(double elevatorPosition, const std::function<bool()>& runExtruder);
   frc2::CommandPtr MakeCancelCommand();
   frc2::Command* GetAutonomousCommand() const;
+  static frc2::CommandPtr MakeRumbleCommand(frc2::CommandXboxController& controller, const units::second_t duration);
 
   frc::SendableChooser<frc2::Command*> autoChooser;
 
