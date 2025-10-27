@@ -21,6 +21,9 @@
 #include "utils/NeoKrakenModule.hpp"
 #include "utils/TurboPoseEstimator.hpp"
 
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/RunCommand.h>
+
 class DriveSubsystem final : public frc2::SubsystemBase {
   NeoKrakenModule fleft, fright, bleft, bright;
   ctre::phoenix6::hardware::Pigeon2 pigeon{DriveSubsystemConstants::kPigeonID, DriveSubsystemConstants::kCanivoreName};
@@ -64,6 +67,12 @@ class DriveSubsystem final : public frc2::SubsystemBase {
   }
 
   TurboPoseEstimator& GetPoseEstimator() { return estimator; }
+
+  frc2::CommandPtr DriveCommand(const std::function<double()>& xSpeed, const std::function<double()>& ySpeed,
+                                const std::function<double()>& rotSpeed);
+
+  frc2::CommandPtr SlowDriveCommand(const std::function<double()>& xSpeed, const std::function<double()>& ySpeed,
+                                    const std::function<double()>& rotSpeed);
 
   void Periodic() override;
   void SimulationPeriodic() override;

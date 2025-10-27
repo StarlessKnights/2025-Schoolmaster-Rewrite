@@ -12,10 +12,6 @@
 
 #include "factory/CommandFactory.h"
 
-#include "commands/FieldDriveCommand.hpp"
-#include "commands/SlowFieldDriveCommand.hpp"
-#include "commands/elevator/ElevatorGoToPositionCommand.hpp"
-#include "commands/led/IndicateSideCommand.hpp"
 #include "constants/Constants.h"
 #include "frc/DataLogManager.h"
 #include "frc/DriverStation.h"
@@ -150,7 +146,7 @@ void RobotContainer::ConfigureDefaultCommands() {
   m_elevatorSubsystem.SetDefaultCommand(m_elevatorSubsystem.RetractCommand());
   m_algaeGrabberSubsystem.SetDefaultCommand(
       m_algaeGrabberSubsystem.GoToPositionCommand(AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition));
-  m_ledSubsystem.SetDefaultCommand(IndicateSideCommand(&m_ledSubsystem, scoring, isManuallyOverriddenProvider));
+  m_ledSubsystem.SetDefaultCommand(m_ledSubsystem.IndicateSideCommand(scoring, isManuallyOverriddenProvider));
 }
 
 void RobotContainer::ConfigureNamedCommands() {
@@ -161,10 +157,9 @@ void RobotContainer::ConfigureNamedCommands() {
 }
 
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
-  return FieldDriveCommand(
-             &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
-             [this] { return m_driverController.GetLeftX(); }, [this] { return m_driverController.GetRightX(); })
-      .ToPtr();
+  return m_driveSubsystem.DriveCommand([this] { return m_driverController.GetLeftY(); },
+                                       [this] { return m_driverController.GetLeftX(); },
+                                       [this] { return m_driverController.GetRightX(); });
 }
 
 frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition,
@@ -176,10 +171,9 @@ frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorP
 }
 
 frc2::CommandPtr RobotContainer::MakeSlowFieldDriveCommand() {
-  return SlowFieldDriveCommand(
-             &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
-             [this] { return m_driverController.GetLeftX(); }, [this] { return m_driverController.GetRightX(); })
-      .ToPtr();
+  return m_driveSubsystem.SlowDriveCommand([this] { return m_driverController.GetLeftY(); },
+                                           [this] { return m_driverController.GetLeftX(); },
+                                           [this] { return m_driverController.GetRightX(); });
 }
 
 frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(const std::function<bool()>& runOuttake) {
@@ -195,7 +189,7 @@ frc2::CommandPtr RobotContainer::MakeProcessorScoreSequence(const std::function<
 
 frc2::CommandPtr RobotContainer::MakeElevatorScoreSequence(const double elevatorPosition,
                                                            const std::function<bool()>& runExtruder) {
-  return frc2::cmd::Parallel(ElevatorGoToPositionCommand(&m_elevatorSubsystem, runExtruder, elevatorPosition).ToPtr(),
+  return frc2::cmd::Parallel(m_elevatorSubsystem.ExtendToHeightAndWaitCommand(elevatorPosition, runExtruder),
                              MakeSlowFieldDriveCommand());
 }
 
@@ -203,8 +197,7 @@ frc2::CommandPtr RobotContainer::MakeCancelCommand() {
   return frc2::cmd::Sequence(CommandFactory::ElevatorPopUpAndAlgaeGrabberGoToPosition(
                                  &m_algaeGrabberSubsystem, &m_elevatorSubsystem,
                                  AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition),
-                             m_elevatorSubsystem.RetractCommand()
-                                 .AlongWith(m_algaeGrabberSubsystem.GoToPositionCommand(
-                                     AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)))
+                             m_elevatorSubsystem.RetractCommand().AlongWith(m_algaeGrabberSubsystem.GoToPositionCommand(
+                                 AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)))
       .WithName("ResetAfterMovementCommand");
 }

@@ -93,6 +93,34 @@ frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() const {
   return GetAngle() - driverGyroOffset;
 }
 
+frc2::CommandPtr DriveSubsystem::DriveCommand(const std::function<double()>& xSpeed,
+                                              const std::function<double()>& ySpeed,
+                                              const std::function<double()>& rotSpeed) {
+  return frc2::RunCommand([this, xSpeed, ySpeed, rotSpeed] {
+           const frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+               ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed, xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+               rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed, GetDriverGyroAngle());
+
+           Drive(fieldRelativeSpeeds);
+         })
+      .ToPtr()
+      .WithName("DriveCommand");
+}
+
+frc2::CommandPtr DriveSubsystem::SlowDriveCommand(const std::function<double()>& xSpeed,
+                                                  const std::function<double()>& ySpeed,
+                                                  const std::function<double()>& rotSpeed) {
+  return frc2::RunCommand([this, xSpeed, ySpeed, rotSpeed] {
+           const frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+               ySpeed() * 0.5_mps, xSpeed() * 0.5_mps, rotSpeed() * units::radians_per_second_t{180_deg_per_s},
+               GetDriverGyroAngle());
+
+           Drive(fieldRelativeSpeeds);
+         })
+      .ToPtr()
+      .WithName("SlowDriveCommand");
+}
+
 void DriveSubsystem::Periodic() {
   if constexpr (frc::RobotBase::IsReal()) {
     estimator.UpdateWithOdometryAndVision(GetAngle(), GetModulePositions());

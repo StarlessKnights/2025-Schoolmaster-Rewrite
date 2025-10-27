@@ -11,6 +11,8 @@
 #include "frc/util/Color.h"
 #include "frc2/command/SubsystemBase.h"
 
+#include <frc2/command/RunCommand.h>
+
 class LEDSubsystem final : public frc2::SubsystemBase {
   frc::AddressableLED addressableLED{LEDSubsystemConstants::kLEDPort};
   std::array<frc::AddressableLED::LEDData, LEDSubsystemConstants::kBufferLength> ledBuffer;
@@ -30,7 +32,7 @@ class LEDSubsystem final : public frc2::SubsystemBase {
         viewCenter(std::ranges::subrange(ledBuffer.begin() + 9, ledBuffer.begin() + 11)) {
     SetName("LEDSubsystem");
 
-    addressableLED.SetLength(ledBuffer.max_size());
+    addressableLED.SetLength(static_cast<int>(ledBuffer.max_size()));
     addressableLED.SetData(ledBuffer);
     addressableLED.Start();
   }
@@ -57,5 +59,26 @@ class LEDSubsystem final : public frc2::SubsystemBase {
     SetMiddle(frc::LEDPattern::Off());
     SetRight(frc::LEDPattern::Off());
     SetLeft(frc::LEDPattern::Off());
+  }
+
+  frc2::CommandPtr IndicateSideCommand(const std::function<bool()>& scoringOnLeft,
+                                       const std::function<bool()>& isManuallyOverridden) {
+    return frc2::RunCommand([this, scoringOnLeft, isManuallyOverridden] {
+             if (isManuallyOverridden()) {
+               const frc::LEDPattern p = LEDSubsystemConstants::kManualModeOn;
+               SetMiddle(p);
+               SetLeft(p);
+               SetRight(p);
+               UpdateBuffer();
+             }
+
+             if (scoringOnLeft()) {
+               LeftOn();
+             } else {
+               RightOn();
+             }
+           })
+        .ToPtr()
+        .WithName("IndicateSideCommand");
   }
 };

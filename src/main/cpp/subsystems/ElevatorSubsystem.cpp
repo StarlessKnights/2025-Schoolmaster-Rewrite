@@ -111,6 +111,19 @@ frc2::CommandPtr ElevatorSubsystem::MoveElevatorToPositionCommand(double positio
           frc2::cmd::WaitUntil([this] { return IsElevatorPIDAtSetpoint(); }).WithName("MoveElevatorToPositionCommand"));
 }
 
+frc2::CommandPtr ElevatorSubsystem::ExtendToHeightAndWaitCommand(double positionSetpoint,
+                                                                 const std::function<bool()>& runCoralExtruder) {
+  return frc2::RunCommand(
+             [this, positionSetpoint, runCoralExtruder] {
+               SetPosition(positionSetpoint);
+               SetCoralGrabber(runCoralExtruder() ? ElevatorSubsystemConstants::kGrabberSpeed : 0.0);
+             },
+             {this})
+      .ToPtr()
+      .WithName("ExtendToHeightAndWaitCommand")
+      .FinallyDo([this] { StopAll(); });
+}
+
 frc2::CommandPtr ElevatorSubsystem::ExtendToHeightAndScoreCommand(double positionSetpoint) {
   return frc2::FunctionalCommand([]() {},
                                  [this, positionSetpoint] {
