@@ -33,9 +33,6 @@ class TurboPhotonCamera {
   TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace);
   void UpdateSim(const frc::Pose2d& robotPose);
   const frc::AprilTagFieldLayout& GetLayout();
-  photon::PhotonPipelineResult GetLatestResult();
-  std::optional<photon::EstimatedRobotPose> GetCameraEstimatedPose3D();
-  std::optional<PoseTimestampPair> FetchPose();
-  int GetNumTargets();
-  int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
+  std::vector<PoseTimestampPair> FetchPose();
+  static int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
 };

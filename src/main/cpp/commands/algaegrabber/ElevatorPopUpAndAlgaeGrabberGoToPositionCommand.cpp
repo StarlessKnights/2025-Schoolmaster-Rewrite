@@ -19,7 +19,7 @@ void ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::Initialize() {
   constexpr double minPosition = AlgaeGrabberSubsystemsConstants::kMinimumSafeElevatorEncoderPosition;
 
   algaeGrabber->SetPosition(algaeGrabberEncoderPosition);
-  homePosition = currentPosition < minPosition ? minPosition : currentPosition;
+  homePosition = std::max(currentPosition, minPosition);
 }
 
 void ElevatorPopUpAndAlgaeGrabberGoToPositionCommand::Execute() {

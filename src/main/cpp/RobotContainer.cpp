@@ -133,8 +133,10 @@ void RobotContainer::ConfigureAlgaeGrabberBindings() {
   // Processor Score
   m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake).WithName("ProcessorScoreCommand"));
 
-  m_driverController.LeftBumper().OnTrue(AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(
-      &m_driveSubsystem, [&]() { return m_driveSubsystem.GetPose(); }));
+  m_driverController.LeftBumper().OnTrue(frc2::cmd::Either(
+      AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(&m_driveSubsystem,
+                                                             [&] { return m_driveSubsystem.GetPose(); }),
+      MakeRumbleCommand(m_driverController, 0.5_s), [&] { return m_driveSubsystem.GetPoseEstimator().SeesTag(); }));
 }
 
 void RobotContainer::ConfigureManualOverrideBindings() {
@@ -177,7 +179,8 @@ frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
       .ToPtr();
 }
 
-frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition, std::function<bool()> runExtruder) {
+frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition,
+                                                          std::function<bool()> runExtruder) {
   return frc2::cmd::Sequence(
       AlgaeGrabberAndElevatorPositionAndIntakeCommand(&m_elevatorSubsystem, &m_algaeGrabberSubsystem, elevatorPosition,
                                                       AlgaeGrabberSubsystemsConstants::kAlgaeRemovalEncoderPosition)
@@ -219,4 +222,12 @@ frc2::CommandPtr RobotContainer::MakeCancelCommand() {
                                                             AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
                                 .ToPtr()))
       .WithName("ResetAfterMovementCommand");
+}
+
+frc2::CommandPtr RobotContainer::MakeRumbleCommand(frc2::CommandXboxController& controller,
+                                                   const units::second_t duration) {
+  return frc2::cmd::RunEnd([&]() { controller.SetRumble(frc::GenericHID::kBothRumble, 0.5); },
+                           [&]() { controller.SetRumble(frc::GenericHID::kBothRumble, 0); })
+      .WithTimeout(duration)
+      .WithName("RumbleController");
 }

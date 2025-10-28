@@ -3,8 +3,6 @@
 
 #include "utils/TurboPoseEstimator.hpp"
 
-#include <optional>
-
 #include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
 #include "utils/PoseTimestampPair.hpp"
@@ -23,8 +21,6 @@ void TurboPoseEstimator::UpdateWithOdometryAndVision(const frc::Rotation2d& gyro
                                                      const std::array<frc::SwerveModulePosition, 4>& modulePositions) {
   poseEstimator.Update(gyroAngle, modulePositions);
   UpdateWithAllAvailableVisionMeasurements();
-
-  posePublisher.Set(poseEstimator.GetEstimatedPosition());
 }
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera& camera) {
@@ -33,14 +29,18 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera& camera) {
     camera.UpdateSim(pose);
   }
 
-  const std::optional<PoseTimestampPair> visionPose = camera.FetchPose();
+  const std::vector<PoseTimestampPair> visionPoses = camera.FetchPose();
 
-  if (!visionPose.has_value()) {
+  if (visionPoses.empty()) {
+    seesTag = false;
     return;
   }
 
-  posePublisher.Set(visionPose->getPose());
-  poseEstimator.AddVisionMeasurement(visionPose->getPose(), visionPose->getLatency());
+  seesTag = true;
+
+  for (const auto& pair : visionPoses) {
+    poseEstimator.AddVisionMeasurement(pair.getPose(), pair.getLatency());
+  }
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {

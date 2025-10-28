@@ -91,7 +91,7 @@ void ElevatorSubsystem::StopAll() {
   SetCoralGrabber(0.0);
 }
 
-bool ElevatorSubsystem::GetIsCoralInHoldingPosition() {
+bool ElevatorSubsystem::GetIsCoralInHoldingPosition() const {
   return coralSensor.GetProximity() < ElevatorSubsystemConstants::kCoralSensorProximityThreshold;
 }
 

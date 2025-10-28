@@ -19,8 +19,8 @@ class IndicateSideCommand final : public frc2::CommandHelper<frc2::Command, Indi
 
  public:
   explicit IndicateSideCommand(LEDSubsystem* led, const std::function<bool()>& scoringOnLeft,
-                               std::function<bool()> isManuallyOverridden)
-      : led(led), scoringOnLeft(scoringOnLeft), isManuallyOverridden(std::move(isManuallyOverridden)) {
+                               const std::function<bool()>& isManuallyOverridden)
+      : led(led), scoringOnLeft(scoringOnLeft), isManuallyOverridden(isManuallyOverridden) {
     SetName("IndicateSideCommand");
     AddRequirements(led);
   }

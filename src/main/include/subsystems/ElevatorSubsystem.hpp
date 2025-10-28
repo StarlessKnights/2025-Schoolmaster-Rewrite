@@ -45,7 +45,7 @@ class ElevatorSubsystem final : public frc2::SubsystemBase {
 
   void StopAll();
 
-  bool GetIsCoralInHoldingPosition();
+  bool GetIsCoralInHoldingPosition() const;
   bool IsElevatorPIDAtSetpoint() const;
 
   double GetElevatorCurrentDraw();
