@@ -228,5 +228,6 @@ frc2::CommandPtr RobotContainer::MakeRumbleCommand(frc2::CommandXboxController& 
                                                    const units::second_t duration) {
   return frc2::cmd::RunEnd([&]() { controller.SetRumble(frc::GenericHID::kBothRumble, 0.5); },
                            [&]() { controller.SetRumble(frc::GenericHID::kBothRumble, 0); })
-      .WithTimeout(duration).WithName("RumbleController");
+      .WithTimeout(duration)
+      .WithName("RumbleController");
 }
