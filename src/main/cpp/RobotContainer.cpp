@@ -11,7 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "commands/FieldDriveCommand.hpp"
 #include "commands/SlowFieldDriveCommand.hpp"
 #include "commands/algaegrabber/AlgaeGrabberAndElevatorPositionAndIntakeCommand.hpp"
 #include "commands/algaegrabber/AlgaeGrabberGoToPositionCommand.hpp"
@@ -136,7 +135,9 @@ void RobotContainer::ConfigureAlgaeGrabberBindings() {
   m_driverController.LeftBumper().OnTrue(frc2::cmd::Either(
       AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(&m_driveSubsystem,
                                                              [&] { return m_driveSubsystem.GetPose(); }),
-      MakeRumbleCommand(m_driverController, 0.5_s), [&] { return m_driveSubsystem.GetPoseEstimator().SeesTag(); }));
+                        MakeRumbleCommand(m_driverController, 0.5_s),
+                        [&] { return m_driveSubsystem.GetPoseEstimator().SeesTag(); })
+          .WithName());
 }
 
 void RobotContainer::ConfigureManualOverrideBindings() {
@@ -173,10 +174,8 @@ void RobotContainer::ConfigureNamedCommands() {
 }
 
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
-  return FieldDriveCommand(
-             &m_driveSubsystem, [this] { return m_driverController.GetLeftY(); },
-             [this] { return m_driverController.GetLeftX(); }, [this] { return m_driverController.GetRightX(); })
-      .ToPtr();
+  return m_driveSubsystem.DriveCommand([this] { return m_driverController.GetLeftX(); },
+                                       [this] { return m_driverController.GetLeftY(); }, [this] { return m_driverController.GetRightX(); });
 }
 
 frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition,

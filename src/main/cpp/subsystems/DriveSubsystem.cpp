@@ -18,6 +18,7 @@
 #include "utils/TurboPoseEstimator.hpp"
 
 #include <frc/DataLogManager.h>
+#include <frc2/command/FunctionalCommand.h>
 
 DriveSubsystem::DriveSubsystem()
     : fleft(DriveSubsystemConstants::kFrontLeftDriveID, DriveSubsystemConstants::kFrontLeftSteerID,
@@ -93,6 +94,23 @@ std::array<frc::SwerveModulePosition, 4> DriveSubsystem::GetModulePositions() {
 
 frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() const {
   return GetAngle() - driverGyroOffset;
+}
+
+frc2::CommandPtr DriveSubsystem::DriveCommand(std::function<double()>&& xSpeed, std::function<double()>&& ySpeed,
+                                              std::function<double()>&& rotSpeed) {
+  return frc2::FunctionalCommand(
+             [] {},
+             [this, xSpeed = std::move(xSpeed), ySpeed = std::move(ySpeed), rotSpeed = std::move(rotSpeed)] {
+               const frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+                   ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                   xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                   rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed, GetDriverGyroAngle());
+
+               Drive(fieldRelativeSpeeds);
+             },
+             [](bool) {}, [] { return false; }, {this})
+      .ToPtr()
+      .WithName("DriveCommand");
 }
 
 void DriveSubsystem::Periodic() {
