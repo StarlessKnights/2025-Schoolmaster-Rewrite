@@ -15,5 +15,6 @@
     "**/*~": true
   },
   "C_Cpp.default.configurationProvider": "vscode-wpilib",
-  "sonarlint.pathToCompileCommands": "${workspaceFolder}/compile_commands.json"
+  "sonarlint.pathToCompileCommands": "${workspaceFolder}/compile_commands.json",
+  "wpilib.skipTests": true
 }

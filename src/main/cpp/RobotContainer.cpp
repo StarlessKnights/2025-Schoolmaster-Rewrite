@@ -137,7 +137,7 @@ void RobotContainer::ConfigureAlgaeGrabberBindings() {
                                                              [&] { return m_driveSubsystem.GetPose(); }),
                         MakeRumbleCommand(m_driverController, 0.5_s),
                         [&] { return m_driveSubsystem.GetPoseEstimator().SeesTag(); })
-          .WithName());
+          .WithName("ProcessorAutoAlign"));
 }
 
 void RobotContainer::ConfigureManualOverrideBindings() {

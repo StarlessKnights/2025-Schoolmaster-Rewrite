@@ -28,7 +28,7 @@ class DriveSubsystem final : public frc2::SubsystemBase {
   TurboPoseEstimator estimator;
 
   frc::ChassisSpeeds m_cmdSpeeds{0.0_mps, 0.0_mps, 0.0_rad_per_s};
-  frc::Pose2d m_simPose{};
+  frc::Pose2d m_simPose = frc::Pose2d(9.506_m, 4.067_m, 0_deg);
   units::second_t m_lastTime{0.0_s};
 
   nt::StructPublisher<frc::Pose2d> m_posePublisher;
