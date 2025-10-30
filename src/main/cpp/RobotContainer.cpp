@@ -23,6 +23,7 @@
 #include "commands/elevator/autonomous/ExtendToHeightThenScoreCommand.hpp"
 #include "commands/led/IndicateSideCommand.hpp"
 #include "constants/Constants.h"
+#include "factory/CommandFactory.hpp"
 #include "frc/DataLogManager.h"
 #include "frc/DriverStation.h"
 #include "frc/geometry/Pose2d.h"
@@ -132,10 +133,11 @@ void RobotContainer::ConfigureAlgaeGrabberBindings() {
   // Processor Score
   m_driverController.B().OnTrue(MakeProcessorScoreSequence(runOuttake).WithName("ProcessorScoreCommand"));
 
-  m_driverController.LeftBumper().OnTrue(frc2::cmd::Either(
-      AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(&m_driveSubsystem,
-                                                             [&] { return m_driveSubsystem.GetPose(); }),
-                        MakeRumbleCommand(m_driverController, 0.5_s),
+  m_driverController.LeftBumper().OnTrue(
+      frc2::cmd::Either(AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(
+                            &m_driveSubsystem, [&] { return m_driveSubsystem.GetPose(); })
+                            .AsProxy(),
+                        CommandFactory::MakeRumbleCommand(m_driverController, 0.5_s),
                         [&] { return m_driveSubsystem.GetPoseEstimator().SeesTag(); })
           .WithName("ProcessorAutoAlign"));
 }
@@ -175,7 +177,8 @@ void RobotContainer::ConfigureNamedCommands() {
 
 frc2::CommandPtr RobotContainer::MakeFieldDriveCommand() {
   return m_driveSubsystem.DriveCommand([this] { return m_driverController.GetLeftX(); },
-                                       [this] { return m_driverController.GetLeftY(); }, [this] { return m_driverController.GetRightX(); });
+                                       [this] { return m_driverController.GetLeftY(); },
+                                       [this] { return m_driverController.GetRightX(); });
 }
 
 frc2::CommandPtr RobotContainer::MakeAlgaeGrabberSequence(const double elevatorPosition,
@@ -221,12 +224,4 @@ frc2::CommandPtr RobotContainer::MakeCancelCommand() {
                                                             AlgaeGrabberSubsystemsConstants::kRetractedEncoderPosition)
                                 .ToPtr()))
       .WithName("ResetAfterMovementCommand");
-}
-
-frc2::CommandPtr RobotContainer::MakeRumbleCommand(frc2::CommandXboxController& controller,
-                                                   const units::second_t duration) {
-  return frc2::cmd::RunEnd([&]() { controller.SetRumble(frc::GenericHID::kBothRumble, 0.5); },
-                           [&]() { controller.SetRumble(frc::GenericHID::kBothRumble, 0); })
-      .WithTimeout(duration)
-      .WithName("RumbleController");
 }

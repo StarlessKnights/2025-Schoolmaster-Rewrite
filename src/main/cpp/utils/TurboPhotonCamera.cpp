@@ -21,7 +21,6 @@
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
 #include "photon/simulation/SimCameraProperties.h"
-#include "photon/targeting/PhotonPipelineResult.h"
 #include "units/frequency.h"
 #include "units/time.h"
 #include "utils/PoseTimestampPair.hpp"
