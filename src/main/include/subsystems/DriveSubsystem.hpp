@@ -18,7 +18,7 @@
 #include "networktables/StructTopic.h"
 #include "units/angular_velocity.h"
 #include "units/time.h"
-#include "utils/NeoKrakenModule.hpp"
+#include "motors/NeoKrakenModule.hpp"
 #include "utils/TurboPoseEstimator.hpp"
 
 class DriveSubsystem final : public frc2::SubsystemBase {

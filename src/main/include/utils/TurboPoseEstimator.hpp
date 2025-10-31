@@ -11,7 +11,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "networktables/StructTopic.h"
-#include "utils/TurboPhotonCamera.hpp"
+#include "vision/TurboPhotonCamera.hpp"
 
 class TurboPoseEstimator {
  private:
