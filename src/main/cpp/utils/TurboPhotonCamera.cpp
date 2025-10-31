@@ -1,0 +1,86 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
+#include "utils/TurboPhotonCamera.hpp"
+
+#include <exception>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include "constants/Constants.h"
+#include "frc/DataLogManager.h"
+#include "frc/RobotBase.h"
+#include "frc/apriltag/AprilTagFieldLayout.h"
+#include "frc/apriltag/AprilTagFields.h"
+#include "frc/geometry/Pose2d.h"
+#include "frc/smartdashboard/SmartDashboard.h"
+#include "networktables/NetworkTableInstance.h"
+#include "photon/PhotonCamera.h"
+#include "photon/PhotonPoseEstimator.h"
+#include "photon/simulation/PhotonCameraSim.h"
+#include "photon/simulation/SimCameraProperties.h"
+#include "units/frequency.h"
+#include "units/time.h"
+#include "utils/PoseTimestampPair.hpp"
+
+TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace)
+    : camera(cameraName), poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
+  if constexpr (frc::RobotBase::IsSimulation()) {
+    auto cameraProp = photon::SimCameraProperties();
+    cameraProp.SetCalibration(1280, 720, 75_deg);
+    cameraProp.SetCalibError(0.25, 0.08);
+    cameraProp.SetFPS(units::hertz_t{30});
+    cameraProp.SetAvgLatency(35_ms);
+    cameraProp.SetLatencyStdDev(5_ms);
+
+    systemSim.emplace("main");
+    cameraSim.emplace(photon::PhotonCameraSim(&camera, cameraProp));
+    cameraSim->EnableDrawWireframe(true);
+
+    systemSim->AddAprilTags(GetLayout());
+    systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
+
+    frc::SmartDashboard::PutData("Sim Field", &systemSim->GetDebugField());
+  }
+
+  visionTargetPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets").Publish();
+}
+
+void TurboPhotonCamera::UpdateSim(const frc::Pose2d& robotPose) {
+  if constexpr (frc::RobotBase::IsSimulation()) {
+    systemSim->Update(robotPose);
+  }
+}
+
+const frc::AprilTagFieldLayout& TurboPhotonCamera::GetLayout() {
+  try {
+    layout = frc::AprilTagFieldLayout{CameraConstants::kPathToAprilTagLayout};
+    frc::DataLogManager::Log("Successfully loaded edited json (April tag field layout)");
+  } catch (std::exception& e) {
+    frc::DataLogManager::Log("Failed to load edited json (April tag field layout): " + std::string(e.what()));
+    layout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
+  }
+
+  return layout;
+}
+
+std::vector<PoseTimestampPair> TurboPhotonCamera::FetchPose() {
+  std::vector<PoseTimestampPair> poses;
+
+  for (const auto& result : camera.GetAllUnreadResults()) {
+    if (auto visionEst = poseEstimator.Update(result)) {
+      poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
+    }
+  }
+
+  if (poses.empty()) {
+    seesTag = false;
+  } else {
+    seesTag = true;
+  }
+
+  return poses;
+}
