@@ -31,13 +31,6 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(TurboPhotonCamera& camera) {
 
   const std::vector<PoseTimestampPair> visionPoses = camera.FetchPose();
 
-  if (visionPoses.empty()) {
-    seesTag = false;
-    return;
-  }
-
-  seesTag = true;
-
   for (const auto& pair : visionPoses) {
     poseEstimator.AddVisionMeasurement(pair.getPose(), pair.getLatency());
   }
@@ -47,4 +40,17 @@ void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(camera);
   }
+}
+
+bool TurboPoseEstimator::SeesTag() const {
+  bool seesTag = false;
+
+  for (const auto& camera : localizationCameras) {
+    if (camera.SeesTag()) {
+      seesTag = true;
+      break;
+    }
+  }
+
+  return seesTag;
 }

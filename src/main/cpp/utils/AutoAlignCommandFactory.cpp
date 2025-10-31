@@ -124,8 +124,9 @@ frc2::CommandPtr AutoAlignCommandFactory::MakeAutoProcessorScoreCommand(
 
   auto goalSupplier = []() { return PathingConstants::kProcessorBlueScoringPosition; };
 
-  return FollowPrecisePathCommand(drive, goalSupplier).OnlyIf([poseSupplier, goalSupplier] {
-    return IsPoseSafeToDriveTo(poseSupplier(), goalSupplier(), PathingConstants::kMaxProcessorScoringDistance);
+  return FollowPrecisePathCommand(drive, goalSupplier)
+      .OnlyIf([poseSupplier, goalSupplier] {
+        return IsPoseSafeToDriveTo(poseSupplier(), goalSupplier(), PathingConstants::kMaxProcessorScoringDistance);
       })
       .WithName("Processor Auto Align");
 }

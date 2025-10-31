@@ -1,0 +1,3 @@
+[submodule "lib/turbolib"]
+	path = lib/turbolib
+	url = https://github.com/StarlessKnights/TurboLib.git

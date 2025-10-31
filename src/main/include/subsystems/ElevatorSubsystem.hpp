@@ -10,7 +10,7 @@
 #include "rev/SparkLowLevel.h"
 #include "rev/SparkMax.h"
 #include "rev/SparkRelativeEncoder.h"
-#include "utils/TurboLaserCAN.hpp"
+#include "sensors/TurboLaserCAN.hpp"
 
 class ElevatorSubsystem final : public frc2::SubsystemBase {
   rev::spark::SparkMax primaryMotor{ElevatorSubsystemConstants::kPrimaryMotorID,

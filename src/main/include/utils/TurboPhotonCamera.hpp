@@ -29,10 +29,13 @@ class TurboPhotonCamera {
 
   nt::StructArrayPublisher<frc::Pose2d> visionTargetPublisher;
 
+  bool seesTag = false;
+
  public:
   TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace);
   void UpdateSim(const frc::Pose2d& robotPose);
   const frc::AprilTagFieldLayout& GetLayout();
   std::vector<PoseTimestampPair> FetchPose();
   static int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
+  bool SeesTag() const { return seesTag; }
 };

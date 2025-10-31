@@ -6,6 +6,7 @@
 #include <array>
 
 #include "constants/Constants.h"
+
 #include "frc/estimator/SwerveDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -16,7 +17,6 @@
 class TurboPoseEstimator {
  private:
   frc::SwerveDrivePoseEstimator<4> poseEstimator;
-  bool seesTag;
 
   std::array<TurboPhotonCamera, 2> localizationCameras = {
       TurboPhotonCamera(CameraConstants::kLocalizationCamOneName, CameraConstants::kLocalizationCamOneOffset),
@@ -28,7 +28,7 @@ class TurboPoseEstimator {
  public:
   TurboPoseEstimator(const frc::Rotation2d& gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,
                      const frc::Pose2d& initialPose)
-      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions, initialPose), seesTag(false) {}
+      : poseEstimator(DriveSubsystemConstants::kKinematics, gyroAngle, modulePositions, initialPose) {}
 
   frc::Pose2d GetPose2D() const;
   void ResetEstimatorPosition(const frc::Rotation2d& gyroAngle,
@@ -38,5 +38,5 @@ class TurboPoseEstimator {
   void TryVisionUpdateWithCamera(TurboPhotonCamera& camera);
   void UpdateWithAllAvailableVisionMeasurements();
 
-  bool SeesTag() const { return seesTag; }
+  bool SeesTag() const;
 };

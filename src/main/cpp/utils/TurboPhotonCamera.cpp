@@ -21,7 +21,6 @@
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
 #include "photon/simulation/SimCameraProperties.h"
-#include "photon/targeting/PhotonPipelineResult.h"
 #include "units/frequency.h"
 #include "units/time.h"
 #include "utils/PoseTimestampPair.hpp"
@@ -75,6 +74,12 @@ std::vector<PoseTimestampPair> TurboPhotonCamera::FetchPose() {
     if (auto visionEst = poseEstimator.Update(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
     }
+  }
+
+  if (poses.empty()) {
+    seesTag = false;
+  } else {
+    seesTag = true;
   }
 
   return poses;

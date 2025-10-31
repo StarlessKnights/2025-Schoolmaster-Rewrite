@@ -18,6 +18,7 @@
 #include "utils/TurboPoseEstimator.hpp"
 
 #include <frc/DataLogManager.h>
+#include <frc2/command/FunctionalCommand.h>
 
 DriveSubsystem::DriveSubsystem()
     : fleft(DriveSubsystemConstants::kFrontLeftDriveID, DriveSubsystemConstants::kFrontLeftSteerID,
@@ -32,7 +33,7 @@ DriveSubsystem::DriveSubsystem()
       bright(DriveSubsystemConstants::kBackRightDriveID, DriveSubsystemConstants::kBackRightSteerID,
              DriveSubsystemConstants::kBackRightEncoderID, DriveSubsystemConstants::kBackRightOffset,
              DriveSubsystemConstants::kCanivoreName),
-      estimator(GetAngle(), GetModulePositions(), frc::Pose2d()) {
+      estimator(GetAngle(), GetModulePositions(), frc::Pose2d(9.506_m, 4.067_m, 0_deg)) {
   m_posePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Publish();
   m_speedsPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("Speeds").Publish();
   m_swerveStatesPublisher =
@@ -93,6 +94,24 @@ std::array<frc::SwerveModulePosition, 4> DriveSubsystem::GetModulePositions() {
 
 frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() const {
   return GetAngle() - driverGyroOffset;
+}
+
+// Note: only temporary functions should be passed in as this function is only designed to take in rvalue references
+frc2::CommandPtr DriveSubsystem::DriveCommand(std::function<double()>&& xSpeed, std::function<double()>&& ySpeed,
+                                              std::function<double()>&& rotSpeed) {
+  return frc2::FunctionalCommand(
+             [] {},
+             [this, xSpeed = std::move(xSpeed), ySpeed = std::move(ySpeed), rotSpeed = std::move(rotSpeed)] {
+               const frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+                   ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                   xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                   rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed, GetDriverGyroAngle());
+
+               Drive(fieldRelativeSpeeds);
+             },
+             [](bool) {}, [] { return false; }, {this})
+      .ToPtr()
+      .WithName("DriveCommand");
 }
 
 void DriveSubsystem::Periodic() {
