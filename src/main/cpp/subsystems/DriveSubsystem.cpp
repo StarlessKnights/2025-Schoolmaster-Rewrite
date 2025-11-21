@@ -101,21 +101,24 @@ frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() const {
 
 frc2::CommandPtr DriveSubsystem::DriveCommand(std::function<double()> xSpeed, std::function<double()> ySpeed,
                                               std::function<double()> rotSpeed) {
-  return frc2::FunctionalCommand([] {},
-                                 [=, this] {
-                                   const frc::ChassisSpeeds cmdSpeeds =
-                                       frc::ChassisSpeeds{ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
-                                                          xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
-                                                          rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed};
+  return frc2::FunctionalCommand(
+             [] {},
+             [=, this] {
+               const frc::ChassisSpeeds cmdSpeeds =
+                   frc::ChassisSpeeds{ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                                      xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                                      rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed};
 
-                                   m_cmdSpeedsPublisher.Set(cmdSpeeds);
+               m_cmdSpeedsPublisher.Set(cmdSpeeds);
 
-                                   const frc::ChassisSpeeds fieldRelativeSpeeds =
-                                       frc::ChassisSpeeds::FromRobotRelativeSpeeds(cmdSpeeds, GetDriverGyroAngle());
+               const frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+                   ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                   xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                   rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed, GetDriverGyroAngle());
 
-                                   Drive(fieldRelativeSpeeds);
-                                 },
-                                 [](bool) {}, [] { return false; }, {this})
+               Drive(fieldRelativeSpeeds);
+             },
+             [](bool) {}, [] { return false; }, {this})
       .ToPtr()
       .WithName("DriveCommand");
 }
