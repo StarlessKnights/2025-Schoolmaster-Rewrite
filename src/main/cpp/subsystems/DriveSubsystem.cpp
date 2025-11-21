@@ -38,10 +38,13 @@ DriveSubsystem::DriveSubsystem()
   m_speedsPublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("Speeds").Publish();
   m_swerveStatesPublisher =
       nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::SwerveModuleState>("SwerveStates").Publish();
+  m_cmdSpeedsPublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::ChassisSpeeds>("CmdSpeeds").Publish();
 
   m_posePublisher.Set(frc::Pose2d());
   m_speedsPublisher.Set(frc::ChassisSpeeds());
   m_swerveStatesPublisher.Set(GetModuleStates());
+  m_cmdSpeedsPublisher.Set(frc::ChassisSpeeds());
 
   m_lastTime = frc::Timer::GetFPGATimestamp();
 
@@ -96,20 +99,23 @@ frc::Rotation2d DriveSubsystem::GetDriverGyroAngle() const {
   return GetAngle() - driverGyroOffset;
 }
 
-// Note: only temporary functions should be passed in as this function is only designed to take in rvalue references
-frc2::CommandPtr DriveSubsystem::DriveCommand(std::function<double()>&& xSpeed, std::function<double()>&& ySpeed,
-                                              std::function<double()>&& rotSpeed) {
-  return frc2::FunctionalCommand(
-             [] {},
-             [this, xSpeed = std::move(xSpeed), ySpeed = std::move(ySpeed), rotSpeed = std::move(rotSpeed)] {
-               const frc::ChassisSpeeds fieldRelativeSpeeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                   ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
-                   xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
-                   rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed, GetDriverGyroAngle());
+frc2::CommandPtr DriveSubsystem::DriveCommand(std::function<double()> xSpeed, std::function<double()> ySpeed,
+                                              std::function<double()> rotSpeed) {
+  return frc2::FunctionalCommand([] {},
+                                 [=, this] {
+                                   const frc::ChassisSpeeds cmdSpeeds =
+                                       frc::ChassisSpeeds{ySpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                                                          xSpeed() * DriveSubsystemConstants::kMaxLinearSpeed,
+                                                          rotSpeed() * DriveSubsystemConstants::kMaxAngularSpeed};
 
-               Drive(fieldRelativeSpeeds);
-             },
-             [](bool) {}, [] { return false; }, {this})
+                                   m_cmdSpeedsPublisher.Set(cmdSpeeds);
+
+                                   const frc::ChassisSpeeds fieldRelativeSpeeds =
+                                       frc::ChassisSpeeds::FromRobotRelativeSpeeds(cmdSpeeds, GetDriverGyroAngle());
+
+                                   Drive(fieldRelativeSpeeds);
+                                 },
+                                 [](bool) {}, [] { return false; }, {this})
       .ToPtr()
       .WithName("DriveCommand");
 }

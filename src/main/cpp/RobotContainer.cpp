@@ -64,6 +64,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() const {
 void RobotContainer::ConfigureBindings() {
   m_driverController.Y().OnTrue(
       frc2::cmd::RunOnce([this] { m_driveSubsystem.DriverGyroZero(); }).WithName("Reset Gyro"));
+
+  // m_driverController.LeftTrigger(0.25).WhileTrue(MakeSlowFieldDriveCommand());
 }
 
 void RobotContainer::ConfigureElevatorBindings() {

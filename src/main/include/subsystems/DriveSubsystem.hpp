@@ -33,6 +33,7 @@ class DriveSubsystem final : public frc2::SubsystemBase {
 
   nt::StructPublisher<frc::Pose2d> m_posePublisher;
   nt::StructPublisher<frc::ChassisSpeeds> m_speedsPublisher;
+  nt::StructPublisher<frc::ChassisSpeeds> m_cmdSpeedsPublisher;
   nt::StructArrayPublisher<frc::SwerveModuleState> m_swerveStatesPublisher;
 
  public:
@@ -65,8 +66,8 @@ class DriveSubsystem final : public frc2::SubsystemBase {
 
   TurboPoseEstimator& GetPoseEstimator() { return estimator; }
 
-  frc2::CommandPtr DriveCommand(std::function<double()>&& xSpeed, std::function<double()>&& ySpeed,
-                                std::function<double()>&& rotSpeed);
+  frc2::CommandPtr DriveCommand(std::function<double()> xSpeed, std::function<double()> ySpeed,
+                                std::function<double()> rotSpeed);
 
   void Periodic() override;
   void SimulationPeriodic() override;
